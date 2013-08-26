@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <relativePath>../CommitComment/pom.xml</relativePath>
+    <groupId>unal.edu.co</groupId>
+    <artifactId>CommitComment</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>unal.edu.co.p2update</artifactId>
+  <packaging>eclipse-repository</packaging>
+</project> 
