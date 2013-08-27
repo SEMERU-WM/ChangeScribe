@@ -1,0 +1,62 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>unal.edu.co</groupId>
+	<artifactId>CommitGenerator</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Commit comment generator</name>
+	<description>An algorithm to generate commit comments of Java programs</description>
+
+
+	<!-- Global properties -->
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.resources.sourceEncoding>UTF-8</project.resources.sourceEncoding>
+
+		<compiler.source>1.7</compiler.source>
+
+	</properties>
+
+	<dependencies>
+		<!-- Change Distiller for AST differencing -->
+		<dependency>
+			<groupId>ch.uzh.ifi.seal</groupId>
+			<artifactId>changedistiller</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.jgit</groupId>
+			<artifactId>org.eclipse.jgit</artifactId>
+			<version>3.0.0.201306101825-r</version>
+		</dependency>
+
+		<!-- Smart HTTP Servlet -->
+		<dependency>
+			<groupId>org.eclipse.jgit</groupId>
+			<artifactId>org.eclipse.jgit.http.server</artifactId>
+			<version>3.0.0.201306101825-r</version>
+		</dependency>
+
+		<!-- AWT UI Helpers -->
+		<dependency>
+			<groupId>org.eclipse.jgit</groupId>
+			<artifactId>org.eclipse.jgit.ui</artifactId>
+			<version>3.0.0.201306101825-r</version>
+		</dependency>
+
+		<!-- JUnit Test Support -->
+		<dependency>
+			<groupId>org.eclipse.jgit</groupId>
+			<artifactId>org.eclipse.jgit.junit</artifactId>
+			<version>3.0.0.201306101825-r</version>
+		</dependency>
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>jgit-repository</id>
+			<url>http://download.eclipse.org/jgit/maven</url>
+		</repository>
+	</repositories>
+</project>
