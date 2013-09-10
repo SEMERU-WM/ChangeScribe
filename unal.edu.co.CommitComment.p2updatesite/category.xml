@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<site>
-   <bundle id="unal.edu.co.CommitComment.feature" version="1.0.0.qualifier">
-      <category name="new_category_1"/>
-   </bundle>
-   <category-def name="new_category_1" label="New Category 1"/>
-</site>

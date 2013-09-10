@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.internal.compiler.ast.ASTNode;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
