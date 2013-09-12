@@ -9,4 +9,12 @@
 	<artifactId>CommitSummarizer.site</artifactId>
 	<packaging>eclipse-repository</packaging>
 	<name>CommitSummarizer :: update site</name>
+	
+	<dependencies>
+	 	<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+		</dependency>
+	</dependencies>
 </project>

@@ -5,7 +5,8 @@ Bundle-SymbolicName: CommitSummarizer.core;singleton:=true
 Bundle-Version: 0.0.1.qualifier
 Bundle-Activator: co.edu.unal.colswe.CommitSummarizer.core.Activator
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.jgit;bundle-version="3.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,
  JavaSE-1.6

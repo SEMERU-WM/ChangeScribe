@@ -1,10 +1,18 @@
 package co.edu.unal.colswe.CommitSummarizer.core;
 
+import java.util.Set;
+
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.Status;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.eclipse.jface.dialogs.MessageDialog;
+
+import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
+import co.edu.unal.colswe.CommitSummarizer.core.git.SCMRepository;
 
 /**
  * Our sample action implements workbench action delegate.
@@ -29,10 +37,27 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 	 * @see IWorkbenchWindowActionDelegate#run
 	 */
 	public void run(IAction action) {
-		MessageDialog.openInformation(
-			window.getShell(),
-			"Eclipse Plugin Archetype",
-			"Hello, Maven+Eclipse world,\n CommitSummarizer is built with Tycho");
+		
+		SCMRepository repo = new SCMRepository();
+		Git git = repo.getGit();
+		
+		Status status = null;
+		try {
+			status = repo.getStatus();
+		} catch (NoWorkTreeException e) {
+			e.printStackTrace();
+		} catch (GitAPIException e) {
+			e.printStackTrace();
+		} 
+		
+		Set<ChangedFile> differences = SCMRepository.getDifferences(status,git.getRepository().getWorkTree().getAbsolutePath());
+		
+		//MyTitleAreaDialog areaDialog = new MyTitleAreaDialog(window.getShell());
+		FilesChangedListDialog listDialog = new FilesChangedListDialog(window.getShell(), differences);
+	    
+	    
+	    listDialog.create();
+	    listDialog.open();
 	}
 
 	/**

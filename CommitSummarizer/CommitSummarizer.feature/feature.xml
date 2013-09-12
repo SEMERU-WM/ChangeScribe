@@ -16,6 +16,16 @@
       [Enter License Description here.]
    </license>
 
+   <includes
+         id="org.eclipse.jgit"
+         version="0.0.0"
+         name="jgit"/>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+   </requires>
+
    <plugin
          id="CommitSummarizer.core"
          download-size="0"
