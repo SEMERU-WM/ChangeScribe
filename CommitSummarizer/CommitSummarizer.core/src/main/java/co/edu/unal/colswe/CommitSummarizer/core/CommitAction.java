@@ -22,12 +22,12 @@ import co.edu.unal.colswe.CommitSummarizer.core.git.SCMRepository;
  * delegated to it.
  * @see IWorkbenchWindowActionDelegate
  */
-public class SampleAction implements IWorkbenchWindowActionDelegate {
+public class CommitAction implements IWorkbenchWindowActionDelegate {
 	private IWorkbenchWindow window;
 	/**
 	 * The constructor.
 	 */
-	public SampleAction() {
+	public CommitAction() {
 	}
 
 	/**
@@ -50,14 +50,20 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 			e.printStackTrace();
 		} 
 		
-		Set<ChangedFile> differences = SCMRepository.getDifferences(status,git.getRepository().getWorkTree().getAbsolutePath());
+		if(git != null) {
+			Set<ChangedFile> differences = SCMRepository.getDifferences(status,git.getRepository().getWorkTree().getAbsolutePath());
+			
+			//MyTitleAreaDialog areaDialog = new MyTitleAreaDialog(window.getShell());
+			FilesChangedListDialog listDialog = new FilesChangedListDialog(window.getShell(), differences);
+		    
+		    
+		    listDialog.create();
+		    listDialog.open();
+		} else {
+			
+		}
 		
-		//MyTitleAreaDialog areaDialog = new MyTitleAreaDialog(window.getShell());
-		FilesChangedListDialog listDialog = new FilesChangedListDialog(window.getShell(), differences);
-	    
-	    
-	    listDialog.create();
-	    listDialog.open();
+		
 	}
 
 	/**

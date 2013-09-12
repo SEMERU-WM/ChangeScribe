@@ -2,11 +2,19 @@ package co.edu.unal.colswe.CommitSummarizer.core.ast;
 
 import java.util.Vector;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 public class ProjectInformation {
 	private int totalIUnits;
@@ -70,6 +78,36 @@ public class ProjectInformation {
 			System.err
 					.println("Oops! An error occured when computing project information");
 		}
+	}
+	
+	public static IResource getSelectedProject() {
+		IWorkbench iworkbench = PlatformUI.getWorkbench();
+		IWorkbenchWindow iworkbenchwindow = null;
+		IWorkbenchPage iworkbenchpage = null;
+		if (iworkbench != null) {
+			iworkbenchwindow = iworkbench.getActiveWorkbenchWindow();
+		} 
+		if (iworkbenchwindow != null) {
+			iworkbenchpage = iworkbenchwindow.getActivePage();
+		}
+		ISelection selection = iworkbenchpage.getSelection();
+	   //the current selection in the navigator view
+	   
+		return extractSelection(selection);
+	}
+	
+	public static IResource extractSelection(ISelection sel) {
+		if (!(sel instanceof IStructuredSelection))
+			return null;
+		IStructuredSelection ss = (IStructuredSelection) sel;
+		Object element = ss.getFirstElement();
+		if (element instanceof IResource)
+			return (IResource) element;
+		if (!(element instanceof IAdaptable))
+			return null;
+		IAdaptable adaptable = (IAdaptable) element;
+		Object adapter = adaptable.getAdapter(IResource.class);
+		return (IResource) adapter;
 	}
 
 	public int getTotalUnits() {
