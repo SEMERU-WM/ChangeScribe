@@ -10,4 +10,12 @@
   <packaging>eclipse-test-plugin</packaging>
   <name>CommitSummarizer :: test</name>
   <description>CommitSummarizer Test Plugin</description>
+  
+  <dependencies>
+ 	<dependency>
+		<groupId>junit</groupId>
+		<artifactId>junit</artifactId>
+		<version>4.11</version>
+	</dependency>
+</dependencies>
 </project>
