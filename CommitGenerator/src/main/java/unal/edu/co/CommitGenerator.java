@@ -5,15 +5,19 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
 
+import unal.edu.co.ast.JParser;
 import unal.edu.co.ast.JavaASTParser;
 import unal.edu.co.repository.git.ChangedFile;
 import unal.edu.co.repository.git.ChangedFile.TypeChange;
 import unal.edu.co.repository.git.SCMRepository;
+import unal.edu.co.stereotype.StereotypedMethod;
+import unal.edu.co.stereotype.TypeAnalyzer;
 import unal.edu.co.textgenerator.ChangeDescriptor;
 import ch.uzh.ifi.seal.changedistiller.ChangeDistiller;
 import ch.uzh.ifi.seal.changedistiller.ChangeDistiller.Language;
@@ -58,11 +62,16 @@ public class CommitGenerator {
 					}
 				} else {
 					if(file.getAbsolutePath().endsWith(".java")) {
+						System.out.println("File: " + file.getAbsolutePath());
 						File right = new File(file.getAbsolutePath());
-						JavaASTParser parser = new JavaASTParser(right);
+						JParser parser = new JParser(right);
 						parser.parse();
-						for (ASTNode node : parser.getNodes()) {
-							System.out.println(node.getNodeType());
+						for (ASTNode node : parser.getElements()) {
+							TypeAnalyzer analyzer = new TypeAnalyzer((TypeDeclaration) node);
+							for (StereotypedMethod method : analyzer.getStereotypedMethods()) {
+								System.out.println("Stereotype: " + method.getStereotypes());
+							}
+							
 						}
 						
 					} else {

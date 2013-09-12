@@ -4,19 +4,24 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
+import unal.edu.co.stereotype.StereotypedMethod;
+import unal.edu.co.stereotype.TypeAnalyzer;
+
 public class TypeVisitor extends ASTVisitor {
 	private boolean isRoot;
+	private TypeAnalyzer typeAnalyzer = null; 
 
-	public TypeVisitor() {
+	public TypeVisitor(TypeAnalyzer typeAnalyzer) {
 		super();
 		this.isRoot = true;
+		this.typeAnalyzer = typeAnalyzer;
 	}
 
 	public boolean visit(final MethodDeclaration node) {
-		/*final StereotypedMethod stereotypedMethod = new StereotypedMethod(node);
+		final StereotypedMethod stereotypedMethod = new StereotypedMethod(node);
 		stereotypedMethod.findStereotypes();
-		TypeAnalyzer.this.report.append(stereotypedMethod.getReport());
-		TypeAnalyzer.this.stereotypedMethods.add(stereotypedMethod);*/
+		typeAnalyzer.getReport().append(stereotypedMethod.getReport());
+		typeAnalyzer.getStereotypedMethods().add(stereotypedMethod);
 		return super.visit(node);
 	}
 

@@ -73,7 +73,7 @@ public class JavaASTParser {
         
         for (final Object o : this.compilationUnit.types()) {
             if (!(o instanceof TypeDeclaration)) {
-                //continue;
+                continue;
             } 
             this.nodes.add((ASTNode)o);
         }
