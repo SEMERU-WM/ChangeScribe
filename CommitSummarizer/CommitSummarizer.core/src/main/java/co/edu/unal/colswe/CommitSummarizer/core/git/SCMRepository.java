@@ -5,6 +5,11 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -21,6 +26,13 @@ import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile.TypeChange;
 import co.edu.unal.colswe.CommitSummarizer.core.util.Utils;
@@ -29,16 +41,53 @@ public class SCMRepository {
 	
 	private Git git;
 	private Repository repository;
+	private IProject project;
 
 	public SCMRepository() {
 		super();
+		File file = new File(getSelectedProject().getLocationURI().getPath().toString());
 		try {
-			git = Git.open(new File("/home/fernandocortes/git/changecomment/"));
+			git = Git.open(file);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			try {
+				git = Git.open(file.getParentFile());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		// TODO Auto-generated constructor stub
+	}
+	
+	public IResource getSelectedProject() {
+		IWorkbench iworkbench = PlatformUI.getWorkbench();
+		IWorkbenchWindow iworkbenchwindow = null;
+		IWorkbenchPage iworkbenchpage = null;
+		if (iworkbench != null) {
+			iworkbenchwindow = iworkbench.getActiveWorkbenchWindow();
+		} 
+		if (iworkbenchwindow != null) {
+			iworkbenchpage = iworkbenchwindow.getActivePage();
+		}
+		ISelection selection = iworkbenchpage.getSelection();
+	   //the current selection in the navigator view
+	   
+		return extractSelection(selection);
+	}
+	
+	public static IResource extractSelection(ISelection sel) {
+		if (!(sel instanceof IStructuredSelection))
+			return null;
+		IStructuredSelection ss = (IStructuredSelection) sel;
+		Object element = ss.getFirstElement();
+		if (element instanceof IResource)
+			return (IResource) element;
+		if (!(element instanceof IAdaptable))
+			return null;
+		IAdaptable adaptable = (IAdaptable) element;
+		Object adapter = adaptable.getAdapter(IResource.class);
+		return (IResource) adapter;
 	}
 	
 	public Repository getRepository() {
