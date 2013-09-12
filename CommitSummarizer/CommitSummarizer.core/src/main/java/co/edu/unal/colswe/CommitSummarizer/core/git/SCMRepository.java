@@ -45,7 +45,7 @@ public class SCMRepository {
 
 	public SCMRepository() {
 		super();
-		File file = new File(getSelectedProject().getLocationURI().getPath().toString());
+		File file = new File(getSelectedProject().getProject().getLocationURI().getPath().toString());
 		try {
 			git = Git.open(file);
 		} catch (IOException e) {
