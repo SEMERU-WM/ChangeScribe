@@ -3,6 +3,7 @@ package co.edu.unal.colswe.CommitSummarizer.core;
 import java.util.Set;
 
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
@@ -10,7 +11,6 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
@@ -64,7 +64,7 @@ public class CommitViewAction implements IViewActionDelegate {
 		    listDialog.create();
 		    listDialog.open();
 		} else {
-			
+			MessageDialog.openInformation(view.getSite().getShell(), "Info", "Git repository not found!");
 		}
 		
 		
