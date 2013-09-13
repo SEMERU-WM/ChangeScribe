@@ -2,6 +2,8 @@ package co.edu.unal.colswe.CommitSummarizer.core.ast;
 
 import java.util.Vector;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -11,6 +13,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -109,6 +112,54 @@ public class ProjectInformation {
 		Object adapter = adaptable.getAdapter(IResource.class);
 		return (IResource) adapter;
 	}
+	
+	public static IProject getProject(ISelection selection) {
+        IProject project = null;
+        if (selection != null && selection.isEmpty() == false
+                && selection instanceof IStructuredSelection) {
+            IStructuredSelection ssel = (IStructuredSelection) selection;
+            if (ssel.size() == 1) {
+                Object obj = ssel.getFirstElement();
+                if (ssel instanceof TreeSelection) {
+                    TreeSelection ts = (TreeSelection) ssel;
+                    obj = ts.getPaths()[0].getFirstSegment();
+                } else {
+                    obj = ssel.getFirstElement();
+                }
+                if (obj instanceof IJavaProject) {
+                    return ((IJavaProject) obj).getProject();
+                }
+                if (obj instanceof IResource) {
+                    project = getProject((IResource) obj);
+                } else if (obj instanceof IJavaProject) {
+                    project = ((IJavaProject) obj).getProject();
+                }
+            }
+        }
+        return project;
+    }
+	
+	/**
+     * Find a project that has the Vaadin project facet based on a resource.
+     * 
+     * If the resource is an element in a suitable project, return that project.
+     * 
+     * Otherwise, return null.
+     * 
+     * @param selection
+     * @return a Vaadin project or null
+     */
+    public static IProject getProject(IResource resource) {
+        IContainer container = null;
+        IProject project = null;
+        if (resource instanceof IContainer) {
+            container = (IContainer) resource;
+        } else if (resource != null) {
+            container = (resource).getParent();
+        }
+        return project;
+    }
+
 
 	public int getTotalUnits() {
 		return this.totalIUnits;

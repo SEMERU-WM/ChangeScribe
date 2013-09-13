@@ -1,5 +1,10 @@
 package co.edu.unal.colswe.CommitSummarizer.core.git;
 
+import java.io.File;
+
+import co.edu.unal.colswe.CommitSummarizer.core.ast.ProjectInformation;
+import co.edu.unal.colswe.CommitSummarizer.core.util.Utils;
+
 public class ChangedFile {
 	
 	
@@ -15,7 +20,7 @@ public class ChangedFile {
 		super();
 		this.path = path;
 		this.changeType = changeType;
-		this.absolutePath = rootPath + "/" + path;
+		this.absolutePath = rootPath + System.getProperty("file.separator") + (new File(path).getPath());
 	}
 
 
@@ -54,7 +59,7 @@ public class ChangedFile {
 	@Override
 	public String toString() {
 		//return "ChangedFile [path=" + path + ", changeType=" + changeType + "]";
-		return path;
+		return "" + changeType + " - " + path;
 	}
 
 	public String getAbsolutePath() {

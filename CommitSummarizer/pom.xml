@@ -9,6 +9,11 @@
   <description>CommitSummarizer parent</description>
   
   <dependencies>
+  	<dependency>
+		<groupId>ch.uzh.ifi.seal</groupId>
+		<artifactId>changedistiller</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</dependency>
  	<dependency>
 		<groupId>junit</groupId>
 		<artifactId>junit</artifactId>

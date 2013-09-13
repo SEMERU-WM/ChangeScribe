@@ -10,4 +10,13 @@
   <packaging>eclipse-plugin</packaging>
   <name>CommitSummarizer :: core</name>
   <description>CommitSummarizer Core Plugin</description>
+  
+  <dependencies>
+  	<!-- Change Distiller for AST differencing -->
+	<dependency>
+		<groupId>ch.uzh.ifi.seal</groupId>
+		<artifactId>changedistiller</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</dependency> 
+  </dependencies>
 </project>

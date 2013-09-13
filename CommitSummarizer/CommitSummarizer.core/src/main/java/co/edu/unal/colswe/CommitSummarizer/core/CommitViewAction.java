@@ -58,7 +58,7 @@ public class CommitViewAction implements IViewActionDelegate {
 			Set<ChangedFile> differences = SCMRepository.getDifferences(status,git.getRepository().getWorkTree().getAbsolutePath());
 			
 			//MyTitleAreaDialog areaDialog = new MyTitleAreaDialog(window.getShell());
-			FilesChangedListDialog listDialog = new FilesChangedListDialog(view.getSite().getShell(), differences);
+			FilesChangedListDialog listDialog = new FilesChangedListDialog(view.getSite().getShell(), differences, git);
 		    
 		    
 		    listDialog.create();

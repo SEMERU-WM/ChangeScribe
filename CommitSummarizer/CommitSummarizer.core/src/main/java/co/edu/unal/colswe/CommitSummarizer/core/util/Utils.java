@@ -73,5 +73,14 @@ public class Utils {
 		return contentFile;
 		
 	}
+	
+	public static String cleanRelativePath(String path) {
+		String newPath = path;
+		if(!System.getProperty("path.separator").equals("\\")) {
+			newPath.replaceAll("/", System.getProperty("file.separator"));
+		}
+		return newPath;
+		
+	}
 
 }

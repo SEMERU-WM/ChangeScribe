@@ -54,7 +54,7 @@ public class CommitAction implements IWorkbenchWindowActionDelegate {
 			Set<ChangedFile> differences = SCMRepository.getDifferences(status,git.getRepository().getWorkTree().getAbsolutePath());
 			
 			//MyTitleAreaDialog areaDialog = new MyTitleAreaDialog(window.getShell());
-			FilesChangedListDialog listDialog = new FilesChangedListDialog(window.getShell(), differences);
+			FilesChangedListDialog listDialog = new FilesChangedListDialog(window.getShell(), differences, git);
 		    
 		    
 		    listDialog.create();
