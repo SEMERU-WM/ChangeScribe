@@ -1,4 +1,4 @@
-package co.edu.unal.colswe.CommitSummarizer.core.stereotype;
+package co.edu.unal.colswe.CommitSummarizer.core.stereotype.analyzer;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -26,6 +26,9 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+
+import co.edu.unal.colswe.CommitSummarizer.core.stereotype.information.TypeInfo;
+import co.edu.unal.colswe.CommitSummarizer.core.stereotype.information.VariableInfo;
 
 public class MethodAnalyzer
 {
@@ -237,8 +240,12 @@ public class MethodAnalyzer
             this.inMethodArguments = 0;
             this.assignedVariableIndex = -1;
             this.assignedParameterIndex = -1;
-            MethodAnalyzer.access$0(MethodAnalyzer.this, node.resolveBinding().getDeclaringClass());
-            MethodAnalyzer.access$2(MethodAnalyzer.this, MethodAnalyzer.this.declaringClass.isAnonymous());
+            if(node.resolveBinding() != null) {
+            	MethodAnalyzer.access$0(MethodAnalyzer.this, node.resolveBinding().getDeclaringClass());
+            	MethodAnalyzer.access$2(MethodAnalyzer.this, MethodAnalyzer.this.declaringClass.isAnonymous());
+            }
+            
+            
             if (node.getBody() != null) {
                 MethodAnalyzer.access$3(MethodAnalyzer.this, true);
                 if (node.getBody().statements().size() > 0) {
@@ -247,11 +254,14 @@ public class MethodAnalyzer
             }
             MethodAnalyzer.access$5(MethodAnalyzer.this, node.isConstructor());
             MethodAnalyzer.access$6(MethodAnalyzer.this, node.getReturnType2());
-            MethodAnalyzer.access$7(MethodAnalyzer.this, node.resolveBinding().getKey().contains(";.clone()Ljava/lang/Object;"));
-            MethodAnalyzer.access$8(MethodAnalyzer.this, node.resolveBinding().getKey().contains(";.finalize()V"));
-            MethodAnalyzer.access$9(MethodAnalyzer.this, node.resolveBinding().getKey().contains(";.toString()Ljava/lang/String;"));
-            MethodAnalyzer.access$10(MethodAnalyzer.this, node.resolveBinding().getKey().contains(";.equals(Ljava/lang/Object;)Z"));
-            MethodAnalyzer.access$11(MethodAnalyzer.this, node.resolveBinding().getKey().contains(";.hashCode()I"));
+            if(node.resolveBinding() != null) {
+            	MethodAnalyzer.access$7(MethodAnalyzer.this, node.resolveBinding().getKey().contains(";.clone()Ljava/lang/Object;"));
+                MethodAnalyzer.access$8(MethodAnalyzer.this, node.resolveBinding().getKey().contains(";.finalize()V"));
+                MethodAnalyzer.access$9(MethodAnalyzer.this, node.resolveBinding().getKey().contains(";.toString()Ljava/lang/String;"));
+                MethodAnalyzer.access$10(MethodAnalyzer.this, node.resolveBinding().getKey().contains(";.equals(Ljava/lang/Object;)Z"));
+                MethodAnalyzer.access$11(MethodAnalyzer.this, node.resolveBinding().getKey().contains(";.hashCode()I"));
+            }
+            
             for (final Object o : node.parameters()) {
                 final SingleVariableDeclaration parameter = (SingleVariableDeclaration)o;
                 MethodAnalyzer.this.parameters.add(new VariableInfo(parameter.resolveBinding()));

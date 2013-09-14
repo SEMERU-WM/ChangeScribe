@@ -8,11 +8,11 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import unal.edu.co.ast.visitor.TypeVisitor;
 
-public class TypeAnalyzer {
+public class Type {
 	private List<StereotypedMethod> stereotypedMethods;
 	private StringBuilder report;
 
-	public TypeAnalyzer(final TypeDeclaration type) {
+	public Type(final TypeDeclaration type) {
 		super();
 		this.stereotypedMethods = new LinkedList<>();
 		this.report = new StringBuilder();

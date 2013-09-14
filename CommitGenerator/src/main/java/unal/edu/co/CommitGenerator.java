@@ -17,7 +17,7 @@ import unal.edu.co.repository.git.ChangedFile;
 import unal.edu.co.repository.git.ChangedFile.TypeChange;
 import unal.edu.co.repository.git.SCMRepository;
 import unal.edu.co.stereotype.StereotypedMethod;
-import unal.edu.co.stereotype.TypeAnalyzer;
+import unal.edu.co.stereotype.Type;
 import unal.edu.co.textgenerator.ChangeDescriptor;
 import ch.uzh.ifi.seal.changedistiller.ChangeDistiller;
 import ch.uzh.ifi.seal.changedistiller.ChangeDistiller.Language;
@@ -67,7 +67,7 @@ public class CommitGenerator {
 						JParser parser = new JParser(right);
 						parser.parse();
 						for (ASTNode node : parser.getElements()) {
-							TypeAnalyzer analyzer = new TypeAnalyzer((TypeDeclaration) node);
+							Type analyzer = new Type((TypeDeclaration) node);
 							for (StereotypedMethod method : analyzer.getStereotypedMethods()) {
 								System.out.println("Stereotype: " + method.getStereotypes());
 							}

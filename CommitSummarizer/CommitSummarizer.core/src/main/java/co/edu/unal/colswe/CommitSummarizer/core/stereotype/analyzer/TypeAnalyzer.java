@@ -1,4 +1,4 @@
-package co.edu.unal.colswe.CommitSummarizer.core.stereotype;
+package co.edu.unal.colswe.CommitSummarizer.core.stereotype.analyzer;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
+import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedMethod;
 import co.edu.unal.colswe.CommitSummarizer.core.visitor.TypeVisitor;
 
 public class TypeAnalyzer {
@@ -14,7 +15,7 @@ public class TypeAnalyzer {
 
 	public TypeAnalyzer(final TypeDeclaration type) {
 		super();
-		this.stereotypedMethods = new LinkedList();
+		this.stereotypedMethods = new LinkedList<StereotypedMethod>();
 		this.report = new StringBuilder();
 		final TypeVisitor visitor = new TypeVisitor(this);
 		type.accept((ASTVisitor) visitor);

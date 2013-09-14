@@ -5,13 +5,13 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import unal.edu.co.stereotype.StereotypedMethod;
-import unal.edu.co.stereotype.TypeAnalyzer;
+import unal.edu.co.stereotype.Type;
 
 public class TypeVisitor extends ASTVisitor {
 	private boolean isRoot;
-	private TypeAnalyzer typeAnalyzer = null; 
+	private Type typeAnalyzer = null; 
 
-	public TypeVisitor(TypeAnalyzer typeAnalyzer) {
+	public TypeVisitor(Type typeAnalyzer) {
 		super();
 		this.isRoot = true;
 		this.typeAnalyzer = typeAnalyzer;

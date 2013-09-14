@@ -4,8 +4,8 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
-import co.edu.unal.colswe.CommitSummarizer.core.stereotype.StereotypedMethod;
-import co.edu.unal.colswe.CommitSummarizer.core.stereotype.TypeAnalyzer;
+import co.edu.unal.colswe.CommitSummarizer.core.stereotype.analyzer.TypeAnalyzer;
+import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedMethod;
 
 public class TypeVisitor extends ASTVisitor {
 	private boolean isRoot;

@@ -1,8 +1,12 @@
-package co.edu.unal.colswe.CommitSummarizer.core.stereotype;
+package co.edu.unal.colswe.CommitSummarizer.core.stereotype.rules;
 
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.Type;
+
+import co.edu.unal.colswe.CommitSummarizer.core.stereotype.MethodStereotype;
+import co.edu.unal.colswe.CommitSummarizer.core.stereotype.analyzer.MethodAnalyzer;
+import co.edu.unal.colswe.CommitSummarizer.core.stereotype.information.VariableInfo;
 
 public class MethodStereotypeRules
 {

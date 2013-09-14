@@ -11,8 +11,8 @@ import org.eclipse.jgit.api.Git;
 import co.edu.unal.colswe.CommitSummarizer.core.ast.JParser;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile.TypeChange;
-import co.edu.unal.colswe.CommitSummarizer.core.stereotype.StereotypedMethod;
-import co.edu.unal.colswe.CommitSummarizer.core.stereotype.TypeAnalyzer;
+import co.edu.unal.colswe.CommitSummarizer.core.stereotype.analyzer.TypeAnalyzer;
+import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedMethod;
 import co.edu.unal.colswe.CommitSummarizer.core.util.Utils;
 
 public class SummarizeChanges {
@@ -51,7 +51,7 @@ public class SummarizeChanges {
 						for (ASTNode node : parser.getElements()) {
 							TypeAnalyzer analyzer = new TypeAnalyzer((TypeDeclaration) node);
 							for (StereotypedMethod method : analyzer.getStereotypedMethods()) {
-								System.out.println("Stereotype: " + method.getStereotypes());
+								System.out.println("Method: " + method.getQualifiedName() + "Stereotype: " + method.getStereotypes());
 							}
 							
 						}
