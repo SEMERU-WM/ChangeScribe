@@ -1,6 +1,7 @@
-package co.edu.unal.colswe.CommitSummarizer.core.stereotype;
+package co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy;
 
-public enum MethodStereotype {
+
+public enum MethodStereotype implements CodeStereotype {
     GET("GET", 0, Category.ACCESSOR, Subcategory.GET), 
     PREDICATE("PREDICATE", 1, Category.ACCESSOR, Subcategory.PREDICATE), 
     PROPERTY("PROPERTY", 2, Category.ACCESSOR, Subcategory.PROPERTY), 
@@ -85,7 +86,7 @@ public enum MethodStereotype {
         INCIDENTAL("INCIDENTAL", 14), 
         EMPTY("EMPTY", 15), 
         ABSTRACT("ABSTRACT", 16);
-        
+
         private String name;
         private int id;
         

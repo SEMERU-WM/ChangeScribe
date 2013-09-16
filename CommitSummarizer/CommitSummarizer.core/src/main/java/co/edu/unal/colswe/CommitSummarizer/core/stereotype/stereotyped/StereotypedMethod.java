@@ -13,10 +13,11 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 
-import co.edu.unal.colswe.CommitSummarizer.core.stereotype.MethodStereotype;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.analyzer.MethodAnalyzer;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.information.TypeInfo;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.rules.MethodStereotypeRules;
+import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.CodeStereotype;
+import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.MethodStereotype;
 
 public class StereotypedMethod extends MethodStereotypeRules implements
 		StereotypedElement {
@@ -37,8 +38,8 @@ public class StereotypedMethod extends MethodStereotypeRules implements
 		this.report = new StringBuilder();
 	}
 
-	public List<MethodStereotype> getStereotypes() {
-		final ArrayList<MethodStereotype> stereotypes = new ArrayList<MethodStereotype>();
+	public List<CodeStereotype> getStereotypes() {
+		final ArrayList<CodeStereotype> stereotypes = new ArrayList<CodeStereotype>();
 		if (this.primaryStereotype != null) {
 			stereotypes.add(this.primaryStereotype);
 		}

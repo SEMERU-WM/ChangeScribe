@@ -2,9 +2,6 @@ package co.edu.unal.colswe.CommitSummarizer.core.git;
 
 import java.io.File;
 
-import co.edu.unal.colswe.CommitSummarizer.core.ast.ProjectInformation;
-import co.edu.unal.colswe.CommitSummarizer.core.util.Utils;
-
 public class ChangedFile {
 	
 	

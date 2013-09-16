@@ -151,13 +151,12 @@ public class ProjectInformation {
      */
     public static IProject getProject(IResource resource) {
         IContainer container = null;
-        IProject project = null;
         if (resource instanceof IContainer) {
             container = (IContainer) resource;
         } else if (resource != null) {
             container = (resource).getParent();
         }
-        return project;
+        return container.getProject();
     }
 
 

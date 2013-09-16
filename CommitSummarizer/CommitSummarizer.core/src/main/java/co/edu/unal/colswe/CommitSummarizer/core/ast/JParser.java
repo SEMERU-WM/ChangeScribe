@@ -8,16 +8,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -38,9 +39,11 @@ public class JParser
     public JParser(final ICompilationUnit unit) {
         super();
         final ASTParser parser = ASTParser.newParser(4);
-        parser.setKind(8);
-        parser.setSource(unit);
         parser.setResolveBindings(true);
+        parser.setKind(8);
+        
+        parser.setSource(unit);
+        
         this.unit = (CompilationUnit)parser.createAST((IProgressMonitor)null);
         this.elements = new ArrayList<ASTNode>();
         try {
@@ -51,18 +54,31 @@ public class JParser
         }
     }
     
-    public JParser(final File file) {
+    public JParser(final File file) throws CoreException {
         super();
         final ASTParser parser = ASTParser.newParser(4);
         parser.setKind(8);
-        
-        IWorkspace workspace = ResourcesPlugin.getPlugin().getWorkspace();
-        IWorkspaceRoot root = workspace.getRoot();
-        
-        
-        parser.setSource(fileToString(file));
         parser.setResolveBindings(true);
-        this.unit = (CompilationUnit)parser.createAST((IProgressMonitor)null);
+        parser.setSource(fileToString(file));
+        
+        String projectName = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).getName();
+        if (ProjectInformation.getProject(ProjectInformation.getSelectedProject()).hasNature(JavaCore.NATURE_ID)) {
+			IJavaProject project = JavaCore.create(ProjectInformation.getSelectedProject().getWorkspace().getRoot()).getJavaProject(projectName);
+			project.open((IProgressMonitor) null);
+	        parser.setProject(project);
+	    }
+        
+        this.unit = (CompilationUnit) parser.createAST((IProgressMonitor)null);
+        
+        IProblem[] problems = this.unit.getProblems();
+	    if (problems != null && problems.length > 0) {
+	    	System.out.println("Got {} problems compiling the source file: " + problems.length);
+	        for (IProblem problem : problems) {
+	        	System.out.println("Got {} problems compiling the source file: " + problem);
+	        }
+	    }
+        
+        
         this.elements = new ArrayList<ASTNode>();
     }
     

@@ -6,12 +6,12 @@ import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.ChildPropertyDescriptor;
 import org.eclipse.jdt.core.dom.Javadoc;
 
-import co.edu.unal.colswe.CommitSummarizer.core.stereotype.MethodStereotype;
+import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.CodeStereotype;
 
 public interface StereotypedElement {
 	BodyDeclaration getElement();
 
-	List<MethodStereotype> getStereotypes();
+	List<CodeStereotype> getStereotypes();
 
 	List<StereotypedElement> getStereoSubElements();
 
