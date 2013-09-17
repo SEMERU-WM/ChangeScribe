@@ -19,7 +19,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.analyzer.TypeAnalyzer;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.information.TypeInfo;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.CodeStereotype;
-import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.MethodStereotype;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.TypeStereotype;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.TypeStereotypeRules;
 
