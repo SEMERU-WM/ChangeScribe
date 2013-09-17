@@ -1,4 +1,4 @@
-## tagger training invoked at Mon May 21 22:54:42 PDT 2012 with arguments:
+## tagger training invoked at Thu May 30 10:51:20 PDT 2013 with arguments:
                    model = english-left3words-distsim.tagger
                     arch = left3words,naacl2003unknowns,wordshapes(-1,1),distsim(/u/nlp/data/pos_tags_are_useless/egw4-reut.512.clusters,-1,1),distsimconjunction(/u/nlp/data/pos_tags_are_useless/egw4-reut.512.clusters,-1,1)
             wordFunction = 
@@ -32,3 +32,4 @@ rareWordMinFeatureThresh = 10
               outputFile = 
             outputFormat = slashTags
      outputFormatOptions = 
+                nthreads = 1

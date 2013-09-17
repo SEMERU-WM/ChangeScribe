@@ -6,19 +6,14 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jgit.api.Git;
 
-import co.edu.unal.colswe.CommitSummarizer.core.ast.JParser;
 import co.edu.unal.colswe.CommitSummarizer.core.ast.ProjectInformation;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile.TypeChange;
-import co.edu.unal.colswe.CommitSummarizer.core.stereotype.analyzer.TypeAnalyzer;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypeIdentifier;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedElement;
-import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedMethod;
+import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.MethodPhraseGenerator;
 import co.edu.unal.colswe.CommitSummarizer.core.util.Utils;
 
 public class SummarizeChanges {
@@ -51,6 +46,7 @@ public class SummarizeChanges {
 						
 					}*/
 				} else {
+					MethodPhraseGenerator phraseGenerator = new MethodPhraseGenerator();
 					if(file.getAbsolutePath().endsWith(".java")) {
 						System.out.println("File: " + file.getAbsolutePath());
 						//File right = new File(file.getAbsolutePath());
@@ -63,9 +59,10 @@ public class SummarizeChanges {
 						stereotypeIdentifier.identifyStereotypes();
 												
 						for (StereotypedElement element : stereotypeIdentifier.getStereotypedElements()) {
-							System.out.println("Class: " + element.getQualifiedName() + "Stereotype: " + element.getStereotypes());
+							System.out.println("Class: " + element.getQualifiedName() + " - Stereotype: " + element.getStereotypes());
 							for (StereotypedElement method : element.getStereoSubElements()) {
-								System.out.println("Method: " + method.getQualifiedName() + "Stereotype: " + method.getStereotypes());
+								System.out.println("Method: " + method.getQualifiedName() + " - Stereotype: " + method.getStereotypes());
+								phraseGenerator.generate(method.getQualifiedName(), "BASIC", method, element);
 							}
 						}
 						

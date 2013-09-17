@@ -1,6 +1,5 @@
 package co.edu.unal.colswe.CommitSummarizer.core.textgenerator.pos;
 
-import java.io.IOException;
 import java.util.LinkedList;
 
 import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.tokenizer.Tokenizer;
@@ -11,16 +10,9 @@ public class POSTagger {
 
 	private static void init() {
 		if (POSTagger.tagger == null) {
-			try {
-				POSTagger.tagger = new MaxentTagger(
-						"res/taggers/wsj-0-18-bidirectional-distsim.tagger");
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+				POSTagger.tagger = new MaxentTagger( 
+						"res/taggers/wsj-0-18-left3words-distsim.tagger");
+			
 		}
 	}
 
@@ -45,9 +37,7 @@ public class POSTagger {
 		return taggedTerms;
 	}
 
-	public static void main(final String[] args) throws ClassNotFoundException, IOException {
-		MaxentTagger tagger2 =  new MaxentTagger(
-				"res/taggers/wsj-0-18-bidirectional-distsim.tagger");
+	public static void main(final String[] args) {
 		final String[] identifiers = { "setUIFont", "UncaughtExceptions",
 				"ShowStatusBar", "CompareTo", "MousePressed",
 				"ActionPerformed", "AfterSave", "ToString", "Length", "Weigth",
@@ -56,7 +46,6 @@ public class POSTagger {
 				"DragDropEnd", "computesWeigth", "showAboutDialog",
 				"setSelectedSong", "hasLeadingComment", "mouseMove", "keyDown",
 				"drawingRequestUpdate" };
-		final POSTagger t = new POSTagger();
 		for (int i = 0; i < identifiers.length; ++i) {
 			for (final TaggedTerm tt : tag(Tokenizer.split(identifiers[i]))) {
 				System.out.print(tt + "  ");
