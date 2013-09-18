@@ -23,6 +23,36 @@ public class PhraseUtils {
 		return Tag.isNoun(term.getTag());
 	}
 	
+	public static boolean isThirdPersonVerb(TaggedTerm term) {
+		return Tag.isThirdPersonVerb(term.getTag());
+	}
+	
+	public static boolean isPastOrPastPartVerb(TaggedTerm term) {
+		return Tag.isPastOrPastPartVerb(term.getTag());
+	}
+	
+	public static boolean hasNounOrAdjective(List<TaggedTerm> taggedPhrase) {
+        for (final TaggedTerm taggedTerm : taggedPhrase) {
+            if (Tag.isNoun(taggedTerm.getTag()) || Tag.isAdjective(taggedTerm.getTag())) {
+                return true;
+            }
+        }
+        return false;
+    }
+	
+	public static boolean hasPrepositionOrAdverb(List<TaggedTerm> taggedPhrase) {
+        for (final TaggedTerm taggedTerm : taggedPhrase) {
+            if (Tag.isPrep(taggedTerm.getTag()) || Tag.isAdverb(taggedTerm.getTag())) {
+                return true;
+            }
+        }
+        return false;
+    }
+	
+	public static boolean hasTrailingPrepositionOrAdverb(List<TaggedTerm> taggedTerms) {
+        return Tag.isPrep(taggedTerms.get(taggedTerms.size() - 1).getTag()) || Tag.isAdverb(taggedTerms.get(taggedTerms.size() - 1).getTag());
+    }
+	
 	public static boolean containsPrepositions(List<TaggedTerm> terms) {
 		boolean contains = false;
 		for(TaggedTerm term : terms) {
