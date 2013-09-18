@@ -38,15 +38,16 @@ public class FilesChangedListDialog extends ListSelectionDialog {
 		Label lblCommitDescription = new Label(area, SWT.NONE);
 		lblCommitDescription.setText("Commit Description");
 		
-		text = new Text(area, SWT.BORDER | SWT.MULTI);
+		setText(new Text(area, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL));
 		GridData gd_text = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
 		gd_text.heightHint = 60;
-		text.setLayoutData(gd_text);
+		getText().setLayoutData(gd_text);
 		
 		Button button = new Button(area, SWT.RIGHT);
 		button.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 		button.setText("Create Message");
 		button.addSelectionListener(new SummarizeChangeListener(this));
+		
 
 		return area;
 	}
@@ -71,6 +72,14 @@ public class FilesChangedListDialog extends ListSelectionDialog {
 
 	public void setGit(Git git) {
 		this.git = git;
+	}
+
+	public Text getText() {
+		return text;
+	}
+
+	public void setText(Text text) {
+		this.text = text;
 	}
 
 }

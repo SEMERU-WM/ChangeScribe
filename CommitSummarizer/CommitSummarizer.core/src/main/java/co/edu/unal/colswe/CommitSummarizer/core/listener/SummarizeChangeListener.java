@@ -19,7 +19,9 @@ public class SummarizeChangeListener implements SelectionListener {
 	public void widgetSelected(SelectionEvent e) {
 		if(changedListDialog.getSelectedFiles() != null && changedListDialog.getSelectedFiles().length > 0) {
 			SummarizeChanges summarizer = new SummarizeChanges(changedListDialog.getGit());
+			
 			summarizer.summarize(changedListDialog.getSelectedFiles());
+			changedListDialog.getText().setText(summarizer.getComment().toString());;
 			MessageDialog.openInformation(changedListDialog.getShell(), "Info",
 					"Starting to build changes description for " + changedListDialog.getSelectedFiles().length + " selected files");
 		} else {

@@ -19,8 +19,16 @@ public class PhraseUtils {
 		return Tag.isVerb(term.getTag());
 	}
 	
-	public static boolean hasObjectInName(TaggedTerm term) {
-		return Tag.isNoun(term.getTag());
+	public static boolean hasObjectInName(List<TaggedTerm> taggedPhrase) {
+		boolean contains = false;
+		for(TaggedTerm term : taggedPhrase) {
+			
+			if(Tag.isNoun(term.getTag())) {
+				contains = true;
+				break;
+			}
+		}
+		return contains;
 	}
 	
 	public static boolean isThirdPersonVerb(TaggedTerm term) {
@@ -63,6 +71,42 @@ public class PhraseUtils {
 			}
 		}
 		return contains;
+	}
+	
+	public static boolean containsAdjetives(List<TaggedTerm> terms) {
+		boolean contains = false;
+		for(TaggedTerm term : terms) {
+			
+			if(Tag.isAdjective(term.getTag())) {
+				contains = true;
+				break;
+			}
+		}
+		return contains;
+	}
+	
+	public static String getAdjetive(List<TaggedTerm> terms) {
+		String adjetive = "";
+		for(TaggedTerm term : terms) {
+			
+			if(Tag.isAdjective(term.getTag())) {
+				adjetive = term.getTerm();
+				break;
+			}
+		}
+		return adjetive;
+	}
+	
+	public static String getObject(List<TaggedTerm> terms) {
+		String object = "";
+		for(TaggedTerm term : terms) {
+			
+			if(Tag.isNoun(term.getTag())) {
+				object = term.getTerm();
+				break;
+			}
+		}
+		return object;
 	}
 
 }

@@ -20,6 +20,7 @@ public class SummarizeChanges {
 	
 	private Git git;
 	private StereotypeIdentifier stereotypeIdentifier;
+	private StringBuilder comment = new StringBuilder();
 	
 	public SummarizeChanges(Git git) {
 		super();
@@ -27,6 +28,7 @@ public class SummarizeChanges {
 		this.stereotypeIdentifier = new StereotypeIdentifier();
 	}
 
+	@SuppressWarnings("unused")
 	public void summarize(ChangedFile[] differences) {
 		for (ChangedFile file : differences) {
 			try {
@@ -48,24 +50,26 @@ public class SummarizeChanges {
 				} else {
 					MethodPhraseGenerator phraseGenerator = new MethodPhraseGenerator();
 					if(file.getAbsolutePath().endsWith(".java")) {
-						System.out.println("File: " + file.getAbsolutePath());
-						//File right = new File(file.getAbsolutePath());
-						
-						
 						String projectName = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).getName();
 						IResource res = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).findMember(file.getPath().replaceFirst(projectName, ""));
 						IFile ifile = ProjectInformation.getSelectedProject().getWorkspace().getRoot().getFile(res.getFullPath());
 						stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(ifile), 0, 0);
 						stereotypeIdentifier.identifyStereotypes();
-												
-						for (StereotypedElement element : stereotypeIdentifier.getStereotypedElements()) {
-							System.out.println("Class: " + element.getQualifiedName() + " - Stereotype: " + element.getStereotypes());
-							for (StereotypedElement method : element.getStereoSubElements()) {
-								System.out.println("Method: " + method.getQualifiedName() + " - Stereotype: " + method.getStereotypes());
-								phraseGenerator.generate(method.getQualifiedName(), "BASIC", method, element);
-							}
-						}
 						
+						
+						for (StereotypedElement element : stereotypeIdentifier.getStereotypedElements()) {
+							System.out.println("Class: " + element.getName().toString() + " - Stereotype: " + element.getStereotypes());
+							String classDescription = "The " + element.getStereotypes() + " class " + element.getName().toString() + " was added. This class allows: \n";
+							getComment().append(classDescription);
+							for (StereotypedElement method : element.getStereoSubElements()) {
+								//System.out.println("Method: " + method.getQualifiedName() + " - Stereotype: " + method.getStereotypes());
+								String description = phraseGenerator.generate(method.getQualifiedName(), "BASIC", method, element);
+								if(description != null && !description.equals("")) {
+									getComment().append(description);
+								}
+							}
+							getComment().append("\n");
+						}
 					} else {
 						//TODO other files
 					}
@@ -85,6 +89,14 @@ public class SummarizeChanges {
 
 	public void setGit(Git git) {
 		this.git = git;
+	}
+
+	public StringBuilder getComment() {
+		return comment;
+	}
+
+	public void setComment(StringBuilder comment) {
+		this.comment = comment;
 	}
 
 }
