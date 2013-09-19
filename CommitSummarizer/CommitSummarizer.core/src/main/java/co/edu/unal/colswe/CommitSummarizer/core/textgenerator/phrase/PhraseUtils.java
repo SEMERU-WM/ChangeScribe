@@ -108,5 +108,16 @@ public class PhraseUtils {
 		}
 		return object;
 	}
+	
+	public static String getIndefiniteArticle(final String text) {
+        String article;
+        if (text.matches("<.*>[aeiouhAEIOUH].*") || text.matches("^[aeiouhAEIOUH].*")) {
+            article = "an";
+        } else {
+            article = "a";
+        }
+        return article;
+    }
+	
 
 }

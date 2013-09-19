@@ -53,7 +53,7 @@ public class MethodPhraseGenerator implements PhraseGenerator {
 		}
 		
 		if(method.isConstructor()) {
-			pset = methodName  + " "; //NPs
+			pset = "create " + PhraseUtils.getIndefiniteArticle(methodName) + " " + methodName  + " "; //NPs
 			String argsDescriptor = "";
 			for(Parameter param : parameters) {
 				String paramText = describeParam(param);
