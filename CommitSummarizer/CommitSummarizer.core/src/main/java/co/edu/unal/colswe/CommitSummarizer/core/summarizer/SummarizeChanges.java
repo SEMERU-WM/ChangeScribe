@@ -6,6 +6,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.PackageDeclaration;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jgit.api.Git;
 
 import co.edu.unal.colswe.CommitSummarizer.core.ast.ProjectInformation;
@@ -30,6 +33,7 @@ public class SummarizeChanges {
 
 	@SuppressWarnings("unused")
 	public void summarize(ChangedFile[] differences) {
+		String currentPackage = "";
 		for (ChangedFile file : differences) {
 			try {
 				if(!file.getChangeType().equals(TypeChange.UNTRACKED.name())) {
@@ -48,7 +52,6 @@ public class SummarizeChanges {
 						
 					}*/
 				} else {
-					MethodPhraseGenerator phraseGenerator = new MethodPhraseGenerator();
 					if(file.getAbsolutePath().endsWith(".java")) {
 						String projectName = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).getName();
 						IResource res = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).findMember(file.getPath().replaceFirst(projectName, ""));
@@ -56,16 +59,26 @@ public class SummarizeChanges {
 						stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(ifile), 0, 0);
 						stereotypeIdentifier.identifyStereotypes();
 						
-						
 						for (StereotypedElement element : stereotypeIdentifier.getStereotypedElements()) {
+							
+							if(currentPackage.equals("")) {
+								currentPackage = stereotypeIdentifier.getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
+								getComment().append("* New classes added to package " + currentPackage + ":  \n\n");
+							} else if(!currentPackage.equals(stereotypeIdentifier.getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName())) {
+								currentPackage = stereotypeIdentifier.getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
+								getComment().append("* New classes added to package " + currentPackage + ":  \n\n");
+							}
+							
+							
 							System.out.println("Class: " + element.getName().toString() + " - Stereotype: " + element.getStereotypes());
 							String classDescription = "The " + element.getStereotypes() + " class " + element.getName().toString() + " was added. This class allows: \n";
 							getComment().append(classDescription);
 							for (StereotypedElement method : element.getStereoSubElements()) {
-								//System.out.println("Method: " + method.getQualifiedName() + " - Stereotype: " + method.getStereotypes());
-								String description = phraseGenerator.generate(method.getQualifiedName(), "BASIC", method, element);
+								MethodPhraseGenerator phraseGenerator = new MethodPhraseGenerator(method, "BASIC");
+								phraseGenerator.generate();
+								String description = phraseGenerator.getPhrase(); 
 								if(description != null && !description.equals("")) {
-									getComment().append(description);
+									getComment().append("\t" + description);
 								}
 							}
 							getComment().append("\n");
@@ -80,8 +93,6 @@ public class SummarizeChanges {
 			
 		}
 	}
-	
-	
 
 	public Git getGit() {
 		return git;

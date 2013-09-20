@@ -18,6 +18,7 @@ public class StereotypeIdentifier {
 	private List<StereotypedElement> stereotypedElements;
 	double methodsMean;
 	double methodsStdDev;
+	private ICompilationUnit compilationUnit;
 
 	public StereotypeIdentifier() {
 		super();
@@ -27,6 +28,7 @@ public class StereotypeIdentifier {
 	public StereotypeIdentifier(final ICompilationUnit unit,
 			final double methodsMean, final double methodsStdDev) {
 		super();
+		this.compilationUnit = unit;
 		this.parser = new JParser(unit);
 		this.methodsMean = methodsMean;
 		this.methodsStdDev = methodsStdDev;
@@ -94,5 +96,13 @@ public class StereotypeIdentifier {
 
 	public JParser getParser() {
 		return this.parser;
+	}
+
+	public ICompilationUnit getCompilationUnit() {
+		return compilationUnit;
+	}
+
+	public void setCompilationUnit(ICompilationUnit compilationUnit) {
+		this.compilationUnit = compilationUnit;
 	}
 }

@@ -2,8 +2,8 @@ package co.edu.unal.colswe.CommitSummarizer.core.git;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
@@ -48,7 +48,7 @@ public class SCMRepository {
 	}
 	
 	public static Set<ChangedFile> getDifferences(Status repositoryStatus, String rootPath) {
-		Set<ChangedFile> differences = new HashSet<ChangedFile>();
+		Set<ChangedFile> differences = new TreeSet<ChangedFile>();
 		
 		for (String string : repositoryStatus.getModified()) {
 			ChangedFile changedFile = new ChangedFile(string, TypeChange.MODIFIED.name(), rootPath);

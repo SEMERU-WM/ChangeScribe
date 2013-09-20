@@ -2,7 +2,8 @@ package co.edu.unal.colswe.CommitSummarizer.core.git;
 
 import java.io.File;
 
-public class ChangedFile {
+@SuppressWarnings("rawtypes")
+public class ChangedFile implements Comparable {
 	
 	
 	private String path;
@@ -65,6 +66,11 @@ public class ChangedFile {
 
 	public void setAbsolutePath(String absolutePath) {
 		this.absolutePath = absolutePath;
+	}
+
+	@Override
+	public int compareTo(Object o2) {
+		return this.getPath().compareTo(((ChangedFile) o2).getPath());
 	}
     
     

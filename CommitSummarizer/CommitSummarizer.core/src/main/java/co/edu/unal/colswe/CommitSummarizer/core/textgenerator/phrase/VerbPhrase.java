@@ -58,8 +58,7 @@ public class VerbPhrase extends Phrase {
 		this.verb = this.taggedPhrase.getFirst().getTerm();
 		if (this.taggedPhrase.size() > 0) {
 			final StringBuilder dirObj = new StringBuilder();
-			if (hasNounOrAdjective(this.taggedPhrase)
-					|| hasPrepositionOrAdverb(this.taggedPhrase)) {
+			if (hasNounOrAdjective(this.taggedPhrase) || hasPrepositionOrAdverb(this.taggedPhrase)) {
 				for (int i = 1; i < this.taggedPhrase.size(); ++i) {
 					final TaggedTerm tt = this.taggedPhrase.get(i);
 					if (Tag.isPrep(tt.getTag()) || Tag.isAdverb(tt.getTag())) {
@@ -69,8 +68,7 @@ public class VerbPhrase extends Phrase {
 					dirObj.append(String.valueOf(tt.getTerm()) + " ");
 				}
 				this.directObject = dirObj.toString();
-			} else if (this.parameters != null && !this.parameters.isEmpty()
-					&& !this.addFirstParam) {
+			} else if (this.parameters != null && !this.parameters.isEmpty() && !this.addFirstParam) {
 				for (final Parameter par : this.parameters) {
 					if (!par.isPrimitive()) {
 						final ParameterPhrase varGen = new ParameterPhrase(par);
@@ -82,21 +80,16 @@ public class VerbPhrase extends Phrase {
 			}
 		}
 		if (this.addFirstParam && !this.parameters.isEmpty()) {
-			final ParameterPhrase varGen2 = new ParameterPhrase(
-					this.parameters.get(0));
+			final ParameterPhrase varGen2 = new ParameterPhrase(this.parameters.get(0));
 			varGen2.generate();
 			if (this.indirectObject != null) {
-				this.indirectObject = this.indirectObject.concat(" ")
-						.concat(varGen2.toString()).trim();
+				this.indirectObject = this.indirectObject.concat(" ").concat(varGen2.toString()).trim();
 			} else {
 				this.indirectObject = varGen2.toString();
 			}
-		} else if ((this.directObject == null || this.directObject.isEmpty())
-				&& this.indirectObject != null
-				&& !this.indirectObject.isEmpty() && this.parameters != null
+		} else if ((this.directObject == null || this.directObject.isEmpty()) && this.indirectObject != null && !this.indirectObject.isEmpty() && this.parameters != null
 				&& !this.parameters.isEmpty()) {
-			final ParameterPhrase varGen2 = new ParameterPhrase(
-					this.parameters.get(0));
+			final ParameterPhrase varGen2 = new ParameterPhrase(this.parameters.get(0));
 			varGen2.generate();
 			this.directObject = varGen2.toString();
 		} else if (this.directObject == null || this.directObject.isEmpty()) {
@@ -117,8 +110,7 @@ public class VerbPhrase extends Phrase {
 	private static boolean hasNounOrAdjective(
 			final LinkedList<TaggedTerm> taggedPhrase) {
 		for (final TaggedTerm taggedTerm : taggedPhrase) {
-			if (Tag.isNoun(taggedTerm.getTag())
-					|| Tag.isAdjective(taggedTerm.getTag())) {
+			if (Tag.isNoun(taggedTerm.getTag()) || Tag.isAdjective(taggedTerm.getTag())) {
 				return true;
 			}
 		}
@@ -128,8 +120,7 @@ public class VerbPhrase extends Phrase {
 	private static boolean hasPrepositionOrAdverb(
 			final LinkedList<TaggedTerm> taggedPhrase) {
 		for (final TaggedTerm taggedTerm : taggedPhrase) {
-			if (Tag.isPrep(taggedTerm.getTag())
-					|| Tag.isAdverb(taggedTerm.getTag())) {
+			if (Tag.isPrep(taggedTerm.getTag()) || Tag.isAdverb(taggedTerm.getTag())) {
 				return true;
 			}
 		}

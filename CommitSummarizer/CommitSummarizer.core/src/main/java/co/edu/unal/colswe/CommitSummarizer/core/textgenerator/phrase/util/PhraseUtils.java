@@ -1,4 +1,4 @@
-package co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase;
+package co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.util;
 
 import java.util.List;
 
