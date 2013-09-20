@@ -36,7 +36,8 @@ public class MethodPhraseGenerator implements PhraseGenerator {
 	
 	@SuppressWarnings("unchecked")
 	private static String generateSimpleDescription(MethodDeclaration method) {
-		String methodName = Tokenizer.split(method.getName().getIdentifier());
+		String methodSignature = getMethodSignature(method);
+		String methodName = Tokenizer.split(method.getName().getFullyQualifiedName());
 		String className = Tokenizer.split(((TypeDeclaration) method.getParent()).getName().toString());
 		String methodArguments = method.parameters().size() == 0 ? "" : Tokenizer.split(getMethodParams(method.parameters()));
 		
@@ -49,19 +50,28 @@ public class MethodPhraseGenerator implements PhraseGenerator {
 		for (int i = 0; i < parameters2.size(); i++) {
 			SingleVariableDeclaration param = parameters2.get(i);
 			Parameter parameter = new Parameter(param.getType().toString(), param.getName().getFullyQualifiedName());
-			parameters.add(parameter);
+			if(!parameter.isPrimitive()) {
+				parameters.add(parameter);
+			}
+			
+			
 		}
 		
 		if(method.isConstructor()) {
-			pset = "create " + PhraseUtils.getIndefiniteArticle(methodName) + " " + methodName  + " "; //NPs
+			pset = "instantiate " + PhraseUtils.getIndefiniteArticle(methodName) + " " + methodName  + " "; //NPs
 			String argsDescriptor = "";
 			for(Parameter param : parameters) {
-				String paramText = describeParam(param);
+				if(argsDescriptor.equals("")) {
+					pset += " with ";
+				}
+				ParameterPhrase pp = new ParameterPhrase(param);
+				pp.generate();
+				String paramText = pp.toString();
 				if(!argsDescriptor.toLowerCase().contains(paramText.toLowerCase())) {
 					if(!argsDescriptor.equals("")) {
-						argsDescriptor += " and ";
+						argsDescriptor += ", ";
 					} else {
-						argsDescriptor = " for ";
+						argsDescriptor = "";
 					}
 					argsDescriptor += paramText;
 				}
@@ -216,6 +226,19 @@ public class MethodPhraseGenerator implements PhraseGenerator {
 		}
 		
 		return paramsConcat.trim();
+		
+	}
+	
+	public static String getMethodSignature(MethodDeclaration method) {
+		String signature = method.getName().getFullyQualifiedName() + " (";
+		List<SingleVariableDeclaration> params = method.parameters();
+		for(SingleVariableDeclaration param : params) {
+			signature += " " + param.getType().toString() + " "  + ", ";
+		}
+		if(signature.endsWith(", ")) {
+			signature = signature.substring(0, signature.length() - 2);
+		}
+		return signature + ")";
 		
 	}
 	
