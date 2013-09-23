@@ -73,15 +73,12 @@ public class StereotypeIdentifier {
 			try {
 				StereotypedElement stereoElement;
 				if (element instanceof TypeDeclaration) {
-					stereoElement = new StereotypedType(
-							(TypeDeclaration) element, this.methodsMean,
-							this.methodsStdDev);
+					stereoElement = new StereotypedType((TypeDeclaration) element, this.methodsMean, this.methodsStdDev);
 				} else {
 					if (!(element instanceof MethodDeclaration)) {
 						continue;
 					}
-					stereoElement = new StereotypedMethod(
-							(MethodDeclaration) element);
+					stereoElement = new StereotypedMethod((MethodDeclaration) element);
 				}
 				stereoElement.findStereotypes();
 				this.stereotypedElements.add(stereoElement);

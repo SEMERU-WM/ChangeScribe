@@ -95,19 +95,18 @@ public class StereotypedMethod extends MethodStereotypeRules implements
 
 	public void findStereotypes() {
 		this.report.append("\n" + this.getKey());
-		try {
+		try { 
 			this.methodAnalyzer = new MethodAnalyzer(this.method);
 			this.primaryStereotype = this.findPrimaryStereotype();
-			if (!this.primaryStereotype.getCategory().equals(
-					MethodStereotype.Category.COLLABORATIONAL)
-					&& !this.primaryStereotype.getCategory().equals(
-							MethodStereotype.Category.DEGENERATE)) {
+			if (!this.primaryStereotype.getCategory().equals(MethodStereotype.Category.COLLABORATIONAL)
+					&& !this.primaryStereotype.getCategory().equals(MethodStereotype.Category.DEGENERATE)) {
 				this.secondaryStereotype = this.findSecondaryStereotype();
 				if (this.secondaryStereotype != null) {
 				}
 			}
 		} catch (NullPointerException ex) {
 			this.primaryStereotype = MethodStereotype.INCIDENTAL;
+			System.out.println(ex.getMessage());
 		}
 	}
 

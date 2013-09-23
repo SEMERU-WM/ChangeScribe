@@ -14,6 +14,7 @@ import org.eclipse.jdt.core.search.TypeReferenceMatch;
 import org.eclipse.jdt.internal.core.ResolvedSourceType;
 
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
+import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.util.PhraseUtils;
 
 @SuppressWarnings("restriction")
 public class TypeDependencySummary implements DependencySummary {
@@ -56,7 +57,7 @@ public class TypeDependencySummary implements DependencySummary {
 	@Override
 	public void generateSummary() {
 		if(getDependencies() != null && getDependencies().size() > 0) {
-			builder = new StringBuilder("Related with: \n\n");
+			builder = new StringBuilder("Related with: " + this.getElement().getElementName().toString() +"\n\n");
 		}
 		
 		for (SearchMatch match : getDependencies()) {
@@ -69,11 +70,11 @@ public class TypeDependencySummary implements DependencySummary {
 				e.printStackTrace();
 			}
 			if(match.isInsideDocComment()) {
-				builder.append("\t" + " Referenced in comments of " +type.getFullyQualifiedName('.') + " class \n");
+				builder.append("\t" + " Referenced in comments of " +type.getFullyQualifiedName('.') + " " + PhraseUtils.getStringType(type) + "\n");
 			} else if(match.isImplicit()) {
-				builder.append("\t" + " Implicit reference in " + type.getFullyQualifiedName('.') + " class \n");
+				builder.append("\t" + " Implicit reference in " + type.getFullyQualifiedName('.') + " " + PhraseUtils.getStringType(type) + "\n");
 			} else {
-				builder.append("\t" + type.getFullyQualifiedName('.') + " class \n");
+				builder.append("\t" + type.getFullyQualifiedName('.') + " " + PhraseUtils.getStringType(type) + "\n");
 			}
 		}
 	}

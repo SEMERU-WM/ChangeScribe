@@ -2,6 +2,9 @@ package co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.util;
 
 import java.util.List;
 
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
+
 import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.pos.Tag;
 import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.pos.TaggedTerm;
 
@@ -118,6 +121,25 @@ public class PhraseUtils {
         }
         return article;
     }
+	
+	public static String getStringType(IType type) {
+		String rta = "";
+		try {
+			if(type.isClass()) {
+				rta = "class";
+			} else if(type.isInterface()) {
+				rta = "interface";
+			} else if(type.isEnum()) {
+				rta = "enumeration";
+			} else if(type.isLocal()) {
+				rta = "local type";
+			}
+			
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+		}
+		return rta;
+	}
 	
 
 }
