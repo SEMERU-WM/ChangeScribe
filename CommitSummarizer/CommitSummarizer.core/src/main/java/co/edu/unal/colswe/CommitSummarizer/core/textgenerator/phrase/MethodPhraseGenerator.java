@@ -51,7 +51,6 @@ public class MethodPhraseGenerator implements PhraseGenerator {
 
 	@Override
 	public void generate() {
-		//String description = "";
 		if(type.equals(MethodPhraseType.BASIC.toString())) {
 			generateSimpleDescription();
 		} else {

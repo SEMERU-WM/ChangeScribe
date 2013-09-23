@@ -40,7 +40,8 @@ public class FilesChangedListDialog extends ListSelectionDialog {
 		
 		setText(new Text(area, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL));
 		GridData gd_text = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
-		gd_text.heightHint = 60;
+		gd_text.widthHint = 608;
+		gd_text.heightHint = 114;
 		getText().setLayoutData(gd_text);
 		
 		Button button = new Button(area, SWT.RIGHT);
