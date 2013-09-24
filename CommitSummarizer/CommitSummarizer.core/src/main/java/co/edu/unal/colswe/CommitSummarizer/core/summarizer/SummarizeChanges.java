@@ -23,6 +23,7 @@ public class SummarizeChanges {
 	private Git git;
 	private StereotypeIdentifier stereotypeIdentifier;
 	private StringBuilder comment = new StringBuilder();
+	private ChangedFile[] differences;
 	
 	public SummarizeChanges(Git git) {
 		super();
@@ -32,6 +33,7 @@ public class SummarizeChanges {
 
 	@SuppressWarnings("unused")
 	public void summarize(ChangedFile[] differences) {
+		this.differences = differences;
 		String currentPackage = "";
 		for (ChangedFile file : differences) {
 			try {
@@ -65,8 +67,8 @@ public class SummarizeChanges {
 	}
 	
 	public void summarizeImpactChange(ChangedFile file) {
-		
 		TypeDependencySummary dependency = new TypeDependencySummary(file, (IJavaElement) this.stereotypeIdentifier.getCompilationUnit());
+		dependency.setDifferences(differences);
 		dependency.find();
 		dependency.generateSummary();
 		getComment().append("\n" + dependency.toString());

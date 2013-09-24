@@ -3,14 +3,12 @@ package co.edu.unal.colswe.CommitSummarizer.core.dependencies;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchRequestor;
-import org.eclipse.jdt.core.search.TypeReferenceMatch;
 import org.eclipse.jdt.internal.core.ResolvedSourceType;
 
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
@@ -23,6 +21,7 @@ public class TypeDependencySummary implements DependencySummary {
 	private IJavaElement element;
 	private List<SearchMatch> dependencies;
 	private StringBuilder builder;
+	private ChangedFile[] differences;
 
 	public TypeDependencySummary(ChangedFile changedFile, IJavaElement element) {
 		this.changedFile = changedFile;
@@ -39,7 +38,7 @@ public class TypeDependencySummary implements DependencySummary {
 			@Override
             public void acceptSearchMatch(SearchMatch match) {
             	if(match.getAccuracy() == SearchMatch.A_ACCURATE) {
-            		if(match.getElement() instanceof ResolvedSourceType) {
+            		if(match.getElement() instanceof ResolvedSourceType && inChangedFiles(match.getResource().getName())) {
                 		System.out.println(match.toString());
                 		addMatched(match);
                 	}
@@ -57,20 +56,18 @@ public class TypeDependencySummary implements DependencySummary {
 	@Override
 	public void generateSummary() {
 		if(getDependencies() != null && getDependencies().size() > 0) {
-			builder = new StringBuilder("Related with: " + this.getElement().getElementName().toString() +"\n\n");
+			builder = new StringBuilder("References: " +"\n\n");
 		}
 		
 		for (SearchMatch match : getDependencies()) {
 			ResolvedSourceType type = (ResolvedSourceType) match.getElement();
-			IResource resource = match.getResource();
 			try {
 				type.getTypes();
 			} catch (JavaModelException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			if(match.isInsideDocComment()) {
-				builder.append("\t" + " Referenced in comments of " +type.getFullyQualifiedName('.') + " " + PhraseUtils.getStringType(type) + "\n");
+				builder.append("\t" + " Referenced in comments of " + type.getFullyQualifiedName('.') + " " + PhraseUtils.getStringType(type) + "\n");
 			} else if(match.isImplicit()) {
 				builder.append("\t" + " Implicit reference in " + type.getFullyQualifiedName('.') + " " + PhraseUtils.getStringType(type) + "\n");
 			} else {
@@ -114,6 +111,26 @@ public class TypeDependencySummary implements DependencySummary {
 			string = builder.toString() + "\n";
 		}
 		return string;
+	}
+
+	public ChangedFile[] getDifferences() {
+		return differences;
+	}
+
+	public void setDifferences(ChangedFile[] differences) {
+		this.differences = differences;
+	}
+	
+	private boolean inChangedFiles(String file) {
+		boolean exist = false;
+		for(ChangedFile cf : differences) {
+			if(cf.getPath().endsWith("/" + file)) {
+				exist = true;
+				System.out.println("exist original: " + cf.getPath() + " searched: " + file);
+				break;
+			} 
+		}
+		return exist;
 	}
 
 }
