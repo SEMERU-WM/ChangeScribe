@@ -19,6 +19,7 @@ public class StereotypeIdentifier {
 	double methodsMean;
 	double methodsStdDev;
 	private ICompilationUnit compilationUnit;
+	private String scmOperation; 
 
 	public StereotypeIdentifier() {
 		super();
@@ -101,5 +102,13 @@ public class StereotypeIdentifier {
 
 	public void setCompilationUnit(ICompilationUnit compilationUnit) {
 		this.compilationUnit = compilationUnit;
+	}
+
+	public String getScmOperation() {
+		return scmOperation;
+	}
+
+	public void setScmOperation(String scmOperation) {
+		this.scmOperation = scmOperation;
 	}
 }

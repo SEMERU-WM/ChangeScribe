@@ -17,23 +17,18 @@ import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.util.Phrase
 @SuppressWarnings("restriction")
 public class TypeDependencySummary implements DependencySummary {
 	
-	private ChangedFile changedFile;
 	private IJavaElement element;
 	private List<SearchMatch> dependencies;
 	private StringBuilder builder;
 	private ChangedFile[] differences;
 
-	public TypeDependencySummary(ChangedFile changedFile, IJavaElement element) {
-		this.changedFile = changedFile;
+	public TypeDependencySummary(IJavaElement element) {
 		this.element = element;
 		this.setDependencies(new ArrayList<SearchMatch>());
 	}
 
 	@Override
 	public void find() {
-		if(changedFile == null) {
-			return;
-		}
 		SearchRequestor requestor = new SearchRequestor() {
 			@Override
             public void acceptSearchMatch(SearchMatch match) {
@@ -78,14 +73,6 @@ public class TypeDependencySummary implements DependencySummary {
 	
 	public void addMatched(SearchMatch match) {
 		this.getDependencies().add(match);
-	}
-
-	public ChangedFile getChangedFile() {
-		return changedFile;
-	}
-
-	public void setChangedFile(ChangedFile changedFile) {
-		this.changedFile = changedFile;
 	}
 
 	public IJavaElement getElement() {

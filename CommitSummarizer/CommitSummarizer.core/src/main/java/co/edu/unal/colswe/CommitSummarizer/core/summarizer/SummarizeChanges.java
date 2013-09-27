@@ -7,24 +7,21 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jgit.api.Git;
 
 import co.edu.unal.colswe.CommitSummarizer.core.ast.ProjectInformation;
-import co.edu.unal.colswe.CommitSummarizer.core.dependencies.TypeDependencySummary;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile.TypeChange;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypeIdentifier;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedElement;
-import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.MethodPhraseGenerator;
 import co.edu.unal.colswe.CommitSummarizer.core.util.Utils;
 
 public class SummarizeChanges {
 	
 	private Git git;
 	private StereotypeIdentifier stereotypeIdentifier;
-	private List<StereotypedElement> stereotypedMethods;
+	private List<StereotypeIdentifier> identifiers;
 	private StringBuilder comment = new StringBuilder();
 	private ChangedFile[] differences;
 	
@@ -32,7 +29,7 @@ public class SummarizeChanges {
 		super();
 		this.git = git;
 		this.stereotypeIdentifier = new StereotypeIdentifier();
-		this.stereotypedMethods = new ArrayList<StereotypedElement>();
+		this.identifiers = new ArrayList<StereotypeIdentifier>();
 	}
 
 	@SuppressWarnings("unused")
@@ -58,15 +55,39 @@ public class SummarizeChanges {
 					}*/
 				} else if(file.getChangeType().equals(TypeChange.UNTRACKED.name())) {
 					if(file.getAbsolutePath().endsWith(".java")) {
-						identifyStereotypes(file);
-						summarizeMethods(file);
-						summarizeImpactChange(file);
+						identifyStereotypes(file, "added");
+						//summarizeMethods(file);
+						//summarizeImpactChange(file);
 					} else {
 						//TODO other files
 					}
-				}
+				} 
 			} catch(Exception e) {
 			    System.err.println("Warning: error while change distilling. " + e.getMessage());
+			}
+		}
+		
+		summarizeTypes();
+	}
+	
+	public void summarizeTypes() {
+		String currentPackage = "";
+		for(StereotypeIdentifier identifier : identifiers) {
+			for(StereotypedElement element : identifier.getStereotypedElements()) {
+					SummarizeType summarizeType = new SummarizeType(element, identifier, differences);
+					summarizeType.generate();
+					
+					if(currentPackage.trim().equals("")) {
+						currentPackage = identifier.getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
+						System.out.println("current 1: " + currentPackage);
+						getComment().append("* Modifications to package " + currentPackage + ":  \n\n");
+					} else if(!currentPackage.equals(identifier.getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName())) {
+						currentPackage = identifier.getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
+						System.out.println("current 2: " + currentPackage);
+						getComment().append("* Modifications to package " + currentPackage + ":  \n\n");
+					}
+					
+					getComment().append(summarizeType.getBuilder().toString());
 			}
 		}
 	}
@@ -75,15 +96,15 @@ public class SummarizeChanges {
 		
 	}
 	
-	public void summarizeImpactChange(ChangedFile file) {
-		TypeDependencySummary dependency = new TypeDependencySummary(file, (IJavaElement) this.stereotypeIdentifier.getCompilationUnit());
+	/*public void summarizeImpactChange(ChangedFile file) {
+		TypeDependencySummary dependency = new TypeDependencySummary((IJavaElement) this.stereotypeIdentifier.getCompilationUnit());
 		dependency.setDifferences(differences);
 		dependency.find();
 		dependency.generateSummary();
 		getComment().append("\n" + dependency.toString());
-	}
+	}*/
 	
-	public void summarizeMethods(ChangedFile file) {
+	/*public void summarizeMethods(ChangedFile file) {
 		String currentPackage = "";
 		
 		for (StereotypedElement element : stereotypeIdentifier.getStereotypedElements()) {
@@ -95,7 +116,7 @@ public class SummarizeChanges {
 				currentPackage = stereotypeIdentifier.getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
 				getComment().append("* New classes added to package " + currentPackage + ":  \n\n");
 			}
-			System.out.println("Class: " + element.getName().toString() + " - Stereotype: " + element.getStereotypes());
+
 			String classDescription = "The " + element.getStereotypes() + " class " + element.getName().toString() + " was added. This class allows: \n";
 			getComment().append(classDescription);
 			for (StereotypedElement method : element.getStereoSubElements()) {
@@ -109,20 +130,17 @@ public class SummarizeChanges {
 			getComment().append("\n");
 		}
 		
-	}
+	}*/
 	
-	public void identifyStereotypes(ChangedFile file) {
+	public void identifyStereotypes(ChangedFile file, String scmOperation) {
 		String projectName = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).getName();
 		IResource res = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).findMember(file.getPath().replaceFirst(projectName, ""));
 		IFile ifile = ProjectInformation.getSelectedProject().getWorkspace().getRoot().getFile(res.getFullPath());
 		stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(ifile), 0, 0);
 		stereotypeIdentifier.identifyStereotypes();
+		stereotypeIdentifier.setScmOperation(scmOperation);
 		
-		for (StereotypedElement element : stereotypeIdentifier.getStereotypedElements()) {
-			for (StereotypedElement method : element.getStereoSubElements()) {
-				addStereotypedMethod(method);
-			}
-		}
+		identifiers.add(stereotypeIdentifier);
 		
 	}
 
@@ -142,16 +160,12 @@ public class SummarizeChanges {
 		this.comment = comment;
 	}
 
-	public List<StereotypedElement> getStereotypedMethods() {
-		return stereotypedMethods;
+	public List<StereotypeIdentifier> getIdentifiers() {
+		return identifiers;
 	}
 
-	public void setStereotypedMethods(List<StereotypedElement> stereotypedMethods) {
-		this.stereotypedMethods = stereotypedMethods;
-	}
-	
-	public void addStereotypedMethod(StereotypedElement element) {
-		stereotypedMethods.add(element);
+	public void setIdentifiers(List<StereotypeIdentifier> identifiers) {
+		this.identifiers = identifiers;
 	}
 
 }
