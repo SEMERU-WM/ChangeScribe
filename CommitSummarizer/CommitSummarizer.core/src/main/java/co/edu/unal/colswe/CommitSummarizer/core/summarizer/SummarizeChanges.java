@@ -1,6 +1,8 @@
 package co.edu.unal.colswe.CommitSummarizer.core.summarizer;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -22,6 +24,7 @@ public class SummarizeChanges {
 	
 	private Git git;
 	private StereotypeIdentifier stereotypeIdentifier;
+	private List<StereotypedElement> stereotypedMethods;
 	private StringBuilder comment = new StringBuilder();
 	private ChangedFile[] differences;
 	
@@ -29,6 +32,7 @@ public class SummarizeChanges {
 		super();
 		this.git = git;
 		this.stereotypeIdentifier = new StereotypeIdentifier();
+		this.stereotypedMethods = new ArrayList<StereotypedElement>();
 	}
 
 	@SuppressWarnings("unused")
@@ -54,6 +58,7 @@ public class SummarizeChanges {
 					}*/
 				} else if(file.getChangeType().equals(TypeChange.UNTRACKED.name())) {
 					if(file.getAbsolutePath().endsWith(".java")) {
+						identifyStereotypes(file);
 						summarizeMethods(file);
 						summarizeImpactChange(file);
 					} else {
@@ -66,6 +71,10 @@ public class SummarizeChanges {
 		}
 	}
 	
+	public void summarizeCommitStereotype() {
+		
+	}
+	
 	public void summarizeImpactChange(ChangedFile file) {
 		TypeDependencySummary dependency = new TypeDependencySummary(file, (IJavaElement) this.stereotypeIdentifier.getCompilationUnit());
 		dependency.setDifferences(differences);
@@ -76,12 +85,6 @@ public class SummarizeChanges {
 	
 	public void summarizeMethods(ChangedFile file) {
 		String currentPackage = "";
-		
-		String projectName = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).getName();
-		IResource res = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).findMember(file.getPath().replaceFirst(projectName, ""));
-		IFile ifile = ProjectInformation.getSelectedProject().getWorkspace().getRoot().getFile(res.getFullPath());
-		stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(ifile), 0, 0);
-		stereotypeIdentifier.identifyStereotypes();
 		
 		for (StereotypedElement element : stereotypeIdentifier.getStereotypedElements()) {
 			
@@ -107,6 +110,21 @@ public class SummarizeChanges {
 		}
 		
 	}
+	
+	public void identifyStereotypes(ChangedFile file) {
+		String projectName = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).getName();
+		IResource res = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).findMember(file.getPath().replaceFirst(projectName, ""));
+		IFile ifile = ProjectInformation.getSelectedProject().getWorkspace().getRoot().getFile(res.getFullPath());
+		stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(ifile), 0, 0);
+		stereotypeIdentifier.identifyStereotypes();
+		
+		for (StereotypedElement element : stereotypeIdentifier.getStereotypedElements()) {
+			for (StereotypedElement method : element.getStereoSubElements()) {
+				addStereotypedMethod(method);
+			}
+		}
+		
+	}
 
 	public Git getGit() {
 		return git;
@@ -122,6 +140,18 @@ public class SummarizeChanges {
 
 	public void setComment(StringBuilder comment) {
 		this.comment = comment;
+	}
+
+	public List<StereotypedElement> getStereotypedMethods() {
+		return stereotypedMethods;
+	}
+
+	public void setStereotypedMethods(List<StereotypedElement> stereotypedMethods) {
+		this.stereotypedMethods = stereotypedMethods;
+	}
+	
+	public void addStereotypedMethod(StereotypedElement element) {
+		stereotypedMethods.add(element);
 	}
 
 }
