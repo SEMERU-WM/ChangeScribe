@@ -24,6 +24,7 @@ import org.eclipse.jdt.internal.compiler.problem.ProblemSeverities;
  * 
  * @since 3.0
  */
+@SuppressWarnings("restriction")
 public class CommentRecorderParser extends Parser {
 
     // support for comments
