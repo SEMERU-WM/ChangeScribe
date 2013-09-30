@@ -65,6 +65,11 @@ public class SCMRepository {
 			differences.add(changedFile);
 		}
 		
+		for	(String string : repositoryStatus.getRemoved()) {
+			ChangedFile changedFile = new ChangedFile(string, TypeChange.REMOVED.name(), rootPath);
+			differences.add(changedFile);
+		}
+		
 		return differences;
 	}
 	

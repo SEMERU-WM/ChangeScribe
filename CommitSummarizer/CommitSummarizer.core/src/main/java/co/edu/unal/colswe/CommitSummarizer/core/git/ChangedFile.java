@@ -47,7 +47,7 @@ public class ChangedFile implements Comparable {
      * @author Beat Fluri
      */
     public static enum TypeChange {
-    	ADDED("ADDED"), MODIFIED("MODIFIED"), UNTRACKED("UNTRACKED");
+    	ADDED("ADDED"), MODIFIED("MODIFIED"), UNTRACKED("UNTRACKED"), REMOVED("REMOVED");
     	
     	private TypeChange(String type) { 
         	

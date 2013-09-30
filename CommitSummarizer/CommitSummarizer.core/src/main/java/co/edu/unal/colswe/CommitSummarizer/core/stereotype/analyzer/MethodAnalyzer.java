@@ -297,22 +297,19 @@ public class MethodAnalyzer {
             final IVariableBinding field = this.getLocalField(node.getExpression());
             if (field != null) {
                 MethodAnalyzer.this.getFields.add(field);
-            }
-            else {
+            } else {
                 int index = this.getVariableIndex(node.getExpression());
                 if (index != -1 && MethodAnalyzer.this.variables.get(index).isInstantiated() && !MethodAnalyzer.this.returnType.isPrimitiveType()) {
                     MethodAnalyzer.access$15(MethodAnalyzer.this, true);
                     MethodAnalyzer.this.variables.get(index).setReturned(true);
-                }
-                else if (index != -1) {
+                } else if (index != -1) {
                     if (!MethodAnalyzer.this.variables.get(index).getAssignedFields().isEmpty()) {
                         for (final IVariableBinding var : MethodAnalyzer.this.variables.get(index).getAssignedFields()) {
                             MethodAnalyzer.this.propertyFields.add(var);
                         }
                     }
                     MethodAnalyzer.this.variables.get(index).setReturned(true);
-                }
-                else {
+                } else {
                     index = this.getParameterIndex(node.getExpression());
                     if (index != -1) {
                         for (final IVariableBinding par : MethodAnalyzer.this.parameters.get(index).getAssignedFields()) {
@@ -396,8 +393,7 @@ public class MethodAnalyzer {
                 int index = this.getVariableIndex(method.getExpression());
                 if (index != -1) {
                     MethodAnalyzer.this.variables.get(index).setModified(true);
-                }
-                else {
+                } else {
                     index = this.getParameterIndex(method.getExpression());
                     if (index != -1) {
                         MethodAnalyzer.this.parameters.get(index).setModified(true);
@@ -441,8 +437,7 @@ public class MethodAnalyzer {
             final TypeInfo type = new TypeInfo(typeBinding);
             if (MethodAnalyzer.this.usedTypes.contains(type)) {
                 MethodAnalyzer.this.usedTypes.get(MethodAnalyzer.this.usedTypes.indexOf(type)).incrementFrequency();
-            }
-            else {
+            } else {
                 MethodAnalyzer.this.usedTypes.add(type);
             }
         }
@@ -488,8 +483,7 @@ public class MethodAnalyzer {
                     return nameBinding;
                 }
                 return this.getLocalField((Expression)superFieldAccess.getQualifier());
-            }
-            else {
+            } else {
                 if (expression instanceof ArrayAccess) {
                     final ArrayAccess arrayAccess = (ArrayAccess)expression;
                     return this.getLocalField(arrayAccess.getArray());

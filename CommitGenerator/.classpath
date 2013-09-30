@@ -46,5 +46,6 @@
 	<classpathentry kind="lib" path="/home/fernandocortes/Desarrollo/IDE/eclipse_kepler/plugins/org.eclipse.text_3.5.300.v20130515-1451.jar"/>
 	<classpathentry kind="lib" path="/home/fernandocortes/Desarrollo/IDE/eclipse_kepler/plugins/org.eclipse.swt.gtk.linux.x86_64_3.102.0.v20130605-1544.jar"/>
 	<classpathentry kind="lib" path="/home/fernandocortes/Desarrollo/IDE/eclipse_kepler/plugins/org.eclipse.swt_3.102.0.v20130605-1539.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SWUM"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

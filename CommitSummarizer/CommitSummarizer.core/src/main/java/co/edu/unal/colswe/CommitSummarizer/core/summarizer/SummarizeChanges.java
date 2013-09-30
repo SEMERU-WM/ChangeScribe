@@ -2,6 +2,7 @@ package co.edu.unal.colswe.CommitSummarizer.core.summarizer;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -14,7 +15,10 @@ import co.edu.unal.colswe.CommitSummarizer.core.ast.ProjectInformation;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile.TypeChange;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypeIdentifier;
+import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedCommit;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedElement;
+import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedMethod;
+import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.CommitStereotype;
 import co.edu.unal.colswe.CommitSummarizer.core.util.Utils;
 
 public class SummarizeChanges {
@@ -56,18 +60,19 @@ public class SummarizeChanges {
 				} else if(file.getChangeType().equals(TypeChange.UNTRACKED.name())) {
 					if(file.getAbsolutePath().endsWith(".java")) {
 						identifyStereotypes(file, "added");
-						//summarizeMethods(file);
-						//summarizeImpactChange(file);
-					} else {
-						//TODO other files
+					} 
+				} else if(file.getChangeType().equals(TypeChange.REMOVED.name())) {
+					if(file.getAbsolutePath().endsWith(".java")) {
+						identifyStereotypes(file, "removed");
 					}
-				} 
+				}
 			} catch(Exception e) {
 			    System.err.println("Warning: error while change distilling. " + e.getMessage());
 			}
 		}
-		
+		summarizeCommitStereotype();
 		summarizeTypes();
+		
 	}
 	
 	public void summarizeTypes() {
@@ -92,45 +97,26 @@ public class SummarizeChanges {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void summarizeCommitStereotype() {
+		List<StereotypedMethod> methods = new ArrayList<StereotypedMethod>();
 		
-	}
-	
-	/*public void summarizeImpactChange(ChangedFile file) {
-		TypeDependencySummary dependency = new TypeDependencySummary((IJavaElement) this.stereotypeIdentifier.getCompilationUnit());
-		dependency.setDifferences(differences);
-		dependency.find();
-		dependency.generateSummary();
-		getComment().append("\n" + dependency.toString());
-	}*/
-	
-	/*public void summarizeMethods(ChangedFile file) {
-		String currentPackage = "";
-		
-		for (StereotypedElement element : stereotypeIdentifier.getStereotypedElements()) {
+		for(StereotypeIdentifier identifier : identifiers) {
+			for(StereotypedElement element : identifier.getStereotypedElements()) {
+				methods.addAll((Collection<? extends StereotypedMethod>) element.getStereoSubElements());
+			}
 			
-			if(currentPackage.equals("")) {
-				currentPackage = stereotypeIdentifier.getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
-				getComment().append("* New classes added to package " + currentPackage + ":  \n\n");
-			} else if(!currentPackage.equals(stereotypeIdentifier.getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName())) {
-				currentPackage = stereotypeIdentifier.getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
-				getComment().append("* New classes added to package " + currentPackage + ":  \n\n");
-			}
-
-			String classDescription = "The " + element.getStereotypes() + " class " + element.getName().toString() + " was added. This class allows: \n";
-			getComment().append(classDescription);
-			for (StereotypedElement method : element.getStereoSubElements()) {
-				MethodPhraseGenerator phraseGenerator = new MethodPhraseGenerator(method, "BASIC");
-				phraseGenerator.generate();
-				String description = phraseGenerator.getPhrase(); 
-				if(description != null && !description.equals("")) {
-					getComment().append("\t" + description);
-				}
-			}
-			getComment().append("\n");
 		}
+		StereotypedCommit stereotypedCommit = new StereotypedCommit(methods);
+		stereotypedCommit.buildSignature();
+		CommitStereotype stereotype = stereotypedCommit.findStereotypes();
 		
-	}*/
+		if(stereotype != null) {
+			getComment().append(stereotypedCommit.getStereotypes().toString() + "\n\n");
+		} else {
+			getComment().append("Not found commit stereotype\n\n");
+		}
+	}
 	
 	public void identifyStereotypes(ChangedFile file, String scmOperation) {
 		String projectName = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).getName();
@@ -141,7 +127,6 @@ public class SummarizeChanges {
 		stereotypeIdentifier.setScmOperation(scmOperation);
 		
 		identifiers.add(stereotypeIdentifier);
-		
 	}
 
 	public Git getGit() {
