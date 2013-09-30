@@ -111,8 +111,12 @@ public class CommitStereotypesRules {
 			commitStereotype = CommitStereotype.OBJECT_CREATION_MODIFIER;
 		}
 		*/
+		int constructor = (signatureMap.get(MethodStereotype.CONSTRUCTOR) != null) ? signatureMap.get(MethodStereotype.CONSTRUCTOR) : 0;
+		int copyConstructor = (signatureMap.get(MethodStereotype.COPY_CONSTRUCTOR) != null) ? signatureMap.get(MethodStereotype.COPY_CONSTRUCTOR) : 0;
+		int destructor = (signatureMap.get(MethodStereotype.DESTRUCTOR) != null) ? signatureMap.get(MethodStereotype.DESTRUCTOR) : 0;
 		int factory = (signatureMap.get(MethodStereotype.FACTORY) != null) ?  signatureMap.get(MethodStereotype.FACTORY) : 0;
-		if(factory > (2/3) * methods.size()) {
+		int creational = factory + destructor + copyConstructor + constructor;
+		if(creational > (2/3) * methods.size()) {
 			commitStereotype = CommitStereotype.OBJECT_CREATION_MODIFIER;
 		}
 		return commitStereotype;
