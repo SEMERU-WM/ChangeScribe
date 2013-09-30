@@ -6,11 +6,12 @@ import java.util.List;
 
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.rules.CommitStereotypesRules;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.CommitStereotype;
+import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.MethodStereotype;
 
 public class StereotypedCommit {
 	
 	private List<StereotypedMethod> methods;
-	private HashMap<StereotypedMethod, Integer> signatureMap = new HashMap<StereotypedMethod, Integer>();
+	private HashMap<MethodStereotype, Integer> signatureMap = new HashMap<MethodStereotype, Integer>();
 	private CommitStereotype primaryStereotype;
 	private CommitStereotype secondaryStereotype;
 	
@@ -20,14 +21,14 @@ public class StereotypedCommit {
 	}
 
 	public void buildSignature() {
-		signatureMap = new HashMap<StereotypedMethod, Integer>();
+		signatureMap = new HashMap<MethodStereotype, Integer>();
 		for(StereotypedMethod method: methods) {
-			//Integer value = null;
+			Integer value = null;
 			if(!getSignatureMap().containsKey(method.getStereotypes().get(0))) {
-				//getSignatureMap().put((StereotypedMethod) method.getStereotypes().get(0), 1);
+				getSignatureMap().put((MethodStereotype) method.getStereotypes().get(0), 1);
 			} else {
-				//value = getSignatureMap().get(method.getStereotypes().get(0));
-				//getSignatureMap().put((StereotypedMethod) method.getStereotypes().get(0), value + 1);
+				value = getSignatureMap().get(method.getStereotypes().get(0));
+				getSignatureMap().put((MethodStereotype) method.getStereotypes().get(0), value + 1);
 			}
 		}
 		System.out.println("signatures: " + getSignatureMap().toString());
@@ -37,22 +38,46 @@ public class StereotypedCommit {
 		CommitStereotypesRules rules = new CommitStereotypesRules();
 		primaryStereotype = null;
 		
+		//small modifier
+		primaryStereotype = rules.checkSmallModifier(methods, signatureMap);
+		if(primaryStereotype != null) {
+			return primaryStereotype;
+		}
+		
+		//large modifier
+		primaryStereotype = rules.checkLargeModifier(methods, signatureMap);
+		if(primaryStereotype != null) {
+			return primaryStereotype;
+		}
+		
+		//degenarate modifier
+		primaryStereotype = rules.checkDegenerateModifier(methods, signatureMap);
+		if(primaryStereotype != null) {
+			return primaryStereotype;
+		}
+		
+		//lazy modifier
+		primaryStereotype = rules.checkLazyModifier(methods, signatureMap);
+		if(primaryStereotype != null) {
+			return primaryStereotype;
+		}
+		
 		//control modifier
-		primaryStereotype = rules.checkControlModifier(methods);
+		primaryStereotype = rules.checkControlModifier(methods, signatureMap);
 		if(primaryStereotype != null) {
 			return primaryStereotype;
 		}
 		
 		//relationship modifier
-		primaryStereotype = rules.checkRelationshipModifier(methods);
+		primaryStereotype = rules.checkRelationshipModifier(methods, signatureMap);
 		if(primaryStereotype != null) {
-			secondaryStereotype = rules.checkBehaviorModifier(methods);
+			secondaryStereotype = rules.checkBehaviorModifier(methods, signatureMap);
 			if(secondaryStereotype != null) {
 				CommitStereotype tmp = primaryStereotype;
 				primaryStereotype = secondaryStereotype;
 				secondaryStereotype = tmp;
 			} else {
-				secondaryStereotype = rules.checkStateAccessModifier(methods);
+				secondaryStereotype = rules.checkStateAccessModifier(methods, signatureMap);
 				if(secondaryStereotype != null) {
 					CommitStereotype tmp = primaryStereotype;
 					primaryStereotype = secondaryStereotype;
@@ -63,9 +88,9 @@ public class StereotypedCommit {
 		}
 		
 		//state update modifier
-		primaryStereotype = rules.checkStateUpdateModifier(methods);
+		primaryStereotype = rules.checkStateUpdateModifier(methods, signatureMap);
 		if(primaryStereotype != null) {
-			secondaryStereotype = rules.checkBehaviorModifier(methods);
+			secondaryStereotype = rules.checkBehaviorModifier(methods, signatureMap);
 			if(secondaryStereotype != null) {
 				CommitStereotype tmp = primaryStereotype;
 				primaryStereotype = secondaryStereotype;
@@ -75,19 +100,19 @@ public class StereotypedCommit {
 		}
 		
 		//state access modifier
-		primaryStereotype = rules.checkStateAccessModifier(methods);
+		primaryStereotype = rules.checkStateAccessModifier(methods, signatureMap);
 		if(primaryStereotype != null) {
 			return primaryStereotype;
 		}
 		
 		//structure modifier
-		primaryStereotype = rules.checkStructureModifier(methods);
+		primaryStereotype = rules.checkStructureModifier(methods, signatureMap);
 		if(primaryStereotype != null) {
 			return primaryStereotype;
 		}
 		
 		//object creation modifier
-		primaryStereotype = rules.checkObjectCreationModifier(methods);
+		primaryStereotype = rules.checkObjectCreationModifier(methods, signatureMap);
 		if(primaryStereotype != null) {
 			return primaryStereotype;
 		}
@@ -109,12 +134,12 @@ public class StereotypedCommit {
 		return stereotypes;
 	}
 	
-	public HashMap<StereotypedMethod, Integer> getSignatureMap() {
+	public HashMap<MethodStereotype, Integer> getSignatureMap() {
 		return signatureMap;
 	}
 
-	public void setSignatureMap(HashMap<StereotypedMethod, Integer> frequencymap) {
-		this.signatureMap = frequencymap;
+	public void setSignatureMap(HashMap<MethodStereotype, Integer> signatureMap) {
+		this.signatureMap = signatureMap;
 	}
 
 	public List<StereotypedMethod> getMethods() {
