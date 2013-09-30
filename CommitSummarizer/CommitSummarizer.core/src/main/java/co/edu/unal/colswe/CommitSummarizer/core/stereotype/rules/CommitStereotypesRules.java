@@ -200,8 +200,9 @@ public class CommitStereotypesRules {
 		int set = (signatureMap.get(MethodStereotype.SET) != null) ?  signatureMap.get(MethodStereotype.SET) : 0;
 		int empty = (signatureMap.get(MethodStereotype.EMPTY) != null) ? signatureMap.get(MethodStereotype.EMPTY) : 0;
 		int incidental = (signatureMap.get(MethodStereotype.INCIDENTAL) != null) ? signatureMap.get(MethodStereotype.INCIDENTAL) : 0;
+		int abs = (signatureMap.get(MethodStereotype.ABSTRACT) != null) ? signatureMap.get(MethodStereotype.ABSTRACT) : 0;
 		int getSet = get + set;
-		int degenerate = incidental + empty;
+		int degenerate = incidental + empty + abs;
 		int degenerational = methods.size() - (getSet - Math.abs(degenerate));
 		if(getSet > 0 && 
 				degenerational <= (1/3) * methods.size() && 
@@ -215,7 +216,8 @@ public class CommitStereotypesRules {
 		CommitStereotype commitStereotype = null;
 		int empty = (signatureMap.get(MethodStereotype.EMPTY) != null) ? signatureMap.get(MethodStereotype.EMPTY) : 0;
 		int incidental = (signatureMap.get(MethodStereotype.INCIDENTAL) != null) ? signatureMap.get(MethodStereotype.INCIDENTAL) : 0;
-		int degenerate = incidental + empty;
+		int abs = (signatureMap.get(MethodStereotype.ABSTRACT) != null) ? signatureMap.get(MethodStereotype.ABSTRACT) : 0;
+		int degenerate = incidental + empty + abs;
 		if(Math.abs(degenerate) > 1) {
 			commitStereotype = CommitStereotype.DEGENERATE_MODIFIER;
 		}
