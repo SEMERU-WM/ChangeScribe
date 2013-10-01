@@ -112,7 +112,8 @@ public class SummarizeChanges {
 		CommitStereotype stereotype = stereotypedCommit.findStereotypes();
 		
 		if(stereotype != null) {
-			getComment().append(stereotypedCommit.getStereotypes().toString() + "\n\n");
+			//getComment().append(stereotypedCommit.getStereotypes().toString() + "\n\n");
+			getComment().append(CommitStereotypeDescriptor.describe(stereotypeIdentifier.getCompilationUnit() ,stereotypedCommit) + "\n\n");
 		} else {
 			getComment().append("Not found commit stereotype\n\n");
 		}
