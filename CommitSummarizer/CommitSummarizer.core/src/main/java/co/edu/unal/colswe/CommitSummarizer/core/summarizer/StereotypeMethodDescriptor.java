@@ -14,7 +14,7 @@ public class StereotypeMethodDescriptor {
 			phraseGenerator.generate();
 			description += phraseGenerator.getPhrase(); 
 		}
-		return "\t" + description;
+		return description;
 	}
 
 }

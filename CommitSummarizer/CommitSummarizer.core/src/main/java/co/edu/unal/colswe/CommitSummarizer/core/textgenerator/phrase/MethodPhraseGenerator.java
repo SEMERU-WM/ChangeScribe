@@ -126,7 +126,7 @@ public class MethodPhraseGenerator implements PhraseGenerator {
 			pset = pset + " " + methodName; //NP
 		}
 		System.out.println("METHOD: " + getMethod().getReturnType2() + " " + getMethod().getName().getFullyQualifiedName() + "(" + MethodPhraseUtils.getMethodParamsString(getMethod().parameters()) + ") "  + " PHRASE: " + pset);
-		phraseString = pset.trim()  + "\n";
+		phraseString = "\t" + pset.trim()  + "\n";
 	}
 	
 	private String inferArguments(String verb, String doValue, List<TaggedTerm> taggedMethod, String ioValue, String methodArguments, MethodDeclaration method, String adjetive) {
