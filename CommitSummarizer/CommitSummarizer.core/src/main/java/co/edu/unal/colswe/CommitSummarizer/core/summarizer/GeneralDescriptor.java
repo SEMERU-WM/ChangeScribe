@@ -21,11 +21,11 @@ public class GeneralDescriptor {
 		if(type.isInterface()) {
 			description.append(describeInterface(type) + " ");
 		} else {
-			if (interfaces.length != 0 && !superclass.getKey().equals("Ljava/lang/Object;")) {
+			if (interfaces != null && superclass != null && interfaces.length != 0 && !superclass.getKey().equals("Ljava/lang/Object;")) {
                 description.append(PhraseUtils.getImplementationDescription(interfaces));
                 description.append(", and ");
                 description.append(PhraseUtils.getExtensionDescription(superclass));
-            } else if (interfaces.length != 0) {
+            } else if (interfaces != null && interfaces.length != 0) {
                 description.append(PhraseUtils.getImplementationDescription(interfaces));
             } else if (superclass != null && !superclass.getKey().equals("Ljava/lang/Object;")) {
                 description.append(PhraseUtils.getExtensionDescription(superclass));

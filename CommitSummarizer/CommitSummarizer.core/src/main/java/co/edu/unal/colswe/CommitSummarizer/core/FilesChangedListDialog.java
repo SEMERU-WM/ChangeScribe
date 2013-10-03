@@ -38,7 +38,7 @@ public class FilesChangedListDialog extends ListSelectionDialog {
 		Label lblCommitDescription = new Label(area, SWT.NONE);
 		lblCommitDescription.setText("Commit Description");
 		
-		setText(new Text(area, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL));
+		setText(new Text(area, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL | SWT.WRAP ));
 		GridData gd_text = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
 		gd_text.widthHint = 608;
 		gd_text.heightHint = 114;

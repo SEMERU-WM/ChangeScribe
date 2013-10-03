@@ -51,7 +51,7 @@ public class TypeDependencySummary implements DependencySummary {
 	@Override
 	public void generateSummary() {
 		if(getDependencies() != null && getDependencies().size() > 0) {
-			builder = new StringBuilder("References: " +"\n\n");
+			builder = new StringBuilder("Referenced in: " +"\n");
 		}
 		
 		for (SearchMatch match : getDependencies()) {
@@ -95,7 +95,7 @@ public class TypeDependencySummary implements DependencySummary {
 	public String toString() {
 		String string = "";
 		if(builder != null && !builder.toString().equals("")) {
-			string = builder.toString() + "\n";
+			string = builder.toString();
 		}
 		return string;
 	}

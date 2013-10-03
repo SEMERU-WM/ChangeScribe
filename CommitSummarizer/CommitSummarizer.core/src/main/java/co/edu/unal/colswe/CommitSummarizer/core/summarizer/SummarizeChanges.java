@@ -7,10 +7,16 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.swt.widgets.Display;
 
+import co.edu.unal.colswe.CommitSummarizer.core.FilesChangedListDialog;
 import co.edu.unal.colswe.CommitSummarizer.core.ast.ProjectInformation;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile.TypeChange;
@@ -28,6 +34,7 @@ public class SummarizeChanges {
 	private List<StereotypeIdentifier> identifiers;
 	private StringBuilder comment = new StringBuilder();
 	private ChangedFile[] differences;
+	private FilesChangedListDialog changedListDialog;
 	
 	public SummarizeChanges(Git git) {
 		super();
@@ -40,39 +47,58 @@ public class SummarizeChanges {
 	public void summarize(ChangedFile[] differences) {
 		this.differences = differences;
 		String currentPackage = "";
-		for (ChangedFile file : differences) {
-			try {
-				if(!file.getChangeType().equals(TypeChange.UNTRACKED.name())) {
-					File left = Utils.getFileContentOfLastCommit(file.getPath(), getGit().getRepository());
-					File right = new File(file.getAbsolutePath());
-					
-					/*if(file.getAbsolutePath().endsWith(".java")) {
-						distiller.extractClassifiedSourceCodeChanges(left, right);
-						
-						List<SourceCodeChange> changes = distiller.getSourceCodeChanges();
-						if(changes != null) {
-						    for(SourceCodeChange change : changes) {
-						    	System.out.println(cd.generateChangeDescription(change));
-						    }
+		for (final ChangedFile file : differences) {
+			/*Job job = new Job("Calculating stereotypes ") {
+				
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {*/
+					try {
+						if(!file.getChangeType().equals(TypeChange.UNTRACKED.name())) {
+							File left = Utils.getFileContentOfLastCommit(file.getPath(), getGit().getRepository());
+							File right = new File(file.getAbsolutePath());
+							
+							/*if(file.getAbsolutePath().endsWith(".java")) {
+								distiller.extractClassifiedSourceCodeChanges(left, right);
+								
+								List<SourceCodeChange> changes = distiller.getSourceCodeChanges();
+								if(changes != null) {
+								    for(SourceCodeChange change : changes) {
+								    	System.out.println(cd.generateChangeDescription(change));
+								    }
+								}
+								
+							}*/
+						} else if(file.getChangeType().equals(TypeChange.UNTRACKED.name())) {
+							if(file.getAbsolutePath().endsWith(".java")) {
+								identifyStereotypes(file, "added");
+							} 
+						} else if(file.getChangeType().equals(TypeChange.REMOVED.name())) {
+							if(file.getAbsolutePath().endsWith(".java")) {
+								identifyStereotypes(file, "removed");
+							}
 						}
-						
-					}*/
-				} else if(file.getChangeType().equals(TypeChange.UNTRACKED.name())) {
-					if(file.getAbsolutePath().endsWith(".java")) {
-						identifyStereotypes(file, "added");
-					} 
-				} else if(file.getChangeType().equals(TypeChange.REMOVED.name())) {
-					if(file.getAbsolutePath().endsWith(".java")) {
-						identifyStereotypes(file, "removed");
+					} catch(Exception e) {
+					    System.err.println("Warning: error while change distilling. " + e.getMessage());
 					}
+					summarizeCommitStereotype();
+					summarizeTypes();
+					/*updateTextInputDescription();
+					return Status.OK_STATUS;
 				}
-			} catch(Exception e) {
-			    System.err.println("Warning: error while change distilling. " + e.getMessage());
-			}
+			};
+			job.schedule();*/
 		}
-		summarizeCommitStereotype();
-		summarizeTypes();
 		
+	}
+	
+	public void updateTextInputDescription() {
+
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				getChangedListDialog().getText().setText(getComment().toString());
+			}
+		});
+
 	}
 	
 	public void summarizeTypes() {
@@ -152,6 +178,14 @@ public class SummarizeChanges {
 
 	public void setIdentifiers(List<StereotypeIdentifier> identifiers) {
 		this.identifiers = identifiers;
+	}
+
+	public FilesChangedListDialog getChangedListDialog() {
+		return changedListDialog;
+	}
+
+	public void setChangedListDialog(FilesChangedListDialog changedListDialog) {
+		this.changedListDialog = changedListDialog;
 	}
 
 }

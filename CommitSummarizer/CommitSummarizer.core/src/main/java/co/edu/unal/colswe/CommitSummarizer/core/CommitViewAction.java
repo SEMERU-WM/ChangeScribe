@@ -2,6 +2,9 @@ package co.edu.unal.colswe.CommitSummarizer.core;
 
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
@@ -9,6 +12,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
@@ -28,7 +32,11 @@ public class CommitViewAction implements IViewActionDelegate {
 	//private IWorkbenchWindow window;
 	
 	private IViewPart view;
+	private Git git;
+	private Set<ChangedFile> differences;
+	private SCMRepository repo;
 	/**
+	 * 
 	 * The constructor.
 	 */
 	public CommitViewAction() {
@@ -42,9 +50,41 @@ public class CommitViewAction implements IViewActionDelegate {
 	 */
 	public void run(IAction action) {
 		
-		SCMRepository repo = new SCMRepository();
-		Git git = repo.getGit();
+		repo = new SCMRepository();
+		initMonitorDialog(action);
 		
+	}
+	
+	private void initMonitorDialog(IAction event) {
+            final Job job = new Job("JSummarizer - Summarizing types") {
+                protected IStatus run(final IProgressMonitor monitor) {
+                	IStatus status = gettingRepositoryStatus(monitor);
+                	createDialog();
+                	return status;
+                }
+            };
+            job.schedule();
+            
+    }
+	
+	private void createDialog() {
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				FilesChangedListDialog listDialog = new FilesChangedListDialog(view.getSite().getShell(), differences, git);
+				listDialog.create();
+				listDialog.open();
+			}
+		});
+	}
+	
+	private IStatus gettingRepositoryStatus(IProgressMonitor monitor) {
+		if (monitor.isCanceled()) {
+            return org.eclipse.core.runtime.Status.CANCEL_STATUS;
+        }
+		monitor.beginTask("Getting status for git repository ", 1);
+		
+		
+		git = repo.getGit();
 		Status status = null;
 		try {
 			status = repo.getStatus();
@@ -55,19 +95,13 @@ public class CommitViewAction implements IViewActionDelegate {
 		} 
 		
 		if(git != null) {
-			Set<ChangedFile> differences = SCMRepository.getDifferences(status,git.getRepository().getWorkTree().getAbsolutePath());
+			monitor.beginTask("Extracting source code differences ", 2);
+			this.differences = SCMRepository.getDifferences(status,git.getRepository().getWorkTree().getAbsolutePath());
 			
-			//MyTitleAreaDialog areaDialog = new MyTitleAreaDialog(window.getShell());
-			FilesChangedListDialog listDialog = new FilesChangedListDialog(view.getSite().getShell(), differences, git);
-		    
-		    
-		    listDialog.create();
-		    listDialog.open();
 		} else {
 			MessageDialog.openInformation(view.getSite().getShell(), "Info", "Git repository not found!");
 		}
-		
-		
+		return org.eclipse.core.runtime.Status.OK_STATUS;
 	}
 
 	/**
