@@ -1,5 +1,6 @@
 package co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.util;
 
+
 public class StringUtils {
 	
 	public static String clearLastCharacterInText(String text, String character) {
@@ -9,5 +10,5 @@ public class StringUtils {
 		return text;
 		
 	}
-
+	
 }

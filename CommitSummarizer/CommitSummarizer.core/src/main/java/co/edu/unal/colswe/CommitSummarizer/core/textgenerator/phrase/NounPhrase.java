@@ -14,7 +14,7 @@ public class NounPhrase extends Phrase {
 	private String connector;
 	private StringBuilder complementPhrase;
 
-	protected NounPhrase(String name) {
+	public NounPhrase(String name) {
 		super(POSTagger.tag(Tokenizer.split(name)));
 	}
 
