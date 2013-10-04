@@ -48,10 +48,6 @@ public class SummarizeChanges {
 		this.differences = differences;
 		String currentPackage = "";
 		for (final ChangedFile file : differences) {
-			/*Job job = new Job("Calculating stereotypes ") {
-				
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {*/
 					try {
 						if(!file.getChangeType().equals(TypeChange.UNTRACKED.name())) {
 							File left = Utils.getFileContentOfLastCommit(file.getPath(), getGit().getRepository());
@@ -82,11 +78,6 @@ public class SummarizeChanges {
 					}
 					summarizeCommitStereotype();
 					summarizeTypes();
-					/*updateTextInputDescription();
-					return Status.OK_STATUS;
-				}
-			};
-			job.schedule();*/
 		}
 		
 	}
@@ -138,7 +129,6 @@ public class SummarizeChanges {
 		CommitStereotype stereotype = stereotypedCommit.findStereotypes();
 		
 		if(stereotype != null) {
-			//getComment().append(stereotypedCommit.getStereotypes().toString() + "\n\n");
 			getComment().append(CommitStereotypeDescriptor.describe(stereotypeIdentifier.getCompilationUnit() ,stereotypedCommit) + "\n\n");
 		} else {
 			getComment().append("Not found commit stereotype\n\n");
