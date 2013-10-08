@@ -9,6 +9,7 @@ public class ChangedFile implements Comparable {
 	private String path;
 	private String changeType;
 	private String absolutePath;
+	private String name;
 	
 	public ChangedFile() {
 		// TODO Auto-generated constructor stub
@@ -18,6 +19,7 @@ public class ChangedFile implements Comparable {
 		super();
 		this.path = path;
 		this.changeType = changeType;
+		this.name = new File(path).getName();
 		this.absolutePath = rootPath + System.getProperty("file.separator") + (new File(path).getPath());
 	}
 
@@ -71,6 +73,14 @@ public class ChangedFile implements Comparable {
 	@Override
 	public int compareTo(Object o2) {
 		return this.getPath().compareTo(((ChangedFile) o2).getPath());
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
     
     

@@ -1,7 +1,5 @@
 package commitsummarizer.core.handlers;
 
-import java.lang.reflect.Member;
-import java.util.HashMap;
 import java.util.Set;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -14,6 +12,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jgit.api.Git;
@@ -25,7 +24,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import co.edu.unal.colswe.CommitSummarizer.core.FilesChangedListDialog;
-import co.edu.unal.colswe.CommitSummarizer.core.ProjectInformation;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import co.edu.unal.colswe.CommitSummarizer.core.git.SCMRepository;
 
@@ -40,7 +38,6 @@ public class CommitCommandHandler extends AbstractHandler {
 	private Git git;
 	private Set<ChangedFile> differences;
 	private SCMRepository repo;
-	private HashMap<String, ProjectInformation> projects;
 	
 	/**
 	 * The constructor.
@@ -53,12 +50,10 @@ public class CommitCommandHandler extends AbstractHandler {
 	 * from the application context.
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		projects = new HashMap<String, ProjectInformation>();
 		IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getActiveMenuSelection(event);
 		window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 		repo = new SCMRepository();
 		initMonitorDialog(selection);
-		//MessageDialog.openInformation(window.getShell(), "CommitSummarizer Core Plugin", "CommitCommand");
 		return null;
 	}
 	
@@ -88,12 +83,16 @@ public class CommitCommandHandler extends AbstractHandler {
 		IJavaProject project = null;
 		if(selected instanceof IMember) {
 			project = ((IMember)selected).getJavaProject();
+		} else if(selected instanceof IJavaProject) {
+			project = ((IJavaProject)selected).getJavaProject();
 		} else if(selected instanceof ICompilationUnit) {
 			project = ((ICompilationUnit)selected).getJavaProject();
 		} else if(selected instanceof IJavaProject) {
 			project = ((IJavaProject)selected).getJavaProject();
 		} else if(selected instanceof IPackageFragment) {
 			project = ((IPackageFragment)selected).getJavaProject();
+		}  else if(selected instanceof IPackageFragmentRoot) {
+			project = ((IPackageFragmentRoot)selected).getJavaProject();
 		} 
 		return project;
 	}

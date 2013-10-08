@@ -3,8 +3,10 @@ package co.edu.unal.colswe.CommitSummarizer.core.summarizer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -38,8 +40,7 @@ public class SummarizeChanges {
 	private StringBuilder comment = new StringBuilder();
 	private ChangedFile[] differences;
 	private FilesChangedListDialog changedListDialog;
-	//private HashMap<String, StereotypeIdentifier> summarized = new sorte 
-	private int counter = 0;
+	private SortedMap<String, StereotypeIdentifier> summarized = new TreeMap<String, StereotypeIdentifier>();
 	
 	public SummarizeChanges(Git git) {
 		super();
@@ -52,14 +53,15 @@ public class SummarizeChanges {
 	public void summarize(final ChangedFile[] differences) {
 		this.differences = differences;
 		this.identifiers = new ArrayList<StereotypeIdentifier>();
-		counter = 0;
+		summarized = new TreeMap<String, StereotypeIdentifier>();
+		getChangedListDialog().getText().setText("");
 		String currentPackage = "";
 		
 			Job job = new Job("Calculating method and types stereotypes") {
 				@Override
 				protected IStatus run(IProgressMonitor arg0) {
 					for (final ChangedFile file : differences) {
-						Job internalJob = new Job("Calculating stereotypes for: ") {
+						Job internalJob = new Job("Calculating stereotype for " + file.getName()) {
 							@Override
 							protected IStatus run(IProgressMonitor arg0) {
 								StereotypeIdentifier identifier = null;
@@ -101,9 +103,7 @@ public class SummarizeChanges {
 						internalJob.addJobChangeListener(new JobChangeAdapter() {
 							public void done(IJobChangeEvent event) {
 						        if (event.getResult().isOK()) {
-						        	counter++;
-						        	System.out.println("COUNTER: " + counter);
-						        	if(counter == identifiers.size()) {
+						        	if(summarized.size() == identifiers.size()) {
 										updateTextInputDescription();
 						        	}
 						        }
@@ -118,8 +118,6 @@ public class SummarizeChanges {
 			};
 			
 			job.schedule();	
-		//}
-		
 	}
 	
 	public void updateTextInputDescription() {
@@ -130,17 +128,17 @@ public class SummarizeChanges {
 				String currentPackage = "";
 				StringBuilder desc = new StringBuilder();
 				desc.append(summarizeCommitStereotype());
-				for(StereotypeIdentifier identifier : identifiers) {
+				for(Entry<String, StereotypeIdentifier> identifier : summarized.entrySet()) {
 					if(currentPackage.trim().equals("")) {
-						currentPackage = identifier.getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
+						currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
 						System.out.println("current 1: " + currentPackage);
 						desc.append("* Modifications to package " + currentPackage + ":  \n\n");
-					} else if(!currentPackage.equals(identifier.getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName())) {
-						currentPackage = identifier.getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
+					} else if(!currentPackage.equals(identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName())) {
+						currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
 						System.out.println("current 2: " + currentPackage);
 						desc.append("* Modifications to package " + currentPackage + ":  \n\n");
 					}
-					desc.append(identifier.toString());
+					desc.append(identifier.getValue().toString());
 				}
 				getChangedListDialog().getText().setText(desc.toString());
 			}
@@ -149,12 +147,15 @@ public class SummarizeChanges {
 	}
 	
 	public void summarizeType(StereotypeIdentifier identifier) {
-		String currentPackage = "";
 		for(StereotypedElement element : identifier.getStereotypedElements()) {
 				SummarizeType summarizeType = new SummarizeType(element, identifier, differences);
 				summarizeType.generate();
 				
 				identifier.getBuilder().append(summarizeType.getBuilder().toString());
+				
+				if(!summarized.containsKey(element.getQualifiedName())) {
+					summarized.put(element.getQualifiedName(), identifier);
+				}
 		}
 	}
 	
