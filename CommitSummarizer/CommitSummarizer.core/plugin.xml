@@ -48,5 +48,50 @@
          </menu> 
       </viewerContribution> 
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="CommitSummarizer.core.commands.category"
+            name="Sample Category">
+      </category>
+      <command
+            categoryId="CommitSummarizer.core.commands.category"
+            id="CommitSummarizer.core.commands.sampleCommand"
+            name="Commit Command">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="commitsummarizer.core.handlers.CommitCommandHandler"
+            commandId="CommitSummarizer.core.commands.sampleCommand">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="CommitSummarizer.core.commands.sampleCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+6">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
+         <menu
+               id="CommitSummarizer.core.menus.sampleMenu"
+               label="CommitSumm"
+               mnemonic="M">
+            <command
+                  commandId="CommitSummarizer.core.commands.sampleCommand"
+                  id="CommitSummarizer.core.menus.sampleCommand"
+                  mnemonic="S">
+            </command>
+         </menu>
+      </menuContribution>
+      
+   </extension>
 
 </plugin>

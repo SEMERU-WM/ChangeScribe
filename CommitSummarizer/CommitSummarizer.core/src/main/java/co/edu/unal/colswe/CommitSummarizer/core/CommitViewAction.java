@@ -70,7 +70,7 @@ public class CommitViewAction implements IViewActionDelegate {
 	private void createDialog() {
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
-				FilesChangedListDialog listDialog = new FilesChangedListDialog(view.getSite().getShell(), differences, git);
+				FilesChangedListDialog listDialog = new FilesChangedListDialog(view.getSite().getShell(), differences, git, null);
 				listDialog.create();
 				listDialog.open();
 			}

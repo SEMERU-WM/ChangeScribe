@@ -22,7 +22,7 @@ public class SummarizeChangeListener implements SelectionListener {
 			summarizer.setChangedListDialog(changedListDialog);
 			
 			summarizer.summarize(changedListDialog.getSelectedFiles());
-			changedListDialog.getText().setText(summarizer.getComment().toString());
+			//changedListDialog.getText().setText(summarizer.getComment().toString());
 			
 		} else {
 			MessageDialog.openInformation(changedListDialog.getShell(), "Information",

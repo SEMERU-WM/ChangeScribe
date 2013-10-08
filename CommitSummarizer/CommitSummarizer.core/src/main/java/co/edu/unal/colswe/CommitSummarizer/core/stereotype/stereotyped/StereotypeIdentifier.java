@@ -20,10 +20,12 @@ public class StereotypeIdentifier {
 	double methodsStdDev;
 	private ICompilationUnit compilationUnit;
 	private String scmOperation; 
+	private StringBuilder builder;
 
 	public StereotypeIdentifier() {
 		super();
 		this.stereotypedElements = new LinkedList<StereotypedElement>();
+		builder = new StringBuilder();
 	}
 	
 	public StereotypeIdentifier(final ICompilationUnit unit,
@@ -34,6 +36,7 @@ public class StereotypeIdentifier {
 		this.methodsMean = methodsMean;
 		this.methodsStdDev = methodsStdDev;
 		this.stereotypedElements = new LinkedList<StereotypedElement>();
+		this.builder = new StringBuilder();
 	}
 
 	public StereotypeIdentifier(final IMember member, final double methodsMean,
@@ -111,4 +114,19 @@ public class StereotypeIdentifier {
 	public void setScmOperation(String scmOperation) {
 		this.scmOperation = scmOperation;
 	}
+
+	public StringBuilder getBuilder() {
+		return builder;
+	}
+
+	public void setBuilder(StringBuilder builder) {
+		this.builder = builder;
+	}
+
+	@Override
+	public String toString() {
+		return builder.toString();
+	}
+	
+	
 }

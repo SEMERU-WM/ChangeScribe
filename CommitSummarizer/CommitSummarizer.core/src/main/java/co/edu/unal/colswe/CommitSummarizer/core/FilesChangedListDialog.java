@@ -3,6 +3,7 @@ package co.edu.unal.colswe.CommitSummarizer.core;
 import java.util.Arrays;
 import java.util.Set;
 
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jgit.api.Git;
@@ -22,12 +23,14 @@ import co.edu.unal.colswe.CommitSummarizer.core.listener.SummarizeChangeListener
 public class FilesChangedListDialog extends ListSelectionDialog {
 	private Text text;
 	private Git git;
+	private IJavaProject selection;
 
-	public FilesChangedListDialog(Shell shell, Set<ChangedFile> differences, Git git) {
+	public FilesChangedListDialog(Shell shell, Set<ChangedFile> differences, Git git, IJavaProject selection) {
 		super(shell, differences,
 				new ArrayContentProvider(),
 				new LabelProvider(), "Changes");
 		this.git = git;
+		this.setSelection(selection);
 		setTitle("Commit changes");
 	}
 
@@ -81,6 +84,14 @@ public class FilesChangedListDialog extends ListSelectionDialog {
 
 	public void setText(Text text) {
 		this.text = text;
+	}
+
+	public IJavaProject getSelection() {
+		return selection;
+	}
+
+	public void setSelection(IJavaProject selection) {
+		this.selection = selection;
 	}
 
 }

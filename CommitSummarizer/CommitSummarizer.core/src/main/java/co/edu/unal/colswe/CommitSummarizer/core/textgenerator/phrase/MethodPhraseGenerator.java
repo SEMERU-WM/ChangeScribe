@@ -113,7 +113,7 @@ public class MethodPhraseGenerator implements PhraseGenerator {
 				} 
 				if(getParameters().size() == 0) {
 					if(PhraseUtils.hasObjectInName(getTaggedText(methodName))) {
-						pset = methodName ;//+ " " + " of " + className;
+						pset = methodName ;
 					} else {
 						pset = methodName + " of " + doValue;
 					}

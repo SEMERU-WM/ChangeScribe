@@ -88,7 +88,7 @@ public class ProjectInformation {
 		IWorkbenchWindow iworkbenchwindow = null;
 		IWorkbenchPage iworkbenchpage = null;
 		if (iworkbench != null) {
-			iworkbenchwindow = iworkbench.getActiveWorkbenchWindow();
+			iworkbenchwindow = iworkbench.getWorkbenchWindows()[0];
 		} 
 		if (iworkbenchwindow != null) {
 			iworkbenchpage = iworkbenchwindow.getActivePage();
