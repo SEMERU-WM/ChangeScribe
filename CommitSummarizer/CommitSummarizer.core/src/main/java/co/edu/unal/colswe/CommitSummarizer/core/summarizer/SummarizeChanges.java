@@ -59,11 +59,11 @@ public class SummarizeChanges {
 		
 			Job job = new Job("Calculating method and types stereotypes") {
 				@Override
-				protected IStatus run(IProgressMonitor arg0) {
+				protected IStatus run(IProgressMonitor externalMonitor) {
 					for (final ChangedFile file : differences) {
 						Job internalJob = new Job("Calculating stereotype for " + file.getName()) {
 							@Override
-							protected IStatus run(IProgressMonitor arg0) {
+							protected IStatus run(IProgressMonitor monitor) {
 								StereotypeIdentifier identifier = null;
 								try {
 									if(!file.getChangeType().equals(TypeChange.UNTRACKED.name())) {
@@ -83,10 +83,12 @@ public class SummarizeChanges {
 										}*/
 									} else if(file.getChangeType().equals(TypeChange.UNTRACKED.name())) {
 										if(file.getAbsolutePath().endsWith(".java")) {
+											monitor.subTask("Identifying stereotypes for " + file.getName());
 											identifier = identifyStereotypes(file, "added");
 										} 
 									} else if(file.getChangeType().equals(TypeChange.REMOVED.name())) {
 										if(file.getAbsolutePath().endsWith(".java")) {
+											monitor.subTask("Identifying stereotypes for " + file.getName());
 											identifier= identifyStereotypes(file, "removed");
 										}
 									}
@@ -95,6 +97,7 @@ public class SummarizeChanges {
 								    e.printStackTrace();
 								}
 								if(identifier != null) {
+									monitor.subTask("Describing type " + file.getName());
 									summarizeType(identifier);
 								}
 								return Status.OK_STATUS;
@@ -103,46 +106,65 @@ public class SummarizeChanges {
 						internalJob.addJobChangeListener(new JobChangeAdapter() {
 							public void done(IJobChangeEvent event) {
 								System.out.println("ANTES DE TERMINO");
-						        if (event.getResult().isOK()) {
-						        	if(summarized.size() == identifiers.size()) {
+						        //if (event.getResult().isOK()) {
+						        	//if(summarized.size() == identifiers.size()) {
 						        		System.out.println("TERMINO-TERMINO-TERMINO");
 										updateTextInputDescription();
-						        	}
-						        }
+						        	//}
+						        //}
 						           
 						    }
 						});
 						internalJob.schedule();
+						try {
+							internalJob.join();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					   if (internalJob.getResult().isOK())
+					      System.out.println("Job completed with success");
+					   else
+					      System.out.println("Job did not complete successfully");
 					}
-					
+					//externalMonitor.worked(identifiers.size()/100);
 					return Status.OK_STATUS;
 				}
 			};
-			
-			job.schedule();	
+			/*job.addJobChangeListener(new JobChangeAdapter() {
+				public void done(IJobChangeEvent event) {
+					
+			        if (event.getResult().isOK()) {
+			        	System.out.println("TERMINO PADRE");
+			        }
+			           
+			    }
+			});*/
+			job.schedule();
 	}
 	
 	public void updateTextInputDescription() {
 
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
-				
-				String currentPackage = "";
-				StringBuilder desc = new StringBuilder();
-				desc.append(summarizeCommitStereotype());
-				for(Entry<String, StereotypeIdentifier> identifier : summarized.entrySet()) {
-					if(currentPackage.trim().equals("")) {
-						currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
-						System.out.println("current 1: " + currentPackage);
-						desc.append("* Modifications to package " + currentPackage + ":  \n\n");
-					} else if(!currentPackage.equals(identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName())) {
-						currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
-						System.out.println("current 2: " + currentPackage);
-						desc.append("* Modifications to package " + currentPackage + ":  \n\n");
+				if(summarized.size() == identifiers.size()) {
+					String currentPackage = "";
+					StringBuilder desc = new StringBuilder();
+					desc.append(summarizeCommitStereotype());
+					for(Entry<String, StereotypeIdentifier> identifier : summarized.entrySet()) {
+						if(currentPackage.trim().equals("")) {
+							currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
+							System.out.println("current 1: " + currentPackage);
+							desc.append("* Modifications to package " + currentPackage + ":  \n\n");
+						} else if(!currentPackage.equals(identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName())) {
+							currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
+							System.out.println("current 2: " + currentPackage);
+							desc.append("* Modifications to package " + currentPackage + ":  \n\n");
+						}
+						desc.append(identifier.getValue().toString());
 					}
-					desc.append(identifier.getValue().toString());
+					getChangedListDialog().getText().setText(desc.toString());
 				}
-				getChangedListDialog().getText().setText(desc.toString());
 			}
 		});
 
