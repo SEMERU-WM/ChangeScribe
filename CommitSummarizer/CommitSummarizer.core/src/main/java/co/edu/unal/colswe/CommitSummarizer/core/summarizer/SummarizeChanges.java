@@ -102,8 +102,10 @@ public class SummarizeChanges {
 						};
 						internalJob.addJobChangeListener(new JobChangeAdapter() {
 							public void done(IJobChangeEvent event) {
+								System.out.println("ANTES DE TERMINO");
 						        if (event.getResult().isOK()) {
 						        	if(summarized.size() == identifiers.size()) {
+						        		System.out.println("TERMINO-TERMINO-TERMINO");
 										updateTextInputDescription();
 						        	}
 						        }
@@ -167,7 +169,6 @@ public class SummarizeChanges {
 			for(StereotypedElement element : identifier.getStereotypedElements()) {
 				methods.addAll((Collection<? extends StereotypedMethod>) element.getStereoSubElements());
 			}
-			
 		}
 		StereotypedCommit stereotypedCommit = new StereotypedCommit(methods);
 		stereotypedCommit.buildSignature();
