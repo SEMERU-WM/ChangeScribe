@@ -8,10 +8,9 @@ import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 public class POSTagger {
 	private static MaxentTagger tagger;
 
-	private static void init() {
+	public static void init() {
 		if (POSTagger.tagger == null) {
-				POSTagger.tagger = new MaxentTagger( 
-						"res/taggers/wsj-0-18-left3words-distsim.tagger");
+				POSTagger.tagger = new MaxentTagger( "res/taggers/wsj-0-18-left3words-distsim.tagger");
 			
 		}
 	}

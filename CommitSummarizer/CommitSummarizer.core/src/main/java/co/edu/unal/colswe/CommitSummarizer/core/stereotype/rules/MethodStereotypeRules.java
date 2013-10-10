@@ -83,7 +83,7 @@ public class MethodStereotypeRules {
 		int returnedFieldVariables = 0;
 		int modifiedObjectParameters = 0;
 		for (final VariableInfo parameter : this.methodAnalyzer.getParameters()) {
-			if (!this.isPrimitive(parameter.getVariableBinding())) {
+			if (parameter.getVariableBinding() != null && !this.isPrimitive(parameter.getVariableBinding())) {
 				allPrimitiveParameters = false;
 			}
 			if (parameter.isReturned()

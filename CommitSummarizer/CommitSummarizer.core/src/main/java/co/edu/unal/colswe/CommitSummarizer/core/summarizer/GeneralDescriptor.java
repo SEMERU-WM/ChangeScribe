@@ -4,6 +4,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.Modifier;
 
+import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile.TypeChange;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedElement;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedType;
 import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.NounPhrase;
@@ -54,9 +55,19 @@ public class GeneralDescriptor {
 		NounPhrase classNamePhrase = new NounPhrase(Tokenizer.split(type.getName()));
 		classNamePhrase.generate();
 		description.append(classNamePhrase.toString());
-		description.append(" was " + operation);
+		description.append(" was " + describeOperation(operation));
         description.append(".\n");
 		return description.toString();
+	}
+	
+	private static String describeOperation(String operation) {
+		String description = "";
+		if(operation.equals(TypeChange.ADDED.toString()) || operation.equals(TypeChange.UNTRACKED.toString())) {
+			description = "added";
+		} else if(operation.equals(TypeChange.REMOVED.toString())) {
+			description = "removed";
+		}
+		return description;
 	}
 	
 	private static String describeInterface(StereotypedType type) {

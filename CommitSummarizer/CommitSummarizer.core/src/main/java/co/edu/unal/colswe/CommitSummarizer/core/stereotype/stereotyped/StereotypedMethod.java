@@ -106,8 +106,8 @@ public class StereotypedMethod extends MethodStereotypeRules implements
 			}
 		} catch (NullPointerException ex) {
 			this.primaryStereotype = MethodStereotype.INCIDENTAL;
-			System.out.println(ex.getMessage());
-		}
+			//TODO DELETE
+			ex.printStackTrace();}
 	}
 
 	private MethodStereotype findPrimaryStereotype() {

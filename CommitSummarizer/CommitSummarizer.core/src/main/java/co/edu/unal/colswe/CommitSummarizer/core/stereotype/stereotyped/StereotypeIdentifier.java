@@ -87,6 +87,9 @@ public class StereotypeIdentifier {
 				stereoElement.findStereotypes();
 				this.stereotypedElements.add(stereoElement);
 			} catch (NullPointerException ex) {
+				
+				//TODO DELETE
+				ex.printStackTrace();
 			}
 		}
 	}

@@ -1,53 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <!--<extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            label="Commit"
-            visible="true"
-            id="CommitSummarizer.core.actionSet">
-         <menu
-               label="CommitSummarizer"
-               id="sampleMenu">
-            <separator
-                  name="sampleGroup">
-            </separator>
-         </menu>
-         <action
-               class="co.edu.unal.colswe.CommitSummarizer.core.CommitAction"
-               icon="icons/sample.gif"
-               id="co.edu.unal.colswe.CommitSummarizer.core.SampleAction"
-               label="Commit"
-               menubarPath="sampleMenu/sampleGroup"
-               toolbarPath="sampleGroup"
-               tooltip="Commit changes to source code repository">
-         </action>
-      </actionSet>
-   </extension>
-   <extension
-         id="CommitSummarizer.core.popupMenus"
-         point="org.eclipse.ui.popupMenus"> 
-      <viewerContribution 
-         id="CommitSummarizer.core.popupMenus" 
-         targetID="org.eclipse.jdt.ui.PackageExplorer">
-         <action
-               class="co.edu.unal.colswe.CommitSummarizer.core.CommitViewAction"
-               icon="icons/sample.gif"
-               id="commitAction"
-               label="Commit"
-               menubarPath="CommitSummarizerMenu/CommitSummarizerGroup"
-               state="true"> 
-         </action>
-         <menu
-               id="CommitSummarizerMenu"
-               label="CommitSummarizer">
-            <separator
-                  name="CommitSummarizerGroup">
-            </separator>
-         </menu> 
-      </viewerContribution> 
-   </extension>-->
    <extension
          point="org.eclipse.ui.commands">
       <category
@@ -69,12 +22,6 @@
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
-      <key
-            commandId="CommitSummarizer.core.commands.sampleCommand"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+6">
-      </key>
    </extension>
    <extension
          point="org.eclipse.ui.menus">

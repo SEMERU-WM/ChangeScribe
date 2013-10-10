@@ -1,6 +1,5 @@
 package co.edu.unal.colswe.CommitSummarizer.core.summarizer;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -77,22 +76,6 @@ public class SummarizeChanges {
 								StereotypeIdentifier identifier = null;
 								try {
 									System.out.println("CHANGE TYPE: " + file.getChangeType());
-									/*if(!file.getChangeType().equals(TypeChange.UNTRACKED.name())) {
-										File left = Utils.getFileContentOfLastCommit(file.getPath(), getGit().getRepository());
-										File right = new File(file.getAbsolutePath());*/
-										
-										/*if(file.getAbsolutePath().endsWith(".java")) {
-											distiller.extractClassifiedSourceCodeChanges(left, right);
-											
-											List<SourceCodeChange> changes = distiller.getSourceCodeChanges();
-											if(changes != null) {
-											    for(SourceCodeChange change : changes) {
-											    	System.out.println(cd.generateChangeDescription(change));
-											    }
-											}
-											
-										}*/
-									/*} else */
 									if(file.getChangeType().equals(TypeChange.UNTRACKED.name()) || file.getChangeType().equals(TypeChange.ADDED.name())) {
 										if(file.getAbsolutePath().endsWith(".java")) {
 											monitor.subTask("Identifying stereotypes for " + file.getName());
@@ -105,7 +88,6 @@ public class SummarizeChanges {
 										}
 									}
 								} catch(Exception e) {
-								    System.err.println("Warning: error while change distilling. " + e.getMessage() );
 								    e.printStackTrace();
 								}
 								if(identifier != null) {
@@ -117,21 +99,13 @@ public class SummarizeChanges {
 						};
 						internalJob.addJobChangeListener(new JobChangeAdapter() {
 							public void done(IJobChangeEvent event) {
-								System.out.println("ANTES DE TERMINO");
-						        //if (event.getResult().isOK()) {
-						        	//if(summarized.size() == identifiers.size()) {
-						        		System.out.println("TERMINO-TERMINO-TERMINO");
-										updateTextInputDescription();
-						        	//}
-						        //}
-						           
+								updateTextInputDescription();					           
 						    }
 						});
 						internalJob.schedule();
 						try {
 							internalJob.join();
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					   if (internalJob.getResult().isOK())
@@ -139,19 +113,10 @@ public class SummarizeChanges {
 					   else
 					      System.out.println("Job did not complete successfully");
 					}
-					//externalMonitor.worked(identifiers.size()/100);
+					
 					return Status.OK_STATUS;
 				}
 			};
-			/*job.addJobChangeListener(new JobChangeAdapter() {
-				public void done(IJobChangeEvent event) {
-					
-			        if (event.getResult().isOK()) {
-			        	System.out.println("TERMINO PADRE");
-			        }
-			           
-			    }
-			});*/
 			job.schedule();
 	}
 	
@@ -256,19 +221,22 @@ public class SummarizeChanges {
 				ICompilationUnit cu = pack.createCompilationUnit(file.getName(), removedFile,false, null);
 				stereotypeIdentifier = new StereotypeIdentifier(cu, 0, 0);
 			} catch (RevisionSyntaxException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (AmbiguousObjectException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IncorrectObjectTypeException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (JavaModelException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		
 		
 		stereotypeIdentifier.identifyStereotypes();
 		stereotypeIdentifier.setScmOperation(scmOperation);

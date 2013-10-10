@@ -18,7 +18,9 @@ public class TypeAnalyzer {
 		this.stereotypedMethods = new LinkedList<StereotypedMethod>();
 		this.report = new StringBuilder();
 		final TypeVisitor visitor = new TypeVisitor(this);
-		type.accept((ASTVisitor) visitor);
+		if(type != null && visitor != null) {
+			type.accept((ASTVisitor) visitor);
+		}
 	}
 
 	public List<StereotypedMethod> getStereotypedMethods() {
