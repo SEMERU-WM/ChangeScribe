@@ -29,8 +29,10 @@ public class MethodPhraseGenerator implements PhraseGenerator {
 		super();
 		this.element = element;
 		this.type = type;
+		
 		this.method = (MethodDeclaration)  element.getElement();
 		setParameters();
+		
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -61,7 +63,12 @@ public class MethodPhraseGenerator implements PhraseGenerator {
 	@SuppressWarnings("unchecked")
 	private void generateSimpleDescription() {
 		String methodName = Tokenizer.split(getMethod().getName().getFullyQualifiedName());
-		String className = Tokenizer.split(((TypeDeclaration) getMethod().getParent()).getName().toString());
+		String className = "";
+		if(getMethod().getParent() instanceof TypeDeclaration) {
+			className = Tokenizer.split(((TypeDeclaration) getMethod().getParent()).getName().toString());
+		} /*else if(getMethod().getParent() instanceof AnonymousClassDeclaration) {
+			className = Tokenizer.split(((AnonymousClassDeclaration) getMethod().getParent())..toString());
+		}*/
 		String methodArguments = getMethod().parameters().size() == 0 ? "" : Tokenizer.split(MethodPhraseUtils.getMethodParams(getMethod().parameters()));
 		
 		String pset = "";

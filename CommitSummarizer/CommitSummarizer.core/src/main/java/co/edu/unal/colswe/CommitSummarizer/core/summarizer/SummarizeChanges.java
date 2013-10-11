@@ -38,6 +38,7 @@ import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.Stereotyp
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedElement;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedMethod;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.CommitStereotype;
+import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.util.CompilationUtils;
 import co.edu.unal.colswe.CommitSummarizer.core.util.Utils;
 
 public class SummarizeChanges {
@@ -56,17 +57,21 @@ public class SummarizeChanges {
 		this.stereotypeIdentifier = new StereotypeIdentifier();
 		this.identifiers = new ArrayList<StereotypeIdentifier>();
 	}
+	
+	public void initSummary(final ChangedFile[] differences) {
+		this.differences = differences;
+		this.identifiers = new ArrayList<StereotypeIdentifier>();
+		this.summarized = new TreeMap<String, StereotypeIdentifier>();
+		getChangedListDialog().getText().setText("");
+		removeCreatedPackages();
+	}
 
 	@SuppressWarnings("unused")
 	public void summarize(final ChangedFile[] differences) {
-		this.differences = differences;
-		this.identifiers = new ArrayList<StereotypeIdentifier>();
-		summarized = new TreeMap<String, StereotypeIdentifier>();
-		getChangedListDialog().getText().setText("");
+		initSummary(differences);
 		String currentPackage = "";
-		removeCreatedPackages();
-		
-			Job job = new Job("Calculating method and types stereotypes") {
+
+		Job job = new Job("Calculating method and types stereotypes") {
 				@Override
 				protected IStatus run(IProgressMonitor externalMonitor) {
 					for (final ChangedFile file : differences) {
@@ -76,7 +81,8 @@ public class SummarizeChanges {
 								StereotypeIdentifier identifier = null;
 								try {
 									System.out.println("CHANGE TYPE: " + file.getChangeType());
-									if(file.getChangeType().equals(TypeChange.UNTRACKED.name()) || file.getChangeType().equals(TypeChange.ADDED.name())) {
+									if(file.getChangeType().equals(TypeChange.UNTRACKED.name()) 
+											|| file.getChangeType().equals(TypeChange.ADDED.name())) {
 										if(file.getAbsolutePath().endsWith(".java")) {
 											monitor.subTask("Identifying stereotypes for " + file.getName());
 											identifier = identifyStereotypes(file, file.getChangeType());
@@ -87,13 +93,14 @@ public class SummarizeChanges {
 											identifier = identifyStereotypes(file, file.getChangeType());
 										}
 									}
+									if(identifier != null) {
+										monitor.subTask("Describing type " + file.getName());
+										summarizeType(identifier);
+									}
 								} catch(Exception e) {
 								    e.printStackTrace();
 								}
-								if(identifier != null) {
-									monitor.subTask("Describing type " + file.getName());
-									summarizeType(identifier);
-								}
+								
 								return Status.OK_STATUS;
 							}
 						};
@@ -108,10 +115,6 @@ public class SummarizeChanges {
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-					   if (internalJob.getResult().isOK())
-					      System.out.println("Job completed with success");
-					   else
-					      System.out.println("Job did not complete successfully");
 					}
 					
 					return Status.OK_STATUS;
@@ -119,7 +122,7 @@ public class SummarizeChanges {
 			};
 			job.schedule();
 	}
-	
+
 	public void updateTextInputDescription() {
 
 		Display.getDefault().asyncExec(new Runnable() {
@@ -147,8 +150,6 @@ public class SummarizeChanges {
 		});
 
 	}
-	
-	
 	
 	protected void removeCreatedPackages() {
 		IFolder folder = ((IJavaProject)changedListDialog.getSelection()).getProject().getFolder("src/commsummtmp");
@@ -196,46 +197,10 @@ public class SummarizeChanges {
 	
 	public StereotypeIdentifier identifyStereotypes(ChangedFile file, String scmOperation) {
 		
-		String projectName = "";
-		IResource res = null;
 		if(scmOperation.equals(TypeChange.ADDED.toString()) ||scmOperation.equals(TypeChange.UNTRACKED.toString())) {
-			if(changedListDialog.getSelection() != null) {
-				projectName = changedListDialog.getSelection().getElementName();
-				res = changedListDialog.getSelection().getProject().findMember(file.getPath().replaceFirst(projectName, ""));
-				stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(res, changedListDialog.getSelection()), 0, 0);
-			} else {
-				projectName = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).getName();
-				res = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).findMember(file.getPath().replaceFirst(projectName, ""));
-				IFile ifile = ProjectInformation.getSelectedProject().getWorkspace().getRoot().getFile(res.getFullPath());
-				stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(ifile), 0, 0);
-			}
+			getAddedStereotypeIdentifier(file);
 		} else if(scmOperation.equals(TypeChange.REMOVED.toString())) {
-			try {
-				String removedFile = Utils.getStringContentOfLastCommit(file.getPath(), getGit().getRepository());
-				projectName = changedListDialog.getSelection().getElementName();
-
-				IPackageFragment pack = null;
-				IFolder folder = ((IJavaProject)changedListDialog.getSelection()).getProject().getFolder("src");
-				pack = changedListDialog.getSelection().getPackageFragmentRoot(folder).createPackageFragment("commsummtmp", true, null);
-				
-				ICompilationUnit cu = pack.createCompilationUnit(file.getName(), removedFile,false, null);
-				stereotypeIdentifier = new StereotypeIdentifier(cu, 0, 0);
-			} catch (RevisionSyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (AmbiguousObjectException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IncorrectObjectTypeException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (JavaModelException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			stereotypeIdentifier = getRemovedStereotypeIdentifier(file);
 		}
 		
 		stereotypeIdentifier.identifyStereotypes();
@@ -246,6 +211,54 @@ public class SummarizeChanges {
 		return stereotypeIdentifier;
 	}
 
+	public StereotypeIdentifier getAddedStereotypeIdentifier(ChangedFile file) {
+		
+		String projectName;
+		IResource res;
+		
+		if(changedListDialog.getSelection() != null) {
+			projectName = changedListDialog.getSelection().getElementName();
+			res = changedListDialog.getSelection().getProject().findMember(file.getPath().replaceFirst(projectName, ""));
+			stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(res, changedListDialog.getSelection()), 0, 0);
+		} else {
+			projectName = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).getName();
+			res = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).findMember(file.getPath().replaceFirst(projectName, ""));
+			IFile ifile = ProjectInformation.getSelectedProject().getWorkspace().getRoot().getFile(res.getFullPath());
+			stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(ifile), 0, 0);
+		}
+		
+		return stereotypeIdentifier;
+	}
+
+	public StereotypeIdentifier getRemovedStereotypeIdentifier(ChangedFile file) {
+		try {
+			String removedFile = Utils.getStringContentOfLastCommit(file.getPath(), getGit().getRepository());
+			IPackageFragment pack = null;
+			String packageName = "";
+			packageName = "commsummtmp." + CompilationUtils.getPackageNameFromStringClass(removedFile);
+			IFolder folder = ((IJavaProject)changedListDialog.getSelection()).getProject().getFolder("src");
+			pack = changedListDialog.getSelection().getPackageFragmentRoot(folder).createPackageFragment(packageName, true, null);
+			ICompilationUnit cu = pack.createCompilationUnit(file.getName(), removedFile,true, null);
+			stereotypeIdentifier = new StereotypeIdentifier(cu, 0, 0);
+		} catch (RevisionSyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (AmbiguousObjectException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IncorrectObjectTypeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JavaModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return stereotypeIdentifier;
+	}
+	
 	public Git getGit() {
 		return git;
 	}

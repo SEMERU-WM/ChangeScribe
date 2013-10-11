@@ -508,15 +508,17 @@ public class MethodAnalyzer {
                 if (relatedType != null && relatedType.isNested() && !Modifier.isStatic(relatedType.getModifiers()) && this.isLocalField(field, relatedType.getDeclaringClass())) {
                     return true;
                 }
-                if (relatedType.getSuperclass() != null && this.isLocalField(field, relatedType.getSuperclass())) {
+                if (relatedType != null && relatedType.getSuperclass() != null && this.isLocalField(field, relatedType.getSuperclass())) {
                     return true;
                 }
                 ITypeBinding[] interfaces;
-                for (int length = (interfaces = relatedType.getInterfaces()).length, i = 0; i < length; ++i) {
-                    final ITypeBinding interfaceType = interfaces[i];
-                    if (this.isLocalField(field, interfaceType)) {
-                        return true;
-                    }
+                if(relatedType != null) {
+	                for (int length = (interfaces = relatedType.getInterfaces()).length, i = 0; i < length; ++i) {
+	                    final ITypeBinding interfaceType = interfaces[i];
+	                    if (this.isLocalField(field, interfaceType)) {
+	                        return true;
+	                    }
+	                }
                 }
             }
             return false;
@@ -571,7 +573,7 @@ public class MethodAnalyzer {
                     return true;
                 }
                 ITypeBinding relatedClass = MethodAnalyzer.this.declaringClass;
-                while (relatedClass.isNested() && !Modifier.isStatic(relatedClass.getModifiers())) {
+                while (relatedClass != null && relatedClass.isNested() && !Modifier.isStatic(relatedClass.getModifiers())) {
                     relatedClass = relatedClass.getDeclaringClass();
                     if (relatedClass == null) {
                         break;
@@ -580,11 +582,14 @@ public class MethodAnalyzer {
                         return true;
                     }
                 }
-                for (relatedClass = MethodAnalyzer.this.declaringClass.getSuperclass(); relatedClass != null; relatedClass = relatedClass.getSuperclass()) {
-                    if (methodBinding.getDeclaringClass().equals((Object)relatedClass)) {
-                        return true;
+                if(MethodAnalyzer.this.declaringClass != null) {
+                	for (relatedClass = MethodAnalyzer.this.declaringClass.getSuperclass(); relatedClass != null; relatedClass = relatedClass.getSuperclass()) {
+                        if (methodBinding.getDeclaringClass().equals((Object)relatedClass)) {
+                            return true;
+                        }
                     }
                 }
+                
             }
             return false;
         }

@@ -97,11 +97,10 @@ public class MethodStereotypeRules {
 			++modifiedObjectParameters;
 		}
 		for (final VariableInfo variable : this.methodAnalyzer.getVariables()) {
-			if (!this.isPrimitive(variable.getVariableBinding())) {
+			if (variable.getVariableBinding() != null && !this.isPrimitive(variable.getVariableBinding())) {
 				allPrimitiveVariables = false;
 			}
-			if (!variable.isReturned()
-					|| variable.getAssignedFields().isEmpty()) {
+			if (!variable.isReturned() || variable.getAssignedFields().isEmpty()) {
 				continue;
 			}
 			++returnedFieldVariables;

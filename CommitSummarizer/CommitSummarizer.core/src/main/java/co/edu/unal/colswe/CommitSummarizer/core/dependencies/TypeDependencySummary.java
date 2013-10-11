@@ -62,11 +62,11 @@ public class TypeDependencySummary implements DependencySummary {
 				e.printStackTrace();
 			}
 			if(match.isInsideDocComment()) {
-				builder.append("\t" + " Referenced in comments of " + type.getFullyQualifiedName('.') + " " + PhraseUtils.getStringType(type) + "\n");
+				builder.append("\t" + " Referenced in comments of " + type.getFullyQualifiedName('.').replaceFirst("commsummtmp.", "") + " " + PhraseUtils.getStringType(type) + "\n");
 			} else if(match.isImplicit()) {
-				builder.append("\t" + " Implicit reference in " + type.getFullyQualifiedName('.') + " " + PhraseUtils.getStringType(type) + "\n");
+				builder.append("\t" + " Implicit reference in " + type.getFullyQualifiedName('.').replaceFirst("commsummtmp.", "") + " " + PhraseUtils.getStringType(type) + "\n");
 			} else {
-				builder.append("\t" + type.getFullyQualifiedName('.') + " " + PhraseUtils.getStringType(type) + "\n");
+				builder.append("\t" + type.getFullyQualifiedName('.').replaceFirst("commsummtmp.", "") + " " + PhraseUtils.getStringType(type) + "\n");
 			}
 		}
 	}

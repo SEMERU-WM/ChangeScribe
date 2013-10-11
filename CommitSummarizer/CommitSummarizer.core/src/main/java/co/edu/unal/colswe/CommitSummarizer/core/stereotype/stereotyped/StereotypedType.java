@@ -181,7 +181,7 @@ public class StereotypedType extends TypeStereotypeRules implements StereotypedE
         this.stereotypedMethods = analyzer.getStereotypedMethods();
         this.report.append(analyzer.getReport());
         for (final StereotypedMethod stereotypedMethod : this.stereotypedMethods) {
-            if (stereotypedMethod.overridesObjectMethod() || stereotypedMethod.isConstructor() || stereotypedMethod.isAnonymous()) {
+            if (stereotypedMethod != null && stereotypedMethod.overridesObjectMethod() || stereotypedMethod.isConstructor() || stereotypedMethod.isAnonymous()) {
                 continue;
             }
             this.addRelatedTypes(stereotypedMethod.getUsedTypes());

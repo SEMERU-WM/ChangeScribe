@@ -4,6 +4,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.pos.POSTagger;
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -30,6 +32,7 @@ public class Activator extends AbstractUIPlugin {
 		super.start(context);
 		plugin  = this;
 		started = true;
+		POSTagger.init();
 	}
 
 	/*

@@ -26,7 +26,6 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import co.edu.unal.colswe.CommitSummarizer.core.FilesChangedListDialog;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import co.edu.unal.colswe.CommitSummarizer.core.git.SCMRepository;
-import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.pos.POSTagger;
 
 /**
  * Our sample handler extends AbstractHandler, an IHandler base class.
@@ -55,7 +54,7 @@ public class CommitCommandHandler extends AbstractHandler {
 		window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 		repo = new SCMRepository();
 		initMonitorDialog(selection);
-		POSTagger.init();
+		
 		return null;
 	}
 	

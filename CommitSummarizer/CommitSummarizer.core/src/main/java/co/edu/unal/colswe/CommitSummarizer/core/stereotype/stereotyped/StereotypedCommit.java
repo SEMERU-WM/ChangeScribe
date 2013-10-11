@@ -22,13 +22,16 @@ public class StereotypedCommit {
 
 	public void buildSignature() {
 		signatureMap = new HashMap<MethodStereotype, Integer>();
-		for(StereotypedMethod method: methods) {
-			Integer value = null;
-			if(!getSignatureMap().containsKey(method.getStereotypes().get(0))) {
-				getSignatureMap().put((MethodStereotype) method.getStereotypes().get(0), 1);
-			} else {
-				value = getSignatureMap().get(method.getStereotypes().get(0));
-				getSignatureMap().put((MethodStereotype) method.getStereotypes().get(0), value + 1);
+		for(Object object: methods) {
+			if(object instanceof StereotypedMethod) {
+				StereotypedMethod method = (StereotypedMethod) object;
+				Integer value = null;
+				if(!getSignatureMap().containsKey(method.getStereotypes().get(0))) {
+					getSignatureMap().put((MethodStereotype) method.getStereotypes().get(0), 1);
+				} else {
+					value = getSignatureMap().get(method.getStereotypes().get(0));
+					getSignatureMap().put((MethodStereotype) method.getStereotypes().get(0), value + 1);
+				}
 			}
 		}
 		System.out.println("signatures: " + getSignatureMap().toString());
