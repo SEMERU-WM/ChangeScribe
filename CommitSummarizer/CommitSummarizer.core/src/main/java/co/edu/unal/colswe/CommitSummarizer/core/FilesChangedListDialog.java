@@ -1,63 +1,504 @@
 package co.edu.unal.colswe.CommitSummarizer.core;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Set;
 
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.BaseLabelProvider;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
+import org.eclipse.jface.viewers.DecoratingStyledCellLabelProvider;
+import org.eclipse.jface.viewers.DecorationOverlayIcon;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
+import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.TreeViewerColumn;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
+import org.eclipse.ui.dialogs.PatternFilter;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 
+import co.edu.unal.colswe.CommitSummarizer.core.decorator.ProblemLabelDecorator;
+import co.edu.unal.colswe.CommitSummarizer.core.editor.JavaViewer;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import co.edu.unal.colswe.CommitSummarizer.core.listener.SummarizeChangeListener;
 
-public class FilesChangedListDialog extends ListSelectionDialog {
-	private Text text;
+public class FilesChangedListDialog extends TitleAreaDialog {
+	private StyledText text;
 	private Git git;
 	private IJavaProject selection;
+	private JavaViewer editor;
+	private ListSelectionDialog listSelectionDialog;
+	private FormToolkit toolkit;
+	private Section filesSection;
+	private CachedCheckboxTreeViewer filesViewer;
+	private Set<ChangedFile> items;
+	private Button commitButton;
+	private Button commitAndPushButton;
+	public static final int COMMIT_AND_PUSH_ID = 30;
 
 	public FilesChangedListDialog(Shell shell, Set<ChangedFile> differences, Git git, IJavaProject selection) {
-		super(shell, differences,
+		super(shell);
+		this.items = differences;
+		listSelectionDialog = new ListSelectionDialog(shell, differences,
 				new ArrayContentProvider(),
 				new LabelProvider(), "Changes");
 		this.git = git;
 		this.setSelection(selection);
-		setTitle("Commit changes");
+	}
+	
+	static class CommitFileContentProvider extends BaseWorkbenchContentProvider {
+		@SuppressWarnings("rawtypes")
+		@Override
+		public Object[] getElements(Object element) {
+			if (element instanceof Object[])
+				return (Object[]) element;
+			if (element instanceof Collection)
+				return ((Collection) element).toArray();
+			return new Object[0];
+		}
+
+		public Object[] getChildren(Object parentElement) {
+			return new Object[0];
+		}
+
+		public Object getParent(Object element) {
+			return null;
+		}
+
+		public boolean hasChildren(Object element) {
+			return false;
+		}
+	}
+	
+	static class CommitPathLabelProvider extends ColumnLabelProvider {
+
+		public String getText(Object obj) {
+			return ((ChangedFile) obj).getPath();
+		}
+
+		public String getToolTipText(Object element) {
+			return ((ChangedFile) element).getPath();
+		}
+
 	}
 
-	@Override
+	static class CommitStatusLabelProvider extends BaseLabelProvider implements
+			IStyledLabelProvider {
+
+		private Image DEFAULT = PlatformUI.getWorkbench().getSharedImages()
+				.getImage(ISharedImages.IMG_OBJ_FILE);
+
+		private ResourceManager resourceManager = new LocalResourceManager(
+				JFaceResources.getResources());
+
+		private Image getEditorImage(ChangedFile item) {
+			Image image = DEFAULT;
+			String name = new Path(item.getPath()).lastSegment();
+			if (name != null) {
+				ImageDescriptor descriptor = PlatformUI.getWorkbench().getEditorRegistry().getImageDescriptor(name);
+				image = (Image) this.resourceManager.get(descriptor);
+			}
+			return image;
+		}
+
+		private Image getDecoratedImage(Image base, ImageDescriptor decorator) {
+			DecorationOverlayIcon decorated = new DecorationOverlayIcon(base,
+					decorator, IDecoration.BOTTOM_RIGHT);
+			return (Image) this.resourceManager.get(decorated);
+		}
+
+		public StyledString getStyledText(Object element) {
+			return new StyledString();
+		}
+
+		public Image getImage(Object element) {
+			ChangedFile item = (ChangedFile) element;
+			ImageDescriptor decorator = null;
+			switch (item.getChangeType()) {
+				case "UNTRACKED":
+					decorator = UIIcons.OVR_UNTRACKED;
+					break;
+				case "ADDED":
+				case "ADDED_INDEX_DIFF":
+					decorator = UIIcons.OVR_STAGED_ADD;
+					break;
+				case "REMOVED":
+				case "REMOVED_NOT_STAGED":
+				case "REMOVED_UNTRACKED":
+					decorator = UIIcons.OVR_STAGED_REMOVE;
+					break;
+				default:
+					break;
+			}
+			return decorator != null ? getDecoratedImage(getEditorImage(item),
+					decorator) : getEditorImage(item);
+		}
+
+		@Override
+		public void dispose() {
+			//SUBMODULE.dispose();
+			resourceManager.dispose();
+			super.dispose();
+		}
+	}
+
+	/*@Override
 	protected Control createDialogArea(Composite parent) {
+		
 		Composite area = (Composite) super.createDialogArea(parent);
 		
 		Label lblCommitDescription = new Label(area, SWT.NONE);
 		lblCommitDescription.setText("Commit Description");
 		
-		setText(new Text(area, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL | SWT.WRAP ));
+		JavaViewer viewer = new JavaViewer();
+		viewer.setShell(getShell());
+		viewer.setComposite(area);
+		viewer.createStyledText();
+		setEditor(viewer);
+		
+		
+		
+		//setText(new StyledText(area, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL | SWT.WRAP ));
 		GridData gd_text = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
 		gd_text.widthHint = 608;
-		gd_text.heightHint = 114;
-		getText().setLayoutData(gd_text);
+		gd_text.heightHint = 164;
+		//getText().setLayoutData(gd_text);
+		
+		getEditor().getText().setLayoutData(gd_text);
 		
 		Button button = new Button(area, SWT.RIGHT);
 		button.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-		button.setText("Create Message");
+		button.setText("Create Description");
 		button.addSelectionListener(new SummarizeChangeListener(this));
 		
+		//initStyles();
 
 		return area;
+	}*/
+	
+	@Override
+	protected Control createContents(Composite parent) {
+		toolkit = new FormToolkit(parent.getDisplay());
+		parent.addDisposeListener(new DisposeListener() {
+
+			public void widgetDisposed(DisposeEvent e) {
+				toolkit.dispose();
+			}
+		});
+		return super.createContents(parent);
+	}
+	
+	@Override
+	protected void createButtonsForButtonBar(Composite parent) {
+		toolkit.adapt(parent, false, false);
+		commitAndPushButton = createButton(parent, COMMIT_AND_PUSH_ID,
+				"Commit and push", false);
+		commitButton = createButton(parent, IDialogConstants.OK_ID,
+				"Commit", true);
+		createButton(parent, IDialogConstants.CANCEL_ID,
+				IDialogConstants.CANCEL_LABEL, false);
+		updateMessage();
+	}
+	
+	@Override
+	protected Control createDialogArea(Composite parent) {
+		Composite container = (Composite) super.createDialogArea(parent);
+		parent.getShell().setText("Commit changes");
+
+		container = toolkit.createComposite(container);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+		toolkit.paintBordersFor(container);
+		GridLayoutFactory.swtDefaults().applyTo(container);
+
+		final SashForm sashForm= new SashForm(container, SWT.VERTICAL | SWT.FILL);
+		toolkit.adapt(sashForm, true, true);
+		sashForm.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+		createMessageAndPersonArea(sashForm);
+		filesSection = createFileSection(sashForm);
+		sashForm.setWeights(new int[] { 50, 50 });
+
+		applyDialogFont(container);
+		container.pack();
+		setTitle("Commit Changes");
+		setMessage("Commit message", IMessageProvider.INFORMATION);
+
+		filesViewer.addCheckStateListener(new ICheckStateListener() {
+
+			public void checkStateChanged(CheckStateChangedEvent event) {
+				updateMessage();
+			}
+		});
+
+		updateFileSectionText();
+		return container;
+	}
+	
+	private Composite createMessageAndPersonArea(Composite container) {
+
+		Composite messageAndPersonArea = toolkit.createComposite(container);
+		GridDataFactory.fillDefaults().grab(true, true)
+				.applyTo(messageAndPersonArea);
+		GridLayoutFactory.swtDefaults().margins(0, 0).spacing(0, 0)
+				.applyTo(messageAndPersonArea);
+
+		Section messageSection = toolkit.createSection(messageAndPersonArea, ExpandableComposite.TITLE_BAR | ExpandableComposite.CLIENT_INDENT);
+		messageSection.setText("Commit message");
+		Composite messageArea = toolkit.createComposite(messageSection);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).extendedMargins(2, 2, 2, 2).applyTo(messageArea);
+		toolkit.paintBordersFor(messageArea);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(messageSection);
+		GridLayoutFactory.swtDefaults().applyTo(messageSection);
+
+		Composite headerArea = new Composite(messageSection, SWT.NONE);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(2).applyTo(headerArea);
+
+		ToolBar messageToolbar = new ToolBar(headerArea, SWT.FLAT | SWT.HORIZONTAL);
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).grab(true, false).applyTo(messageToolbar);
+
+		messageSection.setTextClient(headerArea);
+		
+		JavaViewer viewer = new JavaViewer();
+		viewer.setShell(getShell());
+		viewer.setComposite(messageAndPersonArea);
+		viewer.createStyledText();
+		int minHeight = 164;
+		Point size = container.getSize();
+		viewer.getText().setLayoutData(GridDataFactory.fillDefaults()
+				.grab(true, true).hint(size).minSize(size.x, minHeight)
+				.align(SWT.FILL, SWT.FILL).create());
+		setEditor(viewer);
+		
+		messageSection.setClient(messageArea);
+
+		
+
+		return messageAndPersonArea;
+	}
+	
+	private Section createFileSection(Composite container) {
+		Section filesSection = toolkit.createSection(container,
+				ExpandableComposite.TITLE_BAR
+						| ExpandableComposite.CLIENT_INDENT);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(filesSection);
+		Composite filesArea = toolkit.createComposite(filesSection);
+		filesSection.setClient(filesArea);
+		toolkit.paintBordersFor(filesArea);
+		GridLayoutFactory.fillDefaults().extendedMargins(2, 2, 2, 2).applyTo(filesArea);
+
+		ToolBar filesToolbar = new ToolBar(filesSection, SWT.FLAT);
+
+		filesSection.setTextClient(filesToolbar);
+
+		PatternFilter patternFilter = new PatternFilter() {
+			@Override
+			protected boolean isLeafMatch(Viewer viewer, Object element) {
+				if(element instanceof ChangedFile) {
+					ChangedFile commitItem = (ChangedFile) element;
+					return wordMatches(commitItem.getPath());
+				}
+				return super.isLeafMatch(viewer, element);
+			}
+		};
+		patternFilter.setIncludeLeadingWildcard(true);
+		FilteredCheckboxTree resourcesTreeComposite = new FilteredCheckboxTree(filesArea, toolkit, SWT.FULL_SELECTION, patternFilter);
+		Tree resourcesTree = resourcesTreeComposite.getViewer().getTree();
+		resourcesTree.setData(FormToolkit.KEY_DRAW_BORDER,FormToolkit.TREE_BORDER);
+		resourcesTreeComposite.setLayoutData(GridDataFactory.fillDefaults().hint(600, 200).grab(true, true).create());
+
+		//resourcesTree.addSelectionListener(new CommitItemSelectionListener());
+
+		resourcesTree.setHeaderVisible(true);
+		TreeColumn statCol = new TreeColumn(resourcesTree, SWT.LEFT);
+		statCol.setText("Status");
+		statCol.setWidth(150);
+		//statCol.addSelectionListener(new HeaderSelectionListener(CommitItem.Order.ByStatus));
+
+		TreeColumn resourceCol = new TreeColumn(resourcesTree, SWT.LEFT);
+		resourceCol.setText("Path");
+		resourceCol.setWidth(415);
+		//resourceCol.addSelectionListener(new HeaderSelectionListener(CommitItem.Order.ByFile));
+
+		filesViewer = resourcesTreeComposite.getCheckboxTreeViewer();
+		new TreeViewerColumn(filesViewer, statCol).setLabelProvider(createStatusLabelProvider());
+		new TreeViewerColumn(filesViewer, resourceCol).setLabelProvider(new CommitPathLabelProvider());
+		ColumnViewerToolTipSupport.enableFor(filesViewer);
+		filesViewer.setContentProvider(new CommitFileContentProvider());
+		filesViewer.setUseHashlookup(true);
+		filesViewer.setInput(items.toArray());
+		
+		filesViewer.addCheckStateListener(new ICheckStateListener() {
+
+			public void checkStateChanged(CheckStateChangedEvent event) {
+				updateFileSectionText();
+			}
+		});
+		
+		ToolItem describeChangesItem = new ToolItem(filesToolbar, SWT.PUSH);
+		Image describeImage = UIIcons.ANNOTATE.createImage();
+		//UIUtils.hookDisposal(checkAllItem, checkImage);
+		describeChangesItem.setImage(describeImage);
+		//describeChangesItem.setText("Describe changes");
+		describeChangesItem.setToolTipText("Describe changes");
+		describeChangesItem.addSelectionListener(new SummarizeChangeListener(this));
+
+		ToolItem checkAllItem = new ToolItem(filesToolbar, SWT.PUSH);
+		Image checkImage = UIIcons.CHECK_ALL.createImage();
+		//UIUtils.hookDisposal(checkAllItem, checkImage);
+		checkAllItem.setImage(checkImage);
+		checkAllItem.setToolTipText("Select All");
+		checkAllItem.addSelectionListener(new SelectionAdapter() {
+
+			public void widgetSelected(SelectionEvent e) {
+				filesViewer.setAllChecked(true);
+				updateFileSectionText();
+				updateMessage();
+			}
+
+		});
+
+		ToolItem uncheckAllItem = new ToolItem(filesToolbar, SWT.PUSH);
+		Image uncheckImage = UIIcons.UNCHECK_ALL.createImage();
+		//UIUtils.hookDisposal(uncheckAllItem, uncheckImage);
+		uncheckAllItem.setImage(uncheckImage);
+		uncheckAllItem.setToolTipText("Deselect All");
+		uncheckAllItem.addSelectionListener(new SelectionAdapter() {
+
+			public void widgetSelected(SelectionEvent e) {
+				filesViewer.setAllChecked(false);
+				updateFileSectionText();
+				updateMessage();
+			}
+
+		});
+
+		
+		statCol.pack();
+		resourceCol.pack();
+		return filesSection;
+	}
+	
+	private void updateFileSectionText() {
+		filesSection.setText(MessageFormat.format("Modified files",
+				Integer.valueOf(filesViewer.getCheckedElements().length),
+				Integer.valueOf(filesViewer.getTree().getItemCount())));
+	}
+	
+	private static CellLabelProvider createStatusLabelProvider() {
+		CommitStatusLabelProvider baseProvider = new CommitStatusLabelProvider();
+		ProblemLabelDecorator decorator = new ProblemLabelDecorator(null);
+		return new DecoratingStyledCellLabelProvider(baseProvider, decorator, null) {
+			@Override
+			public String getToolTipText(Object element) {
+				return ((ChangedFile) element).getChangeType();
+			}
+		};
+	}
+	
+
+	
+	private void updateMessage() {
+		if (commitButton == null)
+			// Not yet fully initialized.
+			return;
+
+		String message = null;
+		int type = IMessageProvider.NONE;
+
+		String commitMsg = getEditor().getText().toString();
+		if (commitMsg == null || commitMsg.trim().length() == 0) {
+			message = "Empty message";
+			type = IMessageProvider.INFORMATION;
+		} else if (!isCommitWithoutFilesAllowed()) {
+			message = "No files selected";
+			type = IMessageProvider.INFORMATION;
+		} else {
+			//CommitStatus status = commitMessageComponent.getStatus();
+			//message = status.getMessage();
+			//type = status.getMessageType();
+		}
+
+		setMessage(message, type);
+		boolean commitEnabled = type == IMessageProvider.WARNING
+				|| type == IMessageProvider.NONE;
+		commitButton.setEnabled(commitEnabled);
+		commitAndPushButton.setEnabled(commitEnabled);
+	}
+	
+	private boolean isCommitWithoutFilesAllowed() {
+		if (filesViewer.getCheckedElements().length > 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public ChangedFile[] getSelectedFiles() {
-		return Arrays.copyOf(this.getViewer().getCheckedElements(), this.getViewer().getCheckedElements().length, ChangedFile[].class);
+		
+		return Arrays.copyOf(filesViewer.getCheckedElements(), filesViewer.getCheckedElements().length, ChangedFile[].class);
+	}
+	
+	public void initStyles() {
+		Color orange, blue;
+		orange = new Color(getShell().getDisplay(), 255, 127, 0);
+		blue = getShell().getDisplay().getSystemColor(SWT.COLOR_BLUE);
+		
+		Font font = new Font(getShell().getDisplay(), "Courier", 10, SWT.NORMAL);
+		getText().setFont(font);
+
+		StyleRange range1 = new StyleRange(0, 4, orange, null);
+		range1.fontStyle = SWT.BOLD;
+		getText().setStyleRange(range1);
+
+		StyleRange range2 = new StyleRange(5, 2, blue, null);
+		range2.background = getShell().getDisplay().getSystemColor(SWT.COLOR_YELLOW);
+
+		getText().setStyleRange(range2);//(0, 48, ranges);
+		
+		
 	}
 
 	@Override
@@ -78,11 +519,11 @@ public class FilesChangedListDialog extends ListSelectionDialog {
 		this.git = git;
 	}
 
-	public Text getText() {
+	public StyledText getText() {
 		return text;
 	}
 
-	public void setText(Text text) {
+	public void setText(StyledText text) {
 		this.text = text;
 	}
 
@@ -92,6 +533,22 @@ public class FilesChangedListDialog extends ListSelectionDialog {
 
 	public void setSelection(IJavaProject selection) {
 		this.selection = selection;
+	}
+
+	public JavaViewer getEditor() {
+		return editor;
+	}
+
+	public void setEditor(JavaViewer editor) {
+		this.editor = editor;
+	}
+
+	public ListSelectionDialog getListSelectionDialog() {
+		return listSelectionDialog;
+	}
+
+	public void setListSelectionDialog(ListSelectionDialog listSelectionDialog) {
+		this.listSelectionDialog = listSelectionDialog;
 	}
 
 }

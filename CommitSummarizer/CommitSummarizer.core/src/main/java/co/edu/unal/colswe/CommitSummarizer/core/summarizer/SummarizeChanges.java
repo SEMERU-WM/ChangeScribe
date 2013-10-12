@@ -62,7 +62,7 @@ public class SummarizeChanges {
 		this.differences = differences;
 		this.identifiers = new ArrayList<StereotypeIdentifier>();
 		this.summarized = new TreeMap<String, StereotypeIdentifier>();
-		getChangedListDialog().getText().setText("");
+		getChangedListDialog().getEditor().getText().setText("");
 		removeCreatedPackages();
 	}
 
@@ -143,7 +143,8 @@ public class SummarizeChanges {
 						}
 						desc.append(identifier.getValue().toString());
 					}
-					getChangedListDialog().getText().setText(desc.toString());
+					//getChangedListDialog().getText().setText(desc.toString());
+					getChangedListDialog().getEditor().getText().setText(desc.toString());
 					removeCreatedPackages();
 				}
 			}
