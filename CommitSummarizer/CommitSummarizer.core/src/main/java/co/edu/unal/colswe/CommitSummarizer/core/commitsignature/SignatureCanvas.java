@@ -1,15 +1,19 @@
 package co.edu.unal.colswe.CommitSummarizer.core.commitsignature;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ToolTip;
 
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.MethodStereotype;
 
@@ -25,6 +29,7 @@ public class SignatureCanvas {
 	private Canvas canvas;
 	private Shell shell;
 	private double total;
+	private List<Rectangle> rectangles = new LinkedList<Rectangle>();
 
 	public SignatureCanvas(TreeMap<MethodStereotype, Integer> signatureMap,Composite composite, Shell shell) {
 		super();
@@ -68,7 +73,7 @@ public class SignatureCanvas {
 				// degenerate gray
 				int accum = 20;
 				if (signatureMap != null) {
-					
+					rectangles = new LinkedList<Rectangle>();
 					setTotal();
 					for (final Entry<MethodStereotype, Integer> signature : getSignatureMap().entrySet()) {
 						final double percentaje = Math.round((signature.getValue() * 100.0) / total);
@@ -118,6 +123,18 @@ public class SignatureCanvas {
 			}
 
 		});
+		
+		canvas.addListener(SWT.MouseHover, new Listener() {
+			public void handleEvent(Event e) {
+				for(Rectangle rect : rectangles) {
+					if(rect.contains(e.x, e.y)) {
+						ToolTip toolTip = new ToolTip(getShell(), SWT.NONE);
+						toolTip.setText("hola");
+						toolTip.setVisible(true);
+					}
+				}
+			}
+		});
 	}
 	
 	public void createPercentageRule(Event e) {
@@ -148,7 +165,12 @@ public class SignatureCanvas {
 			int diff = (getWidth() + 15) - (accum + widthValue);
 			widthValue = widthValue + diff;
 		}
-		e.gc.fillRectangle(accum, 20, widthValue,getHeight());
+		
+		Rectangle rect = new Rectangle(accum, 20, widthValue ,getHeight());
+		rectangles.add(rect);
+		
+		e.gc.fillRectangle(accum, 20, widthValue ,getHeight());
+		e.gc.textExtent(signature.getKey().name());
 		e.gc.drawText(signature.getValue() + "", (accum + (int)Math.round((percentaje * getWidth())/100)/2), 30);
 	}
 
