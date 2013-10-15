@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
@@ -47,6 +48,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -61,10 +63,12 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 
+import co.edu.unal.colswe.CommitSummarizer.core.commitsignature.SignatureCanvas;
 import co.edu.unal.colswe.CommitSummarizer.core.decorator.ProblemLabelDecorator;
 import co.edu.unal.colswe.CommitSummarizer.core.editor.JavaViewer;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import co.edu.unal.colswe.CommitSummarizer.core.listener.SummarizeChangeListener;
+import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.MethodStereotype;
 
 public class FilesChangedListDialog extends TitleAreaDialog {
 	private StyledText text;
@@ -79,6 +83,8 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 	private Button commitButton;
 	private Button commitAndPushButton;
 	public static final int COMMIT_AND_PUSH_ID = 30;
+	private TreeMap<MethodStereotype, Integer> signatureMap;
+	private SignatureCanvas signatureCanvas;
 
 	public FilesChangedListDialog(Shell shell, Set<ChangedFile> differences, Git git, IJavaProject selection) {
 		super(shell);
@@ -186,40 +192,6 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		}
 	}
 
-	/*@Override
-	protected Control createDialogArea(Composite parent) {
-		
-		Composite area = (Composite) super.createDialogArea(parent);
-		
-		Label lblCommitDescription = new Label(area, SWT.NONE);
-		lblCommitDescription.setText("Commit Description");
-		
-		JavaViewer viewer = new JavaViewer();
-		viewer.setShell(getShell());
-		viewer.setComposite(area);
-		viewer.createStyledText();
-		setEditor(viewer);
-		
-		
-		
-		//setText(new StyledText(area, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL | SWT.WRAP ));
-		GridData gd_text = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
-		gd_text.widthHint = 608;
-		gd_text.heightHint = 164;
-		//getText().setLayoutData(gd_text);
-		
-		getEditor().getText().setLayoutData(gd_text);
-		
-		Button button = new Button(area, SWT.RIGHT);
-		button.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-		button.setText("Create Description");
-		button.addSelectionListener(new SummarizeChangeListener(this));
-		
-		//initStyles();
-
-		return area;
-	}*/
-	
 	@Override
 	protected Control createContents(Composite parent) {
 		toolkit = new FormToolkit(parent.getDisplay());
@@ -254,7 +226,7 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		toolkit.paintBordersFor(container);
 		GridLayoutFactory.swtDefaults().applyTo(container);
 
-		final SashForm sashForm= new SashForm(container, SWT.VERTICAL | SWT.FILL);
+		final SashForm sashForm = new SashForm(container, SWT.VERTICAL | SWT.FILL);
 		toolkit.adapt(sashForm, true, true);
 		sashForm.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 		createMessageAndPersonArea(sashForm);
@@ -311,12 +283,24 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 				.grab(true, true).hint(size).minSize(size.x, minHeight)
 				.align(SWT.FILL, SWT.FILL).create());
 		setEditor(viewer);
-		
 		messageSection.setClient(messageArea);
-
 		
-
+		signatureCanvas = new SignatureCanvas(signatureMap, messageAndPersonArea, getShell());
+		signatureCanvas.createContents();
+		signatureCanvas.getCanvas().setLayoutData(GridDataFactory.fillDefaults()
+				.grab(true, true).hint(size).minSize(size.x, minHeight)
+				.align(SWT.FILL, SWT.FILL).create());
+		
 		return messageAndPersonArea;
+	}
+	
+	public void updateSignatureCanvas() {
+		if(signatureMap != null) {
+			signatureCanvas.setSignatureMap(signatureMap);
+			//Display.getCurrent().update();
+			//signatureCanvas.createContents(getShell());
+			signatureCanvas.redraw();
+		}
 	}
 	
 	private Section createFileSection(Composite container) {
@@ -415,7 +399,6 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 
 		});
 
-		
 		statCol.pack();
 		resourceCol.pack();
 		return filesSection;
@@ -477,7 +460,6 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 	}
 	
 	public ChangedFile[] getSelectedFiles() {
-		
 		return Arrays.copyOf(filesViewer.getCheckedElements(), filesViewer.getCheckedElements().length, ChangedFile[].class);
 	}
 	
@@ -496,7 +478,7 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		StyleRange range2 = new StyleRange(5, 2, blue, null);
 		range2.background = getShell().getDisplay().getSystemColor(SWT.COLOR_YELLOW);
 
-		getText().setStyleRange(range2);//(0, 48, ranges);
+		getText().setStyleRange(range2);
 		
 		
 	}
@@ -549,6 +531,14 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 
 	public void setListSelectionDialog(ListSelectionDialog listSelectionDialog) {
 		this.listSelectionDialog = listSelectionDialog;
+	}
+
+	public TreeMap<MethodStereotype, Integer> getSignatureMap() {
+		return signatureMap;
+	}
+
+	public void setSignatureMap(TreeMap<MethodStereotype, Integer> signatureMap) {
+		this.signatureMap = signatureMap;
 	}
 
 }

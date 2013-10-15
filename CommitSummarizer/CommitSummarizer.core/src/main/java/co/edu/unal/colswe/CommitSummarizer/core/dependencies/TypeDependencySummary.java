@@ -12,6 +12,7 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.internal.core.ResolvedSourceType;
 
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
+import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile.TypeChange;
 import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.util.PhraseUtils;
 
 @SuppressWarnings("restriction")
@@ -21,9 +22,11 @@ public class TypeDependencySummary implements DependencySummary {
 	private List<SearchMatch> dependencies;
 	private StringBuilder builder;
 	private ChangedFile[] differences;
+	private String operation;
 
-	public TypeDependencySummary(IJavaElement element) {
+	public TypeDependencySummary(IJavaElement element, String operation) {
 		this.element = element;
+		this.operation = operation;
 		this.setDependencies(new ArrayList<SearchMatch>());
 	}
 
@@ -51,16 +54,18 @@ public class TypeDependencySummary implements DependencySummary {
 	@Override
 	public void generateSummary() {
 		if(getDependencies() != null && getDependencies().size() > 0) {
-			builder = new StringBuilder("Referenced in: " +"\n");
+			String lead = "";
+			if(operation.equals(TypeChange.REMOVED.toString())) {
+				lead = "Was referenced by:";
+			} else {
+				lead = "Referenced by:";
+			}
+			builder = new StringBuilder(lead +"\n");
 		}
 		
 		for (SearchMatch match : getDependencies()) {
 			ResolvedSourceType type = (ResolvedSourceType) match.getElement();
-			try {
-				type.getTypes();
-			} catch (JavaModelException e) {
-				e.printStackTrace();
-			}
+
 			if(match.isInsideDocComment()) {
 				builder.append("\t" + " Referenced in comments of " + type.getFullyQualifiedName('.').replaceFirst("commsummtmp.", "") + " " + PhraseUtils.getStringType(type) + "\n");
 			} else if(match.isImplicit()) {

@@ -1,6 +1,6 @@
 package co.edu.unal.colswe.CommitSummarizer.core.stereotype.rules;
 
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.List;
 
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedMethod;
@@ -9,7 +9,7 @@ import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.MethodStereo
 
 public class CommitStereotypesRules {
 	
-	public CommitStereotype checkStructureModifier(List<StereotypedMethod> methods, HashMap<MethodStereotype, Integer> signatureMap) {
+	public CommitStereotype checkStructureModifier(List<StereotypedMethod> methods, TreeMap<MethodStereotype, Integer> signatureMap) {
 		CommitStereotype commitStereotype = null;
 		
 		int get = (signatureMap.get(MethodStereotype.GET) != null) ? signatureMap.get(MethodStereotype.GET) : 0;
@@ -22,7 +22,7 @@ public class CommitStereotypesRules {
 		return commitStereotype;
 	}
 
-	public CommitStereotype checkStateAccessModifier(List<StereotypedMethod> methods, HashMap<MethodStereotype, Integer> signatureMap) {
+	public CommitStereotype checkStateAccessModifier(List<StereotypedMethod> methods, TreeMap<MethodStereotype, Integer> signatureMap) {
 		CommitStereotype commitStereotype = null;
 		
 		int get = (signatureMap.get(MethodStereotype.GET) != null) ? signatureMap.get(MethodStereotype.GET) : 0;
@@ -37,7 +37,7 @@ public class CommitStereotypesRules {
 		return commitStereotype;
 	}
 	
-	public CommitStereotype checkStateUpdateModifier(List<StereotypedMethod> methods, HashMap<MethodStereotype, Integer> signatureMap) {
+	public CommitStereotype checkStateUpdateModifier(List<StereotypedMethod> methods, TreeMap<MethodStereotype, Integer> signatureMap) {
 		CommitStereotype commitStereotype = null;
 		
 		int set = (signatureMap.get(MethodStereotype.SET) != null) ?  signatureMap.get(MethodStereotype.SET) : 0;
@@ -51,7 +51,7 @@ public class CommitStereotypesRules {
 		return commitStereotype;
 	}
 	
-	public CommitStereotype checkBehaviorModifier(List<StereotypedMethod> methods, HashMap<MethodStereotype, Integer> signatureMap) {
+	public CommitStereotype checkBehaviorModifier(List<StereotypedMethod> methods, TreeMap<MethodStereotype, Integer> signatureMap) {
 		CommitStereotype commitStereotype = null;
 		
 		int command = (signatureMap.get(MethodStereotype.COMMAND) != null) ? signatureMap.get(MethodStereotype.COMMAND) : 0;
@@ -64,7 +64,7 @@ public class CommitStereotypesRules {
 		return commitStereotype;
 	}
 	
-	public CommitStereotype checkObjectCreationModifier(List<StereotypedMethod> methods, HashMap<MethodStereotype, Integer> signatureMap) {
+	public CommitStereotype checkObjectCreationModifier(List<StereotypedMethod> methods, TreeMap<MethodStereotype, Integer> signatureMap) {
 		CommitStereotype commitStereotype = null;
 		
 		int constructor = (signatureMap.get(MethodStereotype.CONSTRUCTOR) != null) ? signatureMap.get(MethodStereotype.CONSTRUCTOR) : 0;
@@ -79,7 +79,7 @@ public class CommitStereotypesRules {
 		return commitStereotype;
 	}
 	
-	public CommitStereotype checkRelationshipModifier(List<StereotypedMethod> methods, HashMap<MethodStereotype, Integer> signatureMap) {
+	public CommitStereotype checkRelationshipModifier(List<StereotypedMethod> methods, TreeMap<MethodStereotype, Integer> signatureMap) {
 		CommitStereotype commitStereotype = null;
 
 		int collaborator = (signatureMap.get(MethodStereotype.COLLABORATOR) != null) ?  signatureMap.get(MethodStereotype.COLLABORATOR) : 0;
@@ -96,7 +96,7 @@ public class CommitStereotypesRules {
 		return commitStereotype;
 	}
 	
-	public CommitStereotype checkControlModifier(List<StereotypedMethod> methods, HashMap<MethodStereotype, Integer> signatureMap) {
+	public CommitStereotype checkControlModifier(List<StereotypedMethod> methods, TreeMap<MethodStereotype, Integer> signatureMap) {
 		CommitStereotype commitStereotype = null;
 		
 		int controller = (signatureMap.get(MethodStereotype.CONTROLLER) != null) ? signatureMap.get(MethodStereotype.CONTROLLER) : 0;
@@ -110,7 +110,7 @@ public class CommitStereotypesRules {
 	}
 	
 	
-	public CommitStereotype checkLargeModifier(List<StereotypedMethod> methods, HashMap<MethodStereotype, Integer> signatureMap) {
+	public CommitStereotype checkLargeModifier(List<StereotypedMethod> methods, TreeMap<MethodStereotype, Integer> signatureMap) {
 		CommitStereotype commitStereotype = null;
 		
 		int set = (signatureMap.get(MethodStereotype.SET) != null) ?  signatureMap.get(MethodStereotype.SET) : 0;
@@ -135,7 +135,7 @@ public class CommitStereotypesRules {
 		return commitStereotype;
 	}
 	
-	public CommitStereotype checkLazyModifier(List<StereotypedMethod> methods, HashMap<MethodStereotype, Integer> signatureMap) {
+	public CommitStereotype checkLazyModifier(List<StereotypedMethod> methods, TreeMap<MethodStereotype, Integer> signatureMap) {
 		CommitStereotype commitStereotype = null;
 		
 		int get = (signatureMap.get(MethodStereotype.GET) != null) ?  signatureMap.get(MethodStereotype.GET) : 0;
@@ -155,7 +155,7 @@ public class CommitStereotypesRules {
 		return commitStereotype;
 	}
 	
-	public CommitStereotype checkDegenerateModifier(List<StereotypedMethod> methods, HashMap<MethodStereotype, Integer> signatureMap) {
+	public CommitStereotype checkDegenerateModifier(List<StereotypedMethod> methods, TreeMap<MethodStereotype, Integer> signatureMap) {
 		CommitStereotype commitStereotype = null;
 		
 		int empty = (signatureMap.get(MethodStereotype.EMPTY) != null) ? signatureMap.get(MethodStereotype.EMPTY) : 0;
@@ -169,7 +169,7 @@ public class CommitStereotypesRules {
 		return commitStereotype;
 	}
 	
-	public CommitStereotype checkSmallModifier(List<StereotypedMethod> methods, HashMap<MethodStereotype, Integer> signatureMap) {
+	public CommitStereotype checkSmallModifier(List<StereotypedMethod> methods, TreeMap<MethodStereotype, Integer> signatureMap) {
 		CommitStereotype commitStereotype = null;
 		
 		if(methods.size() < 3) {

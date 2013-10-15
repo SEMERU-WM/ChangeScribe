@@ -22,8 +22,6 @@ public class SummarizeChangeListener implements SelectionListener {
 			summarizer.setChangedListDialog(changedListDialog);
 			
 			summarizer.summarize(changedListDialog.getSelectedFiles());
-			//changedListDialog.getText().setText(summarizer.getComment().toString());
-			
 		} else {
 			MessageDialog.openInformation(changedListDialog.getShell(), "Information",
 					"You do not select any change");

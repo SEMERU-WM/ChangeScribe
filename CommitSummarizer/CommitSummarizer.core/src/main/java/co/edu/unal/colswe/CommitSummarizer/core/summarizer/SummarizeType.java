@@ -22,7 +22,7 @@ public class SummarizeType {
 		builder = new StringBuilder();
 		builder.append(GeneralDescriptor.describe(element, identifier.getParser().getCompilationUnit(), identifier.getScmOperation()));
 		builder.append(StereotypeMethodDescriptor.describe(getElement().getStereoSubElements()));
-		builder.append(ImpactSetDescriptor.describe(identifier.getCompilationUnit(), getDifferences()) + "\n");
+		builder.append(ImpactSetDescriptor.describe(identifier.getCompilationUnit(), getDifferences(), identifier.getScmOperation()) + "\n");
 	}
 	
 	public StringBuilder getBuilder() {

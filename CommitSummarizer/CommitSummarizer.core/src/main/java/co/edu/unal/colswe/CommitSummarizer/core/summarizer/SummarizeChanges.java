@@ -145,6 +145,7 @@ public class SummarizeChanges {
 					}
 					//getChangedListDialog().getText().setText(desc.toString());
 					getChangedListDialog().getEditor().getText().setText(desc.toString());
+					getChangedListDialog().updateSignatureCanvas();
 					removeCreatedPackages();
 				}
 			}
@@ -193,6 +194,7 @@ public class SummarizeChanges {
 		} else {
 			result = "Not found commit stereotype\n\n";
 		}
+		changedListDialog.setSignatureMap(stereotypedCommit.getSignatureMap());
 		return result;
 	}
 	

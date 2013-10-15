@@ -3,6 +3,7 @@ package co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.rules.CommitStereotypesRules;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.CommitStereotype;
@@ -11,7 +12,7 @@ import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.MethodStereo
 public class StereotypedCommit {
 	
 	private List<StereotypedMethod> methods;
-	private HashMap<MethodStereotype, Integer> signatureMap = new HashMap<MethodStereotype, Integer>();
+	private TreeMap<MethodStereotype, Integer> signatureMap = new TreeMap<MethodStereotype, Integer>();
 	private CommitStereotype primaryStereotype;
 	private CommitStereotype secondaryStereotype;
 	
@@ -21,7 +22,7 @@ public class StereotypedCommit {
 	}
 
 	public void buildSignature() {
-		signatureMap = new HashMap<MethodStereotype, Integer>();
+		signatureMap = new TreeMap<MethodStereotype, Integer>();
 		for(Object object: methods) {
 			if(object instanceof StereotypedMethod) {
 				StereotypedMethod method = (StereotypedMethod) object;
@@ -137,11 +138,11 @@ public class StereotypedCommit {
 		return stereotypes;
 	}
 	
-	public HashMap<MethodStereotype, Integer> getSignatureMap() {
+	public TreeMap<MethodStereotype, Integer> getSignatureMap() {
 		return signatureMap;
 	}
 
-	public void setSignatureMap(HashMap<MethodStereotype, Integer> signatureMap) {
+	public void setSignatureMap(TreeMap<MethodStereotype, Integer> signatureMap) {
 		this.signatureMap = signatureMap;
 	}
 
