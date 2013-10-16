@@ -30,6 +30,7 @@ public class SignatureCanvas {
 	private Shell shell;
 	private double total;
 	private List<Rectangle> rectangles = new LinkedList<Rectangle>();
+	private ToolTip toolTip;
 
 	public SignatureCanvas(TreeMap<MethodStereotype, Integer> signatureMap,Composite composite, Shell shell) {
 		super();
@@ -79,8 +80,6 @@ public class SignatureCanvas {
 						final double percentaje = Math.round((signature.getValue() * 100.0) / total);
 						Color color = null;
 						
-						System.out.println("percentage: " + percentaje + " value: " + signature.getValue() + " total: " + total );
-
 						if (signature.getKey() == MethodStereotype.ABSTRACT) {
 							color = e.display.getSystemColor(SWT.COLOR_DARK_GRAY);
 						} else if (signature.getKey() == MethodStereotype.EMPTY) {
@@ -126,15 +125,42 @@ public class SignatureCanvas {
 		
 		canvas.addListener(SWT.MouseHover, new Listener() {
 			public void handleEvent(Event e) {
+				int counter = 0;
 				for(Rectangle rect : rectangles) {
 					if(rect.contains(e.x, e.y)) {
-						ToolTip toolTip = new ToolTip(getShell(), SWT.NONE);
-						toolTip.setText("hola");
+						if(toolTip != null && toolTip.isVisible()) {
+							toolTip.setVisible(false);
+						}
+						toolTip = new ToolTip(getShell(), SWT.BALLOON | SWT.ICON_INFORMATION);
+						toolTip.setText(getToolTipInfo(counter));
 						toolTip.setVisible(true);
+						toolTip.setAutoHide(true);
+						toolTip.setMessage(getToolTipMessage(counter));
 					}
+					counter++;
 				}
 			}
 		});
+		
+		canvas.addListener(SWT.MouseExit, new Listener() {
+			public void handleEvent(Event e) {
+				if(toolTip != null && toolTip.isVisible()) {
+					toolTip.setVisible(false);
+				}
+			}
+		});
+	}
+	
+	public String getToolTipInfo(int value) {
+		String text = "Stereotype: " + ((MethodStereotype)signatureMap.keySet().toArray()[value]).name().replace("_", " ") + "\n";
+		text += "Amount: " + signatureMap.values().toArray()[value];
+		
+		return text;
+	}
+	
+	public String getToolTipMessage(int value) {
+		
+		return ((MethodStereotype)signatureMap.keySet().toArray()[value]).getSubcategory().getDescription();
 	}
 	
 	public void createPercentageRule(Event e) {
@@ -150,7 +176,6 @@ public class SignatureCanvas {
 			} else {
 				e.gc.drawString("" + i + "%", accumulate - 10, 75);
 			}
-			System.out.println("accumulate: " + accumulate);
 			accumulate = accumulate + width / 10;
 			i = i + 10;
 		}
