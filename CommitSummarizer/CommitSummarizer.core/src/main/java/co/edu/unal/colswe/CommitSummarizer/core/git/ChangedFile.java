@@ -10,6 +10,7 @@ public class ChangedFile implements Comparable {
 	private String changeType;
 	private String absolutePath;
 	private String name;
+	private TypeChange typeChange;
 	
 	public ChangedFile() {
 		// TODO Auto-generated constructor stub
@@ -49,7 +50,7 @@ public class ChangedFile implements Comparable {
      * @author Beat Fluri
      */
     public static enum TypeChange {
-    	ADDED("ADDED"), MODIFIED("MODIFIED"), UNTRACKED("UNTRACKED"), REMOVED("REMOVED");
+    	ADDED("ADDED"), MODIFIED("MODIFIED"), UNTRACKED("UNTRACKED"), REMOVED("REMOVED"), ADDED_INDEX_DIFF("ADDED_INDEX_DIFF"), REMOVED_NOT_STAGED("REMOVED_NOT_STAGED"), REMOVED_UNTRACKED("REMOVED_UNTRACKED");
     	
     	private TypeChange(String type) { 
         	
@@ -81,6 +82,14 @@ public class ChangedFile implements Comparable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public TypeChange getTypeChange() {
+		return typeChange;
+	}
+
+	public void setTypeChange(TypeChange typeChange) {
+		this.typeChange = typeChange;
 	}
     
     

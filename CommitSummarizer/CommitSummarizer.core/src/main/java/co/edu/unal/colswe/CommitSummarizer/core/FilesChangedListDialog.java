@@ -48,7 +48,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -164,17 +163,17 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		public Image getImage(Object element) {
 			ChangedFile item = (ChangedFile) element;
 			ImageDescriptor decorator = null;
-			switch (item.getChangeType()) {
-				case "UNTRACKED":
+			switch (item.getTypeChange()) {
+				case UNTRACKED:
 					decorator = UIIcons.OVR_UNTRACKED;
 					break;
-				case "ADDED":
-				case "ADDED_INDEX_DIFF":
+				case ADDED:
+				case ADDED_INDEX_DIFF:
 					decorator = UIIcons.OVR_STAGED_ADD;
 					break;
-				case "REMOVED":
-				case "REMOVED_NOT_STAGED":
-				case "REMOVED_UNTRACKED":
+				case REMOVED:
+				case REMOVED_NOT_STAGED:
+				case REMOVED_UNTRACKED:
 					decorator = UIIcons.OVR_STAGED_REMOVE;
 					break;
 				default:

@@ -53,21 +53,25 @@ public class SCMRepository {
 		for (String string : repositoryStatus.getModified()) {
 			ChangedFile changedFile = new ChangedFile(string, TypeChange.MODIFIED.name(), rootPath);
 			differences.add(changedFile);
+			changedFile.setTypeChange(TypeChange.MODIFIED);
 		}
 		
 		for (String string : repositoryStatus.getAdded()) {
 			ChangedFile changedFile = new ChangedFile(string, TypeChange.ADDED.name(), rootPath);
 			differences.add(changedFile);
+			changedFile.setTypeChange(TypeChange.ADDED);
 		}
 		
 		for (String string : repositoryStatus.getUntracked()) {
 			ChangedFile changedFile = new ChangedFile(string, TypeChange.UNTRACKED.name(), rootPath);
 			differences.add(changedFile);
+			changedFile.setTypeChange(TypeChange.UNTRACKED);
 		}
 		
 		for	(String string : repositoryStatus.getRemoved()) {
 			ChangedFile changedFile = new ChangedFile(string, TypeChange.REMOVED.name(), rootPath);
 			differences.add(changedFile);
+			changedFile.setTypeChange(TypeChange.REMOVED);
 		}
 		
 		return differences;
