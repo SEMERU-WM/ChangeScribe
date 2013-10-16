@@ -16,8 +16,12 @@ public class GeneralDescriptor {
 	public static String describe(StereotypedElement element, CompilationUnit cu, String operation) {
 		StereotypedType type = (StereotypedType) element;
 		StringBuilder description = new StringBuilder();
-		ITypeBinding superclass = type.getElement().resolveBinding().getSuperclass();
-		ITypeBinding[] interfaces = type.getElement().resolveBinding().getInterfaces();
+		ITypeBinding superclass = null; 
+		ITypeBinding[] interfaces = null;
+		if (type.getElement().resolveBinding() != null) {
+			superclass = type.getElement().resolveBinding().getSuperclass();
+			interfaces = type.getElement().resolveBinding().getInterfaces();
+		}
 		
 		if(type.isInterface()) {
 			description.append(describeInterface(type) + " ");
@@ -44,7 +48,7 @@ public class GeneralDescriptor {
                 description.append("data class");
             } else {
                 description.append("class");
-            } if (Modifier.isAbstract(type.getElement().resolveBinding().getModifiers())) {
+            } if (type.getElement().resolveBinding() != null &&Modifier.isAbstract(type.getElement().resolveBinding().getModifiers())) {
                 description.insert(0, "An abstract ");
             } else {
                 description.insert(0, PhraseUtils.getIndefiniteArticle(description.toString()).concat(" "));
@@ -52,7 +56,7 @@ public class GeneralDescriptor {
 		}
 		
 		description.append(" for ");
-		NounPhrase classNamePhrase = new NounPhrase(Tokenizer.split(type.getName()));
+		NounPhrase classNamePhrase = new NounPhrase(Tokenizer.split(type.getElement().getName().getFullyQualifiedName()));
 		classNamePhrase.generate();
 		description.append(classNamePhrase.toString());
 		description.append(" was " + describeOperation(operation));
