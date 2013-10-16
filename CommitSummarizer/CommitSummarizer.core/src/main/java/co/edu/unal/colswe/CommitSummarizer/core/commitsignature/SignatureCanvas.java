@@ -31,6 +31,7 @@ public class SignatureCanvas {
 	private double total;
 	private List<Rectangle> rectangles = new LinkedList<Rectangle>();
 	private ToolTip toolTip;
+	private Rectangle currentRectangle;
 
 	public SignatureCanvas(TreeMap<MethodStereotype, Integer> signatureMap,Composite composite, Shell shell) {
 		super();
@@ -46,7 +47,6 @@ public class SignatureCanvas {
 			canvas.update();
 
 			composite.getParent().layout(true, true);
-			composite.setSize(composite.getClientArea().width + 10,composite.getClientArea().height + 10);
 			composite.redraw();
 			composite.update();
 		}
@@ -128,14 +128,23 @@ public class SignatureCanvas {
 				int counter = 0;
 				for(Rectangle rect : rectangles) {
 					if(rect.contains(e.x, e.y)) {
-						if(toolTip != null && toolTip.isVisible()) {
+						
+						if(currentRectangle == null || currentRectangle != rect){
+							if(toolTip != null && toolTip.isVisible()) {
+								toolTip.setVisible(false);
+							}
+							toolTip = new ToolTip(getShell(), SWT.BALLOON | SWT.ICON_INFORMATION);
+							currentRectangle = rect;
 							toolTip.setVisible(false);
+							toolTip.setText("Stereotype description");
+							toolTip.setMessage(getToolTipInfo(counter) + "\n" + getToolTipMessage(counter));
+							toolTip.setVisible(true);
+							toolTip.setAutoHide(true);
+						} else {
+							toolTip.setVisible(true);
 						}
-						toolTip = new ToolTip(getShell(), SWT.BALLOON | SWT.ICON_INFORMATION);
-						toolTip.setText(getToolTipInfo(counter));
-						toolTip.setVisible(true);
-						toolTip.setAutoHide(true);
-						toolTip.setMessage(getToolTipMessage(counter));
+						
+						
 					}
 					counter++;
 				}
@@ -144,8 +153,21 @@ public class SignatureCanvas {
 		
 		canvas.addListener(SWT.MouseExit, new Listener() {
 			public void handleEvent(Event e) {
-				if(toolTip != null && toolTip.isVisible()) {
-					toolTip.setVisible(false);
+				boolean visible = false;
+				int i = 0;
+				for(Rectangle rect : rectangles) {
+					if(rect.contains(e.x, e.y)) {
+						visible = true;
+						break;
+					}
+					if(i == rectangles.size() - 1 && visible == false) {
+						visible = false;
+					}
+					i++;
+						
+				}
+				if(toolTip != null) {
+					toolTip.setVisible(visible);
 				}
 			}
 		});
