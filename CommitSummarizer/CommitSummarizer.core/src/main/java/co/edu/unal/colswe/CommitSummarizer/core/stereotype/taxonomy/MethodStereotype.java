@@ -20,10 +20,12 @@ public enum MethodStereotype implements CodeStereotype {
     EMPTY("EMPTY", 15, Category.DEGENERATE, Subcategory.EMPTY), 
     ABSTRACT("ABSTRACT", 16, Category.DEGENERATE, Subcategory.ABSTRACT);
     
+    private final int id;
     private final Category category;
     private final Subcategory subcategory;
     
     private MethodStereotype(final String s, final int n, final Category category, final Subcategory subcategory) {
+    	this.id = n;
         this.category = category;
         this.subcategory = subcategory;
     }
@@ -36,7 +38,11 @@ public enum MethodStereotype implements CodeStereotype {
         return this.subcategory;
     }
     
-    public enum Category {
+    public int getId() {
+		return id;
+	}
+
+	public enum Category {
         ACCESSOR("ACCESSOR", 0), 
         MUTATOR("MUTATOR", 1), 
         CREATIONAL("CREATIONAL", 2), 
@@ -69,30 +75,33 @@ public enum MethodStereotype implements CodeStereotype {
     }
     
     public enum Subcategory {
-        GET("GET", 0), 
-        PREDICATE("PREDICATE", 1), 
-        PROPERTY("PROPERTY", 2), 
-        VOID_ACCESSOR("VOID_ACCESSOR", 3), 
-        SET("SET", 4), 
-        COMMAND("COMMAND", 5), 
-        NON_VOID_COMMAND("NON_VOID_COMMAND", 6), 
-        CONSTRUCTOR("CONSTRUCTOR", 7), 
-        COPY_CONSTRUCTOR("COPY_CONSTRUCTOR", 8), 
-        DESTRUCTOR("DESTRUCTOR", 9), 
-        FACTORY("FACTORY", 10), 
-        COLLABORATOR("COLLABORATOR", 11), 
-        CONTROLLER("CONTROLLER", 12), 
-        LOCAL_CONTROLLER("LOCAL_CONTROLLER", 13), 
-        INCIDENTAL("INCIDENTAL", 14), 
-        EMPTY("EMPTY", 15), 
-        ABSTRACT("ABSTRACT", 16);
+    	
+        GET("GET", 0, "Returns a local field directly"), 
+        PREDICATE("PREDICATE", 1, "Returns a Boolean value that is not a local field"), 
+        PROPERTY("PROPERTY", 2, "Returns information about local fields"), 
+        VOID_ACCESSOR("VOID_ACCESSOR", 3, "Returns information about local fields through the parameters"), 
+        SET("SET", 4, "Changes only one local field"), 
+        COMMAND("COMMAND", 5, "Changes more than one local fields"), 
+        NON_VOID_COMMAND("NON_VOID_COMMAND", 6, "Command whose return type is not void or Boolean"), 
+        CONSTRUCTOR("CONSTRUCTOR", 7, "Invoked when creating an object"), 
+        COPY_CONSTRUCTOR("COPY_CONSTRUCTOR", 8, "Creates a new object as a copy of the existing one"), 
+        DESTRUCTOR("DESTRUCTOR", 9, "Performs any necessary cleanups before the object is destroyed"), 
+        FACTORY("FACTORY", 10, "Instantiates an object and returns it"), 
+        COLLABORATOR("COLLABORATOR", 11, "Connects one object with other type of objects"), 
+        CONTROLLER("CONTROLLER", 12, "Provides control logic by invoking only external methods"), 
+        LOCAL_CONTROLLER("LOCAL_CONTROLLER", 13, "Provides control logic by invoking only local methods"), 
+        INCIDENTAL("INCIDENTAL", 14, "Any other case"), 
+        EMPTY("EMPTY", 15, "Has no statements"), 
+        ABSTRACT("ABSTRACT", 16, "Has no body");
 
         private String name;
         private int id;
+        private String description;
         
-		private Subcategory(String name, int id) {
+		private Subcategory(String name, int id, String description) {
 			this.setName(name);
 			this.setId(id);
+			this.setDescription(description);
 		}
 
 		public String getName() {
@@ -109,6 +118,14 @@ public enum MethodStereotype implements CodeStereotype {
 
 		public void setId(int id) {
 			this.id = id;
+		}
+
+		public String getDescription() {
+			return description;
+		}
+
+		public void setDescription(String description) {
+			this.description = description;
 		}
     }
 }
