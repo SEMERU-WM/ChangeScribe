@@ -287,7 +287,7 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		signatureCanvas = new SignatureCanvas(signatureMap, messageAndPersonArea, getShell());
 		signatureCanvas.createContents();
 		signatureCanvas.getCanvas().setLayoutData(GridDataFactory.fillDefaults()
-				.grab(true, true).hint(size).minSize(size.x, minHeight)
+				.grab(true, true).hint(size).minSize(size.x, 90)
 				.align(SWT.FILL, SWT.FILL).create());
 		
 		return messageAndPersonArea;
@@ -296,8 +296,6 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 	public void updateSignatureCanvas() {
 		if(signatureMap != null) {
 			signatureCanvas.setSignatureMap(signatureMap);
-			//Display.getCurrent().update();
-			//signatureCanvas.createContents(getShell());
 			signatureCanvas.redraw();
 		}
 	}

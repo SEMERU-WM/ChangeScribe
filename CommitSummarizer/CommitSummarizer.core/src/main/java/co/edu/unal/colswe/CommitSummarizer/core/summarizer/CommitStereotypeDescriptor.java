@@ -62,7 +62,7 @@ public class CommitStereotypeDescriptor {
 			int abs = (stereotypedCommit.getSignatureMap().get(MethodStereotype.ABSTRACT) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.ABSTRACT) : 0;
 			int degenerate = incidental + empty + abs;
 			description.append("This is a degenerate modifier commit. ");
-			description.append("Commit is composed of " + degenerate + " degenerate methods (empty, incidental, and abstract methods), and other degenerate methods\n" );
+			description.append("Commit is composed of " + degenerate + " degenerate methods (empty, incidental, and abstract methods)\n" );
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.SMALL_MODIFIER) {
 			description.append("This is a small modifier commit. ");
 			description.append("Commit is composed only of " + stereotypedCommit.getMethods().size() + " methods.\n" );

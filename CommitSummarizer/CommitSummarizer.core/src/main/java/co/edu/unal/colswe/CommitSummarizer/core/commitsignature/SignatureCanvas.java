@@ -6,14 +6,21 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolTip;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.MethodStereotype;
 
@@ -51,6 +58,19 @@ public class SignatureCanvas {
 			composite.update();
 		}
 	}
+	
+	/**
+	 * Create a help button with the help icon on it.
+	 * No action is associated with the button
+	 * @param container parent container
+	 * @return created button
+	 */
+	private Button createHelpButton(Composite container) {
+	    Button help = new Button(container,SWT.PUSH);
+	    Image img = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_LCL_LINKTO_HELP);
+	    help.setImage(img);
+	    return help;
+	}
 
 	/**
 	 * Creates the main window's contents
@@ -59,13 +79,30 @@ public class SignatureCanvas {
 	 *            the main window
 	 */
 	public void createContents() {
+		final String ECLIPSE_HELP = "org.eclipse.ui.help";
+		Button help = createHelpButton(composite);
+		help.addSelectionListener(new SelectionAdapter() {
+		    /**
+		     * Open the context help for the file name input field
+		     */
+		    @Override
+		    public void widgetSelected(SelectionEvent e) {
+		    	String html = "<HTML><HEAD><TITLE>HTML Test</TITLE></HEAD><BODY>";
+				for (int i = 0; i < 100; i++) html += "<P>This is line "+i+"</P>";
+				html += "</BODY></HTML>";
+		        Browser browser = new Browser(getShell(), SWT.WEBKIT);
+		        browser.setText(html);
+		        
+		    }
+		});
 		canvas = new Canvas(composite, SWT.NO_REDRAW_RESIZE);
 		canvas.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		canvas.setSize(width, 40);
 
 		canvas.addListener(SWT.Paint, new Listener() {
 			public void handleEvent(Event e) {
 				e.gc.setBackground(e.display.getSystemColor(SWT.COLOR_GRAY));
-				e.gc.fillRectangle(0, 10, composite.getClientArea().width + 10,85);
+				e.gc.fillRectangle(0, 10, composite.getClientArea().width + 10,60);
 
 				createPercentageRule(e);
 				// accessor and muttator different nuances of green and blue 
@@ -143,8 +180,6 @@ public class SignatureCanvas {
 						} else {
 							toolTip.setVisible(true);
 						}
-						
-						
 					}
 					counter++;
 				}
@@ -164,7 +199,6 @@ public class SignatureCanvas {
 						visible = false;
 					}
 					i++;
-						
 				}
 				if(toolTip != null) {
 					toolTip.setVisible(visible);
@@ -194,9 +228,9 @@ public class SignatureCanvas {
 			e.gc.drawLine(accumulate, 10, accumulate, 70);
 			
 			if(accumulate == 20) {
-				e.gc.drawString("" + i + "%", accumulate, 75);
+				e.gc.drawString("" + i + "%", accumulate, 75, true);
 			} else {
-				e.gc.drawString("" + i + "%", accumulate - 10, 75);
+				e.gc.drawString("" + i + "%", accumulate - 10, 75, true);
 			}
 			accumulate = accumulate + width / 10;
 			i = i + 10;

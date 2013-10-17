@@ -1,6 +1,0 @@
-<toc label="Sample Documentation">
-    <topic label="My Section" href="documentation/mySection.html">
-        <topic label="Foo" href="documentation/foo.html"/>
-        <topic label="Bar" href="documentation/bar.html"/>
-    </topic>
-</toc>
