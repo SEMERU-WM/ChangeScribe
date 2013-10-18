@@ -80,7 +80,6 @@ public class SignatureCanvas {
 	 *            the main window
 	 */
 	public void createContents() {
-		final String ECLIPSE_HELP = "org.eclipse.ui.help";
 		Button help = createHelpButton(composite);
 		help.addSelectionListener(new SelectionAdapter() {
 		    /**
@@ -88,11 +87,9 @@ public class SignatureCanvas {
 		     */
 		    @Override
 		    public void widgetSelected(SelectionEvent e) {
-		    	String html = "<HTML><HEAD><TITLE>HTML Test</TITLE></HEAD><BODY>";
-				for (int i = 0; i < 100; i++) html += "<P>This is line "+i+"</P>";
-				html += "</BODY></HTML>";
-		        Browser browser = new Browser(getShell(), SWT.WEBKIT);
-		        browser.setText(html);
+		    	InformationDialog dialog = new InformationDialog(getShell());
+		    	dialog.create();
+		    	dialog.open();
 		    }
 		});
 		canvas = new Canvas(composite, SWT.NO_REDRAW_RESIZE);
