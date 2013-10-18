@@ -69,6 +69,7 @@ public class SignatureCanvas {
 	    Button help = new Button(container,SWT.PUSH);
 	    Image img = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_LCL_LINKTO_HELP);
 	    help.setImage(img);
+	    
 	    return help;
 	}
 
@@ -92,7 +93,6 @@ public class SignatureCanvas {
 				html += "</BODY></HTML>";
 		        Browser browser = new Browser(getShell(), SWT.WEBKIT);
 		        browser.setText(html);
-		        
 		    }
 		});
 		canvas = new Canvas(composite, SWT.NO_REDRAW_RESIZE);
