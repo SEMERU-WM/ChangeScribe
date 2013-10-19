@@ -2,12 +2,16 @@ package co.edu.unal.colswe.CommitSummarizer.core;
 
 import java.util.Vector;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.ui.internal.util.BundleUtility;
+import org.osgi.framework.Bundle;
 
+@SuppressWarnings("restriction")
 public class ProjectInformation {
 	private int totalIUnits;
 	private int totalTypes;
@@ -94,5 +98,15 @@ public class ProjectInformation {
 
 	public String getName() {
 		return this.project.getElementName();
+	}
+	
+	public static String getAbsoluteURL(String path) {
+		Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
+		if (!BundleUtility.isReady(bundle)) {
+			return null;
+		}
+		String loc = bundle.getLocation();
+		loc = loc.substring(loc.indexOf("file:"), loc.length()).concat(path);
+		return loc;
 	}
 }

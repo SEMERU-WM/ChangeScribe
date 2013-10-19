@@ -62,6 +62,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 
+import co.edu.unal.colswe.CommitSummarizer.core.commitsignature.InformationDialog;
 import co.edu.unal.colswe.CommitSummarizer.core.commitsignature.SignatureCanvas;
 import co.edu.unal.colswe.CommitSummarizer.core.decorator.ProblemLabelDecorator;
 import co.edu.unal.colswe.CommitSummarizer.core.editor.JavaViewer;
@@ -93,6 +94,7 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 				new LabelProvider(), "Changes");
 		this.git = git;
 		this.setSelection(selection);
+		this.setHelpAvailable(false);
 	}
 	
 	static class CommitFileContentProvider extends BaseWorkbenchContentProvider {
@@ -300,6 +302,20 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		}
 	}
 	
+	/**
+	 * Create a help button with the help icon on it.
+	 * No action is associated with the button
+	 * @param container parent container
+	 * @return created button
+	 */
+	private ToolItem createHelpButton(ToolBar filesToolbar) {
+		ToolItem help = new ToolItem(filesToolbar,SWT.PUSH);
+	    Image img = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_LCL_LINKTO_HELP);
+	    help.setImage(img);
+	    help.setToolTipText("Help");
+	    return help;
+	}
+	
 	private Section createFileSection(Composite container) {
 		Section filesSection = toolkit.createSection(container,
 				ExpandableComposite.TITLE_BAR
@@ -356,6 +372,16 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				updateFileSectionText();
 			}
+		});
+		
+		ToolItem help = createHelpButton(filesToolbar);
+		help.addSelectionListener(new SelectionAdapter() {
+		    @Override
+		    public void widgetSelected(SelectionEvent e) {
+		    	InformationDialog dialog = new InformationDialog(getShell());
+		    	dialog.create();
+		    	dialog.open();
+		    }
 		});
 		
 		ToolItem describeChangesItem = new ToolItem(filesToolbar, SWT.PUSH);

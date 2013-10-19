@@ -1,0 +1,178 @@
+<html>
+	<head>
+	 	<style type="text/css">
+	 		h2 {font: normal 18px/150% Arial, Helvetica, sans-serif; color: #00557F;}
+	 		.datagrid table { border-collapse: collapse; text-align: left; width: 100%; } 
+	 		.datagrid {font: normal 12px/150% Arial, Helvetica, sans-serif; background: #fff; overflow: hidden; border: 1px solid #006699; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
+	 		.datagrid table td, .datagrid table th { padding: 3px 10px; }
+	 		.datagrid table thead th {background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; color:#FFFFFF; font-size: 15px; font-weight: bold; border-left: 1px solid #0070A8; } 
+	 		.datagrid table thead th:first-child { border: none; }
+	 		.datagrid table tbody td { color: #00557F; border-left: 1px solid #E1EEF4;font-size: 12px;font-weight: normal; }
+	 		.datagrid table tbody .alt td { background: #E1EEf4; color: #00557F; }
+	 		.datagrid table tbody td:first-child { border-left: none; }
+	 		.datagrid table tbody tr:last-child td { border-bottom: none; }
+	 		.datagrid table tfoot td div { border-top: 1px solid #006699;background: #E1EEf4;} 
+	 		.datagrid table tfoot td { padding: 0; font-size: 12px } 
+	 		.datagrid table tfoot td div{ padding: 2px; }
+	 		.datagrid table tfoot td ul { margin: 0; padding:0; list-style: none; text-align: right; }
+	 		.datagrid table tfoot  li { display: inline; }
+	 		.datagrid table tfoot li a { text-decoration: none; display: inline-block;  padding: 2px 8px; margin: 1px;color: #FFFFFF;border: 1px solid #006699;-webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; }
+	 		.datagrid table tfoot ul.active, .datagrid table tfoot ul a:hover { text-decoration: none;border-color: #00557F; color: #FFFFFF; background: none; background-color:#006699;}
+	 	</style>
+	</head>
+	<body>
+	<h2>Commit signature</h2>  
+	<div id="all" class="datagrid" style="margin-top: 5px;">
+		<table>
+               <thead>
+                   <tr>
+                   	<th>Color</th>
+					<th>Method stereotype</th>
+					<th>Description</th>
+				</tr>
+               </thead>
+               <tbody>
+                   <tr>
+                   	<td width="30" style="text-align: center;"><div style="width: 20px; height: 20px; background-color: #CCFFCC;"></div></td>
+					<td>Get</td>
+					<td>Returns a local field directly.</td>
+				</tr>
+				<tr class="alt">
+					<td width="30" style="text-align: center;"><div style="width: 20px; height: 20px; background-color: #9ACC00;"></div></td>
+					<td>Predicate</td>
+					<td>Returns a Boolean value that is not a local field.</td>
+				</tr>
+				<tr>
+					<td width="30" style="text-align: center;"><div style="width: 20px; height: 20px; background-color: #329A65;"></div></td>
+					<td>Property</td>
+					<td>Returns information about local fields.</td>
+				</tr>
+				<tr class="alt">
+					<td width="30" style="text-align: center;"><div style="width: 20px; height: 20px; background-color: #00FF00;"></div></td>
+					<td>Void-accessor</td>
+					<td>Returns information about local fields through the parameters.</td>
+				</tr>
+				
+				<tr>
+					<td width="30" style="text-align: center;"><div style="width: 20px; height: 20px; background-color: #9ACCFF;"></div></td>
+					<td>Set</td>
+					<td>Changes only one local field.</td>
+				</tr>
+				<tr class="alt">
+					<td width="30" style="text-align: center;"><div style="width: 20px; height: 20px; background-color: #00FFFF;"></div></td>
+					<td>Command</td>
+					<td>Changes more than one local fields.</td>
+				</tr>
+				<tr>
+					<td width="30" style="text-align: center;"><div style="width: 20px; height: 20px; background-color: #16DCDC;"></div></td>
+					<td>Non-void-command</td>
+					<td>Command whose return type is not void or Boolean.</td>
+				</tr>
+				
+				<tr class="alt" >
+					<td width="30" style="text-align: center;"><div style="width: 20px; height: 20px; background-color: #D6BE9A"></div></td>
+					<td>Constructor</td>
+					<td>Invoked when creating an object.</td>
+				</tr>
+				<tr>
+					<td width="30" style="text-align: center;"><div style="width: 20px; height: 20px; background-color: #C5A472"></div></td>
+					<td>Copy constructor</td>
+					<td>Creates a new object as a copy of the existing one.</td>
+				</tr>
+				<tr class="alt">
+					<td width="30" style="text-align: center;"><div style="width: 20px; height: 20px; background-color: #C2924C" ></div></td>
+					<td>Factory</td>
+					<td>Instantiates an object and returns it.</td>
+				</tr>
+				<tr>
+					<td width="30" style="text-align: center;"><div style="width: 20px; height: 20px; background-color: #C3872D" ></div></td>
+					<td>Destructor</td>
+					<td>Performs any necessary cleanups before the object is destroyed.</td>
+				</tr>
+
+				<tr class="alt">
+					<td width="30" style="text-align: center;"><div style="width: 20px; height: 20px; background-color: #F27878"></div></td>
+					<td>Collaborator</td>
+					<td>Connects one object with other type of objects.</td>
+				</tr>
+				<tr>
+					<td width="30" style="text-align: center;"><div style="width: 20px; height: 20px; background-color: #FC7F7F" ></div></td>
+					<td>Controller</td>
+					<td>Provides control logic by invoking only external methods.</td>
+				</tr>
+				<tr class="alt">
+					<td width="30" style="text-align: center;"><div style="width: 20px; height: 20px; background-color: #FFA6A6" ></div></td>
+					<td>Local controller</td>
+					<td>Provides control logic by invoking only local methods.</td>
+				</tr>
+				
+				<tr>
+					<td width="30" style="text-align: center;"><div style="width: 20px; height: 20px; background-color: #808080" ></div></td>
+					<td>Abstract</td>
+					<td>The method has no body.</td>
+				</tr>
+				<tr class="alt">
+					<td width="30" style="text-align: center;"><div style="width: 20px; height: 20px; background-color: #808080" ></div></td>
+					<td>Empty</td>
+					<td>The method has no statements.</td>
+				</tr>
+				<tr>
+					<td width="30" style="text-align: center;"><div style="width: 20px; height: 20px; background-color: #808080" ></div></td>
+					<td>Incidental</td>
+					<td>Any other method.</td>
+				</tr>
+               </tbody>
+           </table>
+	</div> 
+	<h2>Commit stereotype</h2>  
+	<div id="all" class="datagrid" style="margin-top: 5px;"> 
+            <table>
+                <thead>
+                    <tr>
+						<th>Type</th>
+						<th>Description</th>
+					</tr>
+                </thead>
+                <tbody>
+                    <tr>
+						<td>Structure modifier</td>
+						<td>Only the simple accessor and mutator, get and set, are present</td>
+					</tr>
+					<tr class="alt">
+						<td>State Access modifier</td>
+						<td>Consists mostly of accessors</td>
+					</tr>
+					<tr>
+						<td>Behavior modifier</td>
+						<td>Consists mostly of command and non-void-command methods</td>
+					</tr>
+					<tr class="alt">
+						<td>Relationships Modifier</td>
+						<td>More collaborators than non- collaborators. Not all the methods are factory methods. Low number of controller methods</td>
+					</tr>
+					<tr>
+						<td>Control Modifier</td>
+						<td>Many control features and controller is present</td>
+					</tr>
+					<tr class="alt">
+						<td>Large modifier</td>
+						<td>Categories of stereotypes (accessor) with mutator) and (factory with controller) have to participate in distributions not in small proportions. Number of methods in a commit is high</td>
+					</tr>
+					<tr>
+						<td>Lazy modifier</td>
+						<td>Has to contain get/set methods. It might have a large number of degenerate methods. Occurrence of other stereotypes is low</td>
+					</tr>
+					<tr class="alt">
+						<td>Degenerate modifier</td>
+						<td>Has at least one degenerate method</td>
+					</tr>
+					<tr class="alt">
+						<td>Small modifier</td>
+						<td>Number of methods in a class is less than 3</td>
+					</tr>
+                </tbody>
+            </table>
+    	</div>
+    	
+	</body>
+</html>

@@ -6,21 +6,14 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolTip;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
 
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.MethodStereotype;
 
@@ -60,38 +53,12 @@ public class SignatureCanvas {
 	}
 	
 	/**
-	 * Create a help button with the help icon on it.
-	 * No action is associated with the button
-	 * @param container parent container
-	 * @return created button
-	 */
-	private Button createHelpButton(Composite container) {
-	    Button help = new Button(container,SWT.PUSH);
-	    Image img = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_LCL_LINKTO_HELP);
-	    help.setImage(img);
-	    
-	    return help;
-	}
-
-	/**
 	 * Creates the main window's contents
 	 * 
 	 * @param shell
 	 *            the main window
 	 */
 	public void createContents() {
-		Button help = createHelpButton(composite);
-		help.addSelectionListener(new SelectionAdapter() {
-		    /**
-		     * Open the context help for the file name input field
-		     */
-		    @Override
-		    public void widgetSelected(SelectionEvent e) {
-		    	InformationDialog dialog = new InformationDialog(getShell());
-		    	dialog.create();
-		    	dialog.open();
-		    }
-		});
 		canvas = new Canvas(composite, SWT.NO_REDRAW_RESIZE);
 		canvas.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		canvas.setSize(width, 40);
@@ -129,11 +96,11 @@ public class SignatureCanvas {
 						} else if (signature.getKey() == MethodStereotype.CONSTRUCTOR) {
 							color = new Color(getShell().getDisplay(), 214, 190, 154);
 						} else if (signature.getKey() == MethodStereotype.COPY_CONSTRUCTOR) {
-							color = new Color(getShell().getDisplay(), 214, 190, 154);
+							color = new Color(getShell().getDisplay(), 197, 164, 114);
 						} else if (signature.getKey() == MethodStereotype.DESTRUCTOR) {
-							color = new Color(getShell().getDisplay(), 214, 190, 154);
+							color = new Color(getShell().getDisplay(), 195, 135, 45);
 						} else if (signature.getKey() == MethodStereotype.FACTORY) {
-							color = new Color(getShell().getDisplay(), 214, 190, 154);
+							color = new Color(getShell().getDisplay(), 194, 146, 76);
 						} else if (signature.getKey() == MethodStereotype.GET) {
 							color = new Color(getShell().getDisplay(), 204, 255, 204);
 						} else if (signature.getKey() == MethodStereotype.PREDICATE) {
