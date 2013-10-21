@@ -17,6 +17,10 @@ public class NounPhrase extends Phrase {
 	public NounPhrase(String name) {
 		super(POSTagger.tag(Tokenizer.split(name)));
 	}
+	
+	public NounPhrase(LinkedList<TaggedTerm> taggedPhrase) {
+		super(taggedPhrase);
+	}
 
 	public NounPhrase(LinkedList<TaggedTerm> taggedPhrase, List<Parameter> parameters, String connector) {
 		super(taggedPhrase);

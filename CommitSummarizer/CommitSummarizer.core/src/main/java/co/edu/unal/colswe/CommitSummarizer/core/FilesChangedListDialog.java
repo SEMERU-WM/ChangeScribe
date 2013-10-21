@@ -428,7 +428,7 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 	}
 	
 	private void updateFileSectionText() {
-		filesSection.setText(MessageFormat.format("Modified files",
+		filesSection.setText(MessageFormat.format("Modified files (selected {0} of {1})",
 				Integer.valueOf(filesViewer.getCheckedElements().length),
 				Integer.valueOf(filesViewer.getTree().getItemCount())));
 	}

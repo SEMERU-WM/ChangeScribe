@@ -11,7 +11,7 @@ public class CommitStereotypeDescriptor {
 	public static String describe(ICompilationUnit cu, StereotypedCommit stereotypedCommit) {
 		StringBuilder description = new StringBuilder();
 		
-		description.append("BUG - FEATURE: type ID \n\n");
+		description.append("BUG - FEATURE: <type-ID> \n\n");
 		
 		if(stereotypedCommit.getStereotypes().get(0) == CommitStereotype.STRUCTURE_MODIFIER) {
 			description.append("This is a structure modifier commit. ");
@@ -36,7 +36,7 @@ public class CommitStereotypeDescriptor {
 			description.append("Commit is composed mainly of controller, factory, constructor, copy-constructor and destructor methods.\n" );
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.LARGE_MODIFIER) {
 			description.append("This is a large modifier commit. ");
-			description.append("Commit is composed of " + stereotypedCommit.getMethods().size() + "\n" );
+			//description.append("Commit is composed of " + stereotypedCommit.getMethods().size() + "\n" );
 			int constructor = (stereotypedCommit.getSignatureMap().get(MethodStereotype.CONSTRUCTOR) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.CONSTRUCTOR) : 0;
 			int copyConstructor = (stereotypedCommit.getSignatureMap().get(MethodStereotype.COPY_CONSTRUCTOR) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.COPY_CONSTRUCTOR) : 0;
 			int destructor = (stereotypedCommit.getSignatureMap().get(MethodStereotype.DESTRUCTOR) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.DESTRUCTOR) : 0;
@@ -44,10 +44,10 @@ public class CommitStereotypeDescriptor {
 			int creational = factory + destructor + copyConstructor + constructor;
 			int controller = (stereotypedCommit.getSignatureMap().get(MethodStereotype.CONTROLLER) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.CONTROLLER) : 0;
 			if(creational > 0) {
-				description.append(", " + creational + " methods are creational category\n" );
+				//description.append(", " + creational + " methods are creational category\n" );
 			}
 			if(creational > 0) {
-				description.append(", and " + controller + " methods are controller.\n" );
+				//description.append(", and " + controller + " methods are controller.\n" );
 			}
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.LAZY_MODIFIER) {
 			int get = (stereotypedCommit.getSignatureMap().get(MethodStereotype.GET) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.GET) : 0;

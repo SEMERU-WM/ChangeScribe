@@ -60,7 +60,7 @@ public class GeneralDescriptor {
 		classNamePhrase.generate();
 		description.append(classNamePhrase.toString());
 		description.append(" was " + describeOperation(operation));
-        description.append(".\n");
+        description.append(". It allows: \n");
 		return description.toString();
 	}
 	

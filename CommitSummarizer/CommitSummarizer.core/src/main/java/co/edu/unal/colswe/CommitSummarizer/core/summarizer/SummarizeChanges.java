@@ -131,19 +131,24 @@ public class SummarizeChanges {
 					String currentPackage = "";
 					StringBuilder desc = new StringBuilder();
 					desc.append(summarizeCommitStereotype());
+					int i = 1;
+					int j = 1;
 					for(Entry<String, StereotypeIdentifier> identifier : summarized.entrySet()) {
 						if(currentPackage.trim().equals("")) {
 							currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
 							System.out.println("current 1: " + currentPackage);
-							desc.append("* Modifications to package " + currentPackage + ":  \n\n");
+							desc.append(i + ". Modifications to package " + currentPackage + ":  \n\n");
+							i++;
 						} else if(!currentPackage.equals(identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName())) {
 							currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
 							System.out.println("current 2: " + currentPackage);
-							desc.append("* Modifications to package " + currentPackage + ":  \n\n");
+							desc.append(i + ". Modifications to package " + currentPackage + ":  \n\n");
+							j = 1;
+							i++;
 						}
-						desc.append(identifier.getValue().toString());
+						desc.append((i - 1) + "." + j + ". " + identifier.getValue().toString());
+						j++;
 					}
-					//getChangedListDialog().getText().setText(desc.toString());
 					getChangedListDialog().getEditor().getText().setText(desc.toString());
 					getChangedListDialog().updateSignatureCanvas();
 					removeCreatedPackages();

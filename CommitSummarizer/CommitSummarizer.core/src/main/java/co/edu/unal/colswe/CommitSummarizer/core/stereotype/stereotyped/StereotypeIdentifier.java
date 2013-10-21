@@ -68,7 +68,7 @@ public class StereotypeIdentifier {
 		this.methodsStdDev = methodsStdDev;
 	}
 
-	public void identifyStereotypes() {
+	public void identifyStereotypes() { 
 		if (this.parser == null) {
 			return;
 		}

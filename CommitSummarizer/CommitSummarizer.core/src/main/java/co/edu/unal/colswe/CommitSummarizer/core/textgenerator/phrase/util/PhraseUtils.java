@@ -1,5 +1,6 @@
 package co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.util;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jdt.core.IType;
@@ -43,6 +44,10 @@ public class PhraseUtils {
 		return Tag.isPastOrPastPartVerb(term.getTag());
 	}
 	
+	public static boolean hasLeadingNoun(LinkedList<TaggedTerm> taggedTerms) {
+        return Tag.isNoun(taggedTerms.getFirst().getTag());
+    }
+	
 	public static boolean hasNounOrAdjective(List<TaggedTerm> taggedPhrase) {
         for (final TaggedTerm taggedTerm : taggedPhrase) {
             if (Tag.isNoun(taggedTerm.getTag()) || Tag.isAdjective(taggedTerm.getTag())) {
@@ -63,6 +68,14 @@ public class PhraseUtils {
 	
 	public static boolean hasTrailingPrepositionOrAdverb(List<TaggedTerm> taggedTerms) {
         return Tag.isPrep(taggedTerms.get(taggedTerms.size() - 1).getTag()) || Tag.isAdverb(taggedTerms.get(taggedTerms.size() - 1).getTag());
+    }
+	
+	public static boolean hasLeadingPreposition(LinkedList<TaggedTerm> taggedTerms) {
+        return Tag.isPrep(taggedTerms.getFirst().getTag());
+    }
+	
+	public static boolean hasTrailingAdjective(LinkedList<TaggedTerm> taggedTerms) {
+        return Tag.isAdjective(taggedTerms.getFirst().getTag());
     }
 	
 	public static boolean containsPrepositions(List<TaggedTerm> terms) {
@@ -182,6 +195,16 @@ public class PhraseUtils {
         result.append(" ");
         result.append("extension");
         return result.toString();
+    }
+    
+    public static int indexOfMiddleTo(LinkedList<TaggedTerm> taggedTerms) {
+        for (int i = 0; i < taggedTerms.size(); ++i) {
+            final TaggedTerm t = taggedTerms.get(i);
+            if (Tag.isTo(t.getTag()) || t.getTerm().equals("2")) {
+                return i;
+            }
+        }
+        return -1;
     }
 
 }

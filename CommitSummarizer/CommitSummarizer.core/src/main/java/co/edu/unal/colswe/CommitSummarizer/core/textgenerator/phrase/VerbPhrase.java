@@ -51,6 +51,15 @@ public class VerbPhrase extends Phrase {
 		this.addFirstParam = addFirstParam;
 	}
 
+	public VerbPhrase(String string, NounPhrase directObj,
+			LinkedList<Parameter> parameters) {
+		super();
+		this.verb = string;
+		directObj.generate();
+		this.directObject = directObj.toString();
+		this.parameters = parameters;
+	}
+
 	public void generate() {
 		if (this.taggedPhrase == null || this.taggedPhrase.isEmpty()) {
 			return;
@@ -137,6 +146,21 @@ public class VerbPhrase extends Phrase {
 		}
 		if (this.indirectObject != null) {
 			result.append(this.indirectObject);
+		}
+		if(this.verb.equals("instantiate") && parameters != null && parameters.size() > 0) {
+			for(Parameter param : parameters) {
+				ParameterPhrase varGen = new ParameterPhrase(param);
+				varGen.generate(); 
+				if (parameters.indexOf(param) == 0) {
+					result.append(" with "); 
+				}
+				result.append(String.valueOf(varGen.toString()));
+				if(parameters.size() > 1 && parameters.indexOf(param) < parameters.size() - 1) {
+					result.append(", ");
+				} else if(parameters.size() > 1 && parameters.indexOf(param) == parameters.size() - 1) {
+					result.append(" and " + String.valueOf(varGen.toString()));
+				}
+			}
 		}
 		return result.toString().trim();
 	}
