@@ -57,7 +57,8 @@ import org.eclipse.swt.graphics.Color;
         "private", "protected", "public", "static", "added", "removed", 
         "commit", "degenerate", "incidental", "lazy", "mutator",
         "controller", "control", "methods", "empty", "Referenced", "small", 
-        "BUG", "FEATURE", "modifier", "state", "update", "access", "structure", "behavior"};
+        "BUG", "FEATURE", "modifier", "state", "update", "access", "structure", 
+        "behavior", "large", "module", "modules"};
 
     public JavaScanner() {
       initialize();

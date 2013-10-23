@@ -1,7 +1,6 @@
 package co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 

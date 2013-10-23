@@ -165,6 +165,8 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		public Image getImage(Object element) {
 			ChangedFile item = (ChangedFile) element;
 			ImageDescriptor decorator = null;
+			//Image other = null;
+			Image finalOther = null;
 			switch (item.getTypeChange()) {
 				case UNTRACKED:
 					decorator = UIIcons.OVR_UNTRACKED;
@@ -178,11 +180,21 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 				case REMOVED_UNTRACKED:
 					decorator = UIIcons.OVR_STAGED_REMOVE;
 					break;
+				/*case UNTRACKED_FOLDERS:
+					other = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
+					DecorationOverlayIcon decorated = new DecorationOverlayIcon(other, UIIcons.OVR_UNTRACKED, IDecoration.BOTTOM_RIGHT);
+					finalOther = (Image) this.resourceManager.get(decorated);
+					break;*/
 				default:
 					break;
 			}
-			return decorator != null ? getDecoratedImage(getEditorImage(item),
-					decorator) : getEditorImage(item);
+			
+			if(decorator != null) {
+				finalOther = getDecoratedImage(getEditorImage(item), decorator);
+			} else if(finalOther == null) {
+				finalOther = getEditorImage(item);
+			}
+			return finalOther;
 		}
 
 		@Override

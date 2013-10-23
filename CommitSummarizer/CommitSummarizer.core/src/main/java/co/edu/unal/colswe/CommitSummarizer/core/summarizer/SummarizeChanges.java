@@ -3,6 +3,7 @@ package co.edu.unal.colswe.CommitSummarizer.core.summarizer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.SortedMap;
@@ -50,6 +51,7 @@ public class SummarizeChanges {
 	private ChangedFile[] differences;
 	private FilesChangedListDialog changedListDialog;
 	private SortedMap<String, StereotypeIdentifier> summarized = new TreeMap<String, StereotypeIdentifier>();
+	private LinkedList<ChangedFile> modulesAdded;  
 	
 	public SummarizeChanges(Git git) {
 		super();
@@ -62,6 +64,7 @@ public class SummarizeChanges {
 		this.differences = differences;
 		this.identifiers = new ArrayList<StereotypeIdentifier>();
 		this.summarized = new TreeMap<String, StereotypeIdentifier>();
+		this.modulesAdded = new LinkedList<>();
 		getChangedListDialog().getEditor().getText().setText("");
 		removeCreatedPackages();
 	}
@@ -92,7 +95,7 @@ public class SummarizeChanges {
 											monitor.subTask("Identifying stereotypes for " + file.getName());
 											identifier = identifyStereotypes(file, file.getChangeType());
 										}
-									}
+									} 
 									if(identifier != null) {
 										monitor.subTask("Describing type " + file.getName());
 										summarizeType(identifier);
@@ -127,7 +130,7 @@ public class SummarizeChanges {
 
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
-				if(summarized.size() == differences.length) {
+				if(summarized.size() + modulesAdded.size() == differences.length) {
 					String currentPackage = "";
 					StringBuilder desc = new StringBuilder();
 					desc.append(summarizeCommitStereotype());
@@ -150,7 +153,9 @@ public class SummarizeChanges {
 						j++;
 					}
 					getChangedListDialog().getEditor().getText().setText(desc.toString());
-					getChangedListDialog().updateSignatureCanvas();
+					if(summarized.size() > 0) {
+						getChangedListDialog().updateSignatureCanvas();
+					}
 					removeCreatedPackages();
 				}
 			}
@@ -195,7 +200,8 @@ public class SummarizeChanges {
 		CommitStereotype stereotype = stereotypedCommit.findStereotypes();
 		
 		if(stereotype != null) {
-			result = CommitStereotypeDescriptor.describe(stereotypeIdentifier.getCompilationUnit() ,stereotypedCommit) + "\n\n";
+			result = CommitStereotypeDescriptor.describe(stereotypeIdentifier.getCompilationUnit() ,stereotypedCommit);
+			result += CommitStereotypeDescriptor.describeNewModules(git, differences) + "\n\n";
 		} else {
 			result = "Not found commit stereotype\n\n";
 		}

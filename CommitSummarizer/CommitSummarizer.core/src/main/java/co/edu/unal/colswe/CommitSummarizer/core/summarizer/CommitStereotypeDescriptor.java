@@ -1,7 +1,17 @@
 package co.edu.unal.colswe.CommitSummarizer.core.summarizer;
 
-import org.eclipse.jdt.core.ICompilationUnit;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.Status;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.NoWorkTreeException;
+
+import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
+import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile.TypeChange;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedCommit;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.CommitStereotype;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.MethodStereotype;
@@ -42,7 +52,7 @@ public class CommitStereotypeDescriptor {
 			int destructor = (stereotypedCommit.getSignatureMap().get(MethodStereotype.DESTRUCTOR) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.DESTRUCTOR) : 0;
 			int factory = (stereotypedCommit.getSignatureMap().get(MethodStereotype.FACTORY) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.FACTORY) : 0;
 			int creational = factory + destructor + copyConstructor + constructor;
-			int controller = (stereotypedCommit.getSignatureMap().get(MethodStereotype.CONTROLLER) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.CONTROLLER) : 0;
+			//int controller = (stereotypedCommit.getSignatureMap().get(MethodStereotype.CONTROLLER) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.CONTROLLER) : 0;
 			if(creational > 0) {
 				//description.append(", " + creational + " methods are creational category\n" );
 			}
@@ -69,6 +79,47 @@ public class CommitStereotypeDescriptor {
 		}
 		
 		return description.toString();
+	}
+	
+	public static String describeNewModules(Git git, ChangedFile[] differences) {
+		
+		Status repositoryStatus = null;
+		try {
+			repositoryStatus = git.status().call();
+		} catch (NoWorkTreeException | GitAPIException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		SortedMap<String, ChangedFile> newModules = new TreeMap<>();		
+		for (String string : repositoryStatus.getUntrackedFolders()) {
+			for(ChangedFile file : differences) {
+				if(file.getPath().substring(0, file.getPath().lastIndexOf("/")).equals(string) && !newModules.containsKey(string)) {
+					ChangedFile changedFile = new ChangedFile(string, TypeChange.UNTRACKED_FOLDERS.name(), git.getRepository().getWorkTree().getAbsolutePath());
+					newModules.put(string, changedFile);
+					break;
+				}
+			}
+		}
+		
+		StringBuilder builder = new StringBuilder(" New");
+		
+		if(newModules.entrySet().size() == 1) {
+			builder.append(" module was added to system: ");
+		} else {
+			builder.append(" modules were added to system: ");
+		}
+		int i = 1;
+		for(Entry<String, ChangedFile> entry : newModules.entrySet()) {
+			builder.append(entry.getValue().getName());
+			if(newModules.entrySet().size() > 1 && i < newModules.entrySet().size() - 2) {
+				builder.append(", ");
+			} else if(newModules.entrySet().size() > 1 && i == newModules.entrySet().size() - 1) {
+				builder.append(" and ");
+			}
+			i++;
+		}
+		builder.append(". ");
+		return builder.toString();
 	}
 
 }
