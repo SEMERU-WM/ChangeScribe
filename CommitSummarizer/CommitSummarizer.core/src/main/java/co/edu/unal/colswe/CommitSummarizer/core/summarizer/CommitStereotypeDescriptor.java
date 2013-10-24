@@ -25,25 +25,25 @@ public class CommitStereotypeDescriptor {
 		
 		if(stereotypedCommit.getStereotypes().get(0) == CommitStereotype.STRUCTURE_MODIFIER) {
 			description.append("This is a structure modifier commit. ");
-			description.append("Commit is composed only of setter and getter methods.\n" );
+			description.append("Commit is composed only of setter and getter methods. " );
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.STATE_ACCESS_MODIFIER) {
 			description.append("This is a state access modifier commit. ");
-			description.append("Commit is composed only of accessor methods.\n" );
+			description.append("Commit is composed only of accessor methods. " );
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.STATE_UPDATE_MODIFIER) {
 			description.append("This is a state update modifier commit. ");
-			description.append("Commit is composed only of mutator methods.\n" );
+			description.append("Commit is composed only of mutator methods. " );
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.BEHAVIOR_MODIFIER) {
 			description.append("This is a behavior modifier commit. ");
-			description.append("Commit is composed of command and non-void-command methods.\n" );
+			description.append("Commit is composed of command and non-void-command methods. " );
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.OBJECT_CREATION_MODIFIER) {
 			description.append("This is an object creation modifier commit. ");
-			description.append("Commit is composed of factory, constructor, copy constructor and destructor methods.\n" );
+			description.append("Commit is composed of factory, constructor, copy constructor and destructor methods. " );
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.RELATIONSHIP_MODIFIER) {
 			description.append("This is a relationship modifier commit. ");
-			description.append("Commit is composed mainly of collaborators and low number of controller methods.\n" );
+			description.append("Commit is composed mainly of collaborators and low number of controller methods. " );
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.CONTROL_MODIFIER) {
 			description.append("This is a control modifier commit. ");
-			description.append("Commit is composed mainly of controller, factory, constructor, copy-constructor and destructor methods.\n" );
+			description.append("Commit is composed mainly of controller, factory, constructor, copy-constructor and destructor methods. " );
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.LARGE_MODIFIER) {
 			description.append("This is a large modifier commit. ");
 			//description.append("Commit is composed of " + stereotypedCommit.getMethods().size() + "\n" );
@@ -65,17 +65,17 @@ public class CommitStereotypeDescriptor {
 			int getSet = get + set;
 			
 			description.append("This is a lazy modifier commit. ");
-			description.append("Commit is composed of " + getSet + " getter and setter methods, and other degenerate methods.\n" );
+			description.append("Commit is composed of " + getSet + " getter and setter methods, and other degenerate methods." );
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.DEGENERATE_MODIFIER) {
 			int empty = (stereotypedCommit.getSignatureMap().get(MethodStereotype.EMPTY) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.EMPTY) : 0;
 			int incidental = (stereotypedCommit.getSignatureMap().get(MethodStereotype.INCIDENTAL) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.INCIDENTAL) : 0;
 			int abs = (stereotypedCommit.getSignatureMap().get(MethodStereotype.ABSTRACT) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.ABSTRACT) : 0;
 			int degenerate = incidental + empty + abs;
 			description.append("This is a degenerate modifier commit. ");
-			description.append("Commit is composed of " + degenerate + " degenerate methods (empty, incidental, and abstract methods)\n" );
+			description.append("Commit is composed of " + degenerate + " degenerate methods (empty, incidental, and abstract methods)." );
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.SMALL_MODIFIER) {
 			description.append("This is a small modifier commit. ");
-			description.append("Commit is composed only of " + stereotypedCommit.getMethods().size() + " methods.\n" );
+			description.append("Commit is composed only of " + stereotypedCommit.getMethods().size() + " methods. " );
 		}
 		
 		return description.toString();
@@ -92,7 +92,9 @@ public class CommitStereotypeDescriptor {
 		}
 		SortedMap<String, ChangedFile> newModules = new TreeMap<>();		
 		for (String string : repositoryStatus.getUntrackedFolders()) {
+			System.out.println("NEW MODULE: " + string);
 			for(ChangedFile file : differences) {
+				System.out.println("SUBSTRING : " + file.getPath().substring(0, file.getPath().lastIndexOf("/")));
 				if(file.getPath().substring(0, file.getPath().lastIndexOf("/")).equals(string) && !newModules.containsKey(string)) {
 					ChangedFile changedFile = new ChangedFile(string, TypeChange.UNTRACKED_FOLDERS.name(), git.getRepository().getWorkTree().getAbsolutePath());
 					newModules.put(string, changedFile);
@@ -119,7 +121,7 @@ public class CommitStereotypeDescriptor {
 			i++;
 		}
 		builder.append(". ");
-		return builder.toString();
+		return newModules.size() > 0 ? builder.toString():"";
 	}
 
 }
