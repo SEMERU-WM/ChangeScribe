@@ -6,5 +6,8 @@
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="lib" path="lib"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="lib" path="lib/jakarta-regexp-1.5.jar"/>
+	<classpathentry kind="lib" path="lib/changetypes.jar"/>
+	<classpathentry kind="lib" path="lib/lsd.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
