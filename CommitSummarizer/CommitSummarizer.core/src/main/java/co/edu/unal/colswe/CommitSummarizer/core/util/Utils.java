@@ -84,7 +84,7 @@ public class Utils {
 		ObjectId objectId = treeWalk.getObjectId(0);
 		ObjectLoader loader = repository.open(objectId);
 		
-		return IOUtils.stringFromFile(Utils.inputStreamToFile(loader.openStream()).getAbsolutePath());
+		return IOUtils.stringFromFile(Utils.inputStreamToFile(loader.openStream()).getAbsolutePath(), "utf-8");
 	}
 
 	public static File inputStreamToFile(InputStream is) throws IOException {

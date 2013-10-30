@@ -65,6 +65,7 @@ public class SCMRepository {
 		for (String string : repositoryStatus.getUntracked()) {
 			ChangedFile changedFile = new ChangedFile(string, TypeChange.UNTRACKED.name(), rootPath);
 			differences.add(changedFile);
+			System.out.println("path: " + changedFile.getPath());
 			changedFile.setTypeChange(TypeChange.UNTRACKED);
 		}
 		
@@ -74,6 +75,16 @@ public class SCMRepository {
 			changedFile.setTypeChange(TypeChange.REMOVED);
 		}
 		
+		return differences;
+	}
+	
+	public static Set<ChangedFile> getRemovedFiles(Status repositoryStatus, String rootPath) {
+		Set<ChangedFile> differences = new TreeSet<ChangedFile>();
+		for	(String string : repositoryStatus.getRemoved()) {
+			ChangedFile changedFile = new ChangedFile(string, TypeChange.REMOVED.name(), rootPath);
+			differences.add(changedFile);
+			changedFile.setTypeChange(TypeChange.REMOVED);
+		}
 		return differences;
 	}
 	

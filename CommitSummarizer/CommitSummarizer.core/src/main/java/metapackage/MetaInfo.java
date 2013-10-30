@@ -3,6 +3,8 @@ package metapackage;
 
 import java.io.File;
 
+import co.edu.unal.colswe.CommitSummarizer.core.Activator;
+
 public class MetaInfo {
 	public static final int k=1; 
 	public static final int minConcFact=3;
@@ -10,7 +12,7 @@ public class MetaInfo {
 	public static final double accuracy =0.75;
 	public static final int maxException=10;
 
-	public static final String baseDir = lsclipse.LSclipse.getDefault().getStateLocation().toOSString();
+	public static final String baseDir = Activator.getDefault().getStateLocation().toOSString();
 //	public static String srcDir = baseDir+"\\input";
 //	public static String resDir = baseDir+"\\output";
 //	public static String fdbDir = baseDir+"\\fdb";

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import lsd.rule.LSDFact;
-import lsd.rule.LSDVariable;
+import lsd.lsd.rule.LSDFact;
+import lsd.lsd.rule.LSDVariable;
 
 public class LSDResult {
 	public int num_matches;

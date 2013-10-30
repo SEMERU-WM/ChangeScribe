@@ -3,37 +3,55 @@ package co.edu.unal.colswe.CommitSummarizer.core.summarizer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import lsclipse.LSDResult;
+import lsclipse.LSDiffExecutor;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
+import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
+import org.eclipse.jgit.lib.IndexDiff;
+import org.eclipse.jgit.treewalk.FileTreeIterator;
+import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
 import org.eclipse.swt.widgets.Display;
 
 import co.edu.unal.colswe.CommitSummarizer.core.FilesChangedListDialog;
 import co.edu.unal.colswe.CommitSummarizer.core.ast.ProjectInformation;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile.TypeChange;
+import co.edu.unal.colswe.CommitSummarizer.core.git.SCMRepository;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypeIdentifier;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedCommit;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedElement;
@@ -52,6 +70,7 @@ public class SummarizeChanges {
 	private FilesChangedListDialog changedListDialog;
 	private SortedMap<String, StereotypeIdentifier> summarized = new TreeMap<String, StereotypeIdentifier>();
 	private LinkedList<ChangedFile> modulesAdded;  
+	private List<LSDResult> rules = new ArrayList<LSDResult>();
 	
 	public SummarizeChanges(Git git) {
 		super();
@@ -65,14 +84,17 @@ public class SummarizeChanges {
 		this.identifiers = new ArrayList<StereotypeIdentifier>();
 		this.summarized = new TreeMap<String, StereotypeIdentifier>();
 		this.modulesAdded = new LinkedList<>();
+		rules = new ArrayList<LSDResult>();
 		getChangedListDialog().getEditor().getText().setText("");
 		removeCreatedPackages();
+		//deleteTmpProject();
 	}
 
 	@SuppressWarnings("unused")
 	public void summarize(final ChangedFile[] differences) {
 		initSummary(differences);
 		String currentPackage = "";
+		rebuildVersion();
 
 		Job job = new Job("Calculating method and types stereotypes") {
 				@Override
@@ -95,7 +117,9 @@ public class SummarizeChanges {
 											monitor.subTask("Identifying stereotypes for " + file.getName());
 											identifier = identifyStereotypes(file, file.getChangeType());
 										}
-									} 
+									} else if(file.getChangeType().equals(TypeChange.MODIFIED.name())) {
+										monitor.subTask("Identifying stereotypes for " + file.getName());
+									}
 									if(identifier != null) {
 										monitor.subTask("Describing type " + file.getName());
 										summarizeType(identifier);
@@ -156,6 +180,10 @@ public class SummarizeChanges {
 					if(summarized.size() > 0) {
 						getChangedListDialog().updateSignatureCanvas();
 					}
+					
+					for(LSDResult result : rules) {
+						System.out.println("REFACTORING: " + result.desc);
+					}
 					removeCreatedPackages();
 				}
 			}
@@ -209,13 +237,90 @@ public class SummarizeChanges {
 		return result;
 	}
 	
+	public void rebuildVersion() {
+		
+		/*for (final ChangedFile file : differences) {
+			if(file.getChangeType().equals(TypeChange.REMOVED.name()) || file.getChangeType().equals(TypeChange.MODIFIED.name())) {
+				if(file.getAbsolutePath().endsWith(".java")) {
+					findRefactorings(file);
+				}
+			} 
+		}*/
+		Set<ICompilationUnit> previousCU = new HashSet<>();
+		Set<ICompilationUnit> currentCU = new HashSet<>();
+		IPackageFragment[] packages;
+	    try {
+	        packages = changedListDialog.getSelection().getPackageFragments();
+	        for (IPackageFragment mypackage : packages) {
+	            if (mypackage.getKind() == IPackageFragmentRoot.K_SOURCE) {
+	            	for (ICompilationUnit unit : mypackage.getCompilationUnits()) {
+	            		ChangedFile file = new ChangedFile(unit.getPath().toString().replaceFirst("/", ""), TypeChange.ADDED.name(), getGit().getRepository().getWorkTree().getAbsolutePath());
+	            		IndexDiff diff = null;
+						try {
+							diff = new IndexDiff(git.getRepository(), "HEAD", new FileTreeIterator(git.getRepository()));
+							diff.setFilter(new PathFilterGroup().createFromStrings(file.getPath()));
+		            		diff.diff();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+	            		
+	            		if (!diff.getModified().isEmpty() || !diff.getRemoved().isEmpty()) {
+	            			previousCU.add(findRefactorings(file));
+	            		}
+		
+		            }
+	            	Set<ChangedFile> differences = SCMRepository.getRemovedFiles(git.status().call(), getGit().getRepository().getWorkTree().getAbsolutePath());
+	            	for (ChangedFile file : differences) {
+	            			previousCU.add(findRefactorings(file));
+		            }
+	                System.out.println("Source Name " + mypackage.getElementName());
+	                System.out.println("Number of Classes: " + mypackage.getClassFiles().length);
+	                
+	                //findRefactorings(file);
+	            }
+	           
+	        }
+	    } catch (JavaModelException | NoWorkTreeException | GitAPIException e) {
+	        e.printStackTrace();
+	    }
+	    
+	    try {
+			currentCU = getFiles("SWUM");
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//List<LSDResult> result = (new LSDiffExecutor()).doLSDiff("MyProject", "ChangeDiff");
+	    List<LSDResult> result = (new LSDiffExecutor()).doLSDiff(currentCU, previousCU);
+		if(result != null && !result.isEmpty()) {
+			rules.addAll(result);
+		}
+	}
+	
+	private static Set<ICompilationUnit> getFiles(String projname) throws CoreException {
+		IWorkspaceRoot ws = ResourcesPlugin.getWorkspace().getRoot();
+		IProject proj = ws.getProject(projname);
+		IJavaProject javaProject = JavaCore.create(proj);
+		Set<ICompilationUnit> files = new HashSet<ICompilationUnit>();
+		javaProject.open(new NullProgressMonitor());
+		for( IPackageFragment packFrag : javaProject.getPackageFragments()) {
+			for (ICompilationUnit icu : packFrag.getCompilationUnits()) {
+				files.add(icu);
+			}
+		}
+		javaProject.close();
+		return files;
+	}
+	
 	public StereotypeIdentifier identifyStereotypes(ChangedFile file, String scmOperation) {
 		
 		if(scmOperation.equals(TypeChange.ADDED.toString()) ||scmOperation.equals(TypeChange.UNTRACKED.toString())) {
 			getAddedStereotypeIdentifier(file);
 		} else if(scmOperation.equals(TypeChange.REMOVED.toString())) {
 			stereotypeIdentifier = getRemovedStereotypeIdentifier(file);
-		}
+		} 
 		
 		stereotypeIdentifier.identifyStereotypes();
 		stereotypeIdentifier.setScmOperation(scmOperation);
@@ -223,6 +328,58 @@ public class SummarizeChanges {
 		identifiers.add(stereotypeIdentifier);
 		
 		return stereotypeIdentifier;
+	}
+	
+	protected ICompilationUnit findRefactorings(ChangedFile file) {
+		IProject project = createProject();
+		IFolder src = null;
+		IJavaProject javaProject = null;
+		ICompilationUnit cu = null;
+		try {
+			//
+			javaProject = JavaCore.create(project);
+			javaProject.open(null);
+			src = project.getFolder("src");
+			if(!src.exists()) {
+				src.create(true , true , null);
+			}
+			
+			String removedFile;
+		
+			removedFile = Utils.getStringContentOfLastCommit(file.getPath(), getGit().getRepository());
+			IPackageFragment pack = null;
+			String packageName = "";
+			packageName = CompilationUtils.getPackageNameFromStringClass(removedFile);
+			IPackageFragmentRoot rootPack = javaProject.getPackageFragmentRoot(src);
+			
+			
+			
+			pack = rootPack.createPackageFragment(packageName, true, null);
+			cu = pack.createCompilationUnit(file.getName(), removedFile,true, null);
+			stereotypeIdentifier = new StereotypeIdentifier(cu, 0, 0);
+			
+			/*final ProgressBarDialog pbdiag = new ProgressBarDialog(changedListDialog.getShell());
+			pbdiag.open();
+			pbdiag.setStep(0);*/
+			 
+			//List<LSDResult> result = (new LSDiffExecutor()).doLSDiff(getAddedStereotypeIdentifier(file).getCompilationUnit(), cu);
+		} catch (RevisionSyntaxException | IOException | IllegalStateException e) {
+			e.printStackTrace();
+		} catch (CoreException | NullPointerException e) {
+			//deleteTmpProject();
+			e.printStackTrace();
+		} 
+		return cu;
+	}
+	
+	protected void deleteTmpProject() {
+		IProject project = createProject();
+		try {
+			project.delete(true, null);
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public StereotypeIdentifier getAddedStereotypeIdentifier(ChangedFile file) {
@@ -271,6 +428,78 @@ public class SummarizeChanges {
 			e.printStackTrace();
 		}
 		return stereotypeIdentifier;
+	}
+	
+	public StereotypeIdentifier getModifiedStereotypeIdentifier(ChangedFile file) {
+		try {
+			String removedFile = Utils.getStringContentOfLastCommit(file.getPath(), getGit().getRepository());
+			IPackageFragment pack = null;
+			String packageName = "";
+			packageName = "commsummtmp." + CompilationUtils.getPackageNameFromStringClass(removedFile);
+			IFolder folder = ((IJavaProject)changedListDialog.getSelection()).getProject().getFolder("src");
+			pack = changedListDialog.getSelection().getPackageFragmentRoot(folder).createPackageFragment(packageName, true, null);
+			ICompilationUnit cu = pack.createCompilationUnit(file.getName(), removedFile,true, null);
+			stereotypeIdentifier = new StereotypeIdentifier(cu, 0, 0);
+		} catch (RevisionSyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (AmbiguousObjectException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IncorrectObjectTypeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JavaModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return stereotypeIdentifier;
+	}
+	
+	public IProject createProject() {
+		IProject project = null;
+		IFolder src = null;
+		IJavaProject javaProject = null;
+		try {
+			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+			project = root.getProject("MyProject");
+			
+			if(!project.exists()) {
+				project.create(null);
+			}
+			project.open(null);
+			
+			src = project.getFolder("src");
+			if(!src.exists()) {
+				src.create(false , true , null);
+			}
+			
+			IProjectDescription description = project.getDescription();
+			String[] natures = description.getNatureIds();
+			String[] newNatures = new String[natures.length + 1];
+			System.arraycopy(natures, 0, newNatures, 0, natures.length);
+			newNatures[natures.length] = JavaCore.NATURE_ID;
+			description.setNatureIds(newNatures);
+			project.setDescription(description, null);
+			
+			javaProject = JavaCore.create(project);
+			javaProject.open(null);
+			
+			IPackageFragmentRoot rootPack = javaProject.getPackageFragmentRoot(src);
+			
+			IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
+			IClasspathEntry[] newEntries = new IClasspathEntry[1];
+			//System.arraycopy(oldEntries, 0, newEntries, 0, oldEntries.length);
+			newEntries[0] = JavaCore.newSourceEntry(rootPack.getPath());
+			javaProject.setRawClasspath(newEntries, null);
+			
+		} catch (CoreException | RevisionSyntaxException e) {
+			e.printStackTrace();
+		} 
+		return project;
 	}
 	
 	public Git getGit() {

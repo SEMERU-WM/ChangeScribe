@@ -25,10 +25,10 @@ import java.util.concurrent.TimeUnit;
 
 import lsclipse.dialogs.ProgressBarDialog;
 import lsclipse.utils.StringCleaner;
-import lsd.facts.LSDRuleEnumerator;
-import lsd.rule.LSDFact;
-import lsd.rule.LSDPredicate;
-import lsd.rule.LSDRule;
+import lsd.lsd.facts.LSDRuleEnumerator;
+import lsd.lsd.rule.LSDFact;
+import lsd.lsd.rule.LSDPredicate;
+import lsd.lsd.rule.LSDRule;
 import metapackage.MetaInfo;
 
 import org.eclipse.core.resources.IProject;
@@ -52,6 +52,7 @@ import changetypes.AtomicChange.ChangeTypes;
 import changetypes.ChangeSet;
 import changetypes.Fact;
 import changetypes.FactBase;
+import co.edu.unal.colswe.CommitSummarizer.core.Activator;
 
 public class LSDiffRunner {
 	private static final int NUM_THREADS = 4;
@@ -337,37 +338,37 @@ public class LSDiffRunner {
 		//if 2KB_lsdPred not installed, install it now
 		File included2KBFile = MetaInfo.included2kb;
 		if (!included2KBFile.exists()) {
-			InputStream is = lsclipse.LSclipse.getDefault().getClass().getResourceAsStream("/lib/"+included2KBFile.getName());
+			InputStream is = Activator.getDefault().getClass().getResourceAsStream("/lib/"+included2KBFile.getName());
 			writeStreamToFile(is, included2KBFile);
 		}
 		//if deltaKB_lsdPred not installed, install it now
 		File includedDeltaKBFile = MetaInfo.includedDelta;
 		if (!includedDeltaKBFile.exists()) {
-			InputStream is = lsclipse.LSclipse.getDefault().getClass().getResourceAsStream("/lib/"+includedDeltaKBFile.getName());
+			InputStream is = Activator.getDefault().getClass().getResourceAsStream("/lib/"+includedDeltaKBFile.getName());
 			writeStreamToFile(is, includedDeltaKBFile);
 		}
 		//if winnowingrules not installed, install it now
 		File winnowingRulesFile = new File(MetaInfo.winnowings);
 		if (!winnowingRulesFile.exists()) {
-			InputStream is = lsclipse.LSclipse.getDefault().getClass().getResourceAsStream("/lib/"+winnowingRulesFile.getName());
+			InputStream is = Activator.getDefault().getClass().getResourceAsStream("/lib/"+winnowingRulesFile.getName());
 			writeStreamToFile(is, winnowingRulesFile);
 		}
 		//if newwinnowingrules not installed, install it now
 		File typeLevelWinnowingRulesFile = new File(MetaInfo.winnowings);
 		if (!typeLevelWinnowingRulesFile.exists()) {
-			InputStream is = lsclipse.LSclipse.getDefault().getClass().getResourceAsStream("/lib/"+typeLevelWinnowingRulesFile.getName());
+			InputStream is = Activator.getDefault().getClass().getResourceAsStream("/lib/"+typeLevelWinnowingRulesFile.getName());
 			writeStreamToFile(is, typeLevelWinnowingRulesFile);
 		}
 		//if deltaKB_primed_lsdPred not installed, install it now
 		File includedPrimedDeltaKBFile = new File(MetaInfo.lsclipseRefactorDeltaPrimed);
 		if (!includedPrimedDeltaKBFile.exists()) {
-			InputStream is = lsclipse.LSclipse.getDefault().getClass().getResourceAsStream("/lib/"+includedPrimedDeltaKBFile.getName());
+			InputStream is = Activator.getDefault().getClass().getResourceAsStream("/lib/"+includedPrimedDeltaKBFile.getName());
 			writeStreamToFile(is, includedPrimedDeltaKBFile);
 		}
 		// if primed1 is not installed, install it now 
 		File includedPred1File = new File(MetaInfo.lsclipseRefactorPred);
 		if (!includedPred1File.exists()) {
-			InputStream is = lsclipse.LSclipse.getDefault().getClass().getResourceAsStream("/lib/"+includedPred1File.getName());
+			InputStream is = Activator.getDefault().getClass().getResourceAsStream("/lib/"+includedPred1File.getName());
 			writeStreamToFile(is, includedPred1File);
 		}
 	}
