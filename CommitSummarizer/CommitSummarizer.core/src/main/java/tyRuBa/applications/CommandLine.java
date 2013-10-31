@@ -10,6 +10,7 @@ import tyRuBa.engine.FrontEnd;
 import tyRuBa.engine.RuleBase;
 import tyRuBa.modes.TypeModeError;
 import tyRuBa.parser.ParseException;
+import tyRuBa.tests.PerformanceTest;
 
 /**
  * @noToString This tag indicates the developer explicitly checked this class and
@@ -112,6 +113,8 @@ public class CommandLine {
 					} else if (args[i].equals("-benchmark")) {
 						ensureFrontEnd();
 						String queryfile = args[++i];
+						PerformanceTest test = PerformanceTest.make(frontend,queryfile);
+						frontend.output().println("----- results for tests in "+queryfile+" -------");						frontend.output().println(test);
 						//frontend.output().println(PoormansProfiler.profile());
 					} else if (args[i].equals("-metadata")) {
 						ensureFrontEnd();

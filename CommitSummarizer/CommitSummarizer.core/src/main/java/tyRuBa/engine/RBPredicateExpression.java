@@ -3,6 +3,8 @@ package tyRuBa.engine;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import junit.framework.Assert;
+
 import tyRuBa.engine.compilation.CompilationContext;
 import tyRuBa.engine.compilation.Compiled;
 import tyRuBa.engine.compilation.CompiledPredicateExpression;
@@ -60,6 +62,7 @@ public class RBPredicateExpression extends RBExpression {
 	}
 
     public Compiled compile(CompilationContext c) {
+        Assert.assertNotNull("Must be mode checked first!",getMode());
         if (getMode().hi.compareTo(Multiplicity.one) <= 0) {
             return new SemiDetCompiledPredicateExpression(getMode(), rules, getArgs());
         }
@@ -184,6 +187,7 @@ public class RBPredicateExpression extends RBExpression {
     }
 
     private void setRuleBase(RuleBase bestRuleBase) {
+        Assert.assertNull(rules);
         this.rules = bestRuleBase;
     }
 

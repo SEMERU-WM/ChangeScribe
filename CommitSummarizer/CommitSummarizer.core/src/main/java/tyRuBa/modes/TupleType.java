@@ -6,9 +6,7 @@
 package tyRuBa.modes;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 public class TupleType extends Type {
 

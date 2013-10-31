@@ -3,8 +3,6 @@ package tyRuBa.modes;
 import java.util.HashMap;
 import java.util.Map;
 
-import tyRuBa.engine.MetaBase;
-
 public class CompositeType extends BoundaryType {
 
 	private TypeConstructor typeConst = null;

@@ -5,8 +5,6 @@ package tyRuBa.modes;
 
 import java.io.Serializable;
 
-import tyRuBa.engine.RBTerm;
-
 
 /**
  * @author riecken

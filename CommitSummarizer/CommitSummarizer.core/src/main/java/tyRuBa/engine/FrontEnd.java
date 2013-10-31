@@ -26,8 +26,6 @@ import tyRuBa.modes.TypeModeError;
 import tyRuBa.parser.ParseException;
 import tyRuBa.util.Aurelizer;
 import tyRuBa.util.ElementSource;
-import tyRuBa.util.NullQueryLogger;
-import tyRuBa.util.QueryLogger;
 import tyRuBa.util.SynchPolicy;
 import tyRuBa.util.SynchResource;
 import tyRuBa.util.pager.Pager;
@@ -110,7 +108,7 @@ implements SynchResource {
 			rules = RuleBase.make(this, "GLOBAL", false);
 		else
 			rules = RuleBase.make(this);
-				
+		RuleBase.silent = true;
 		try {
 //			parse("__meta(version(5,14,unofficial)).");
 //			insert(

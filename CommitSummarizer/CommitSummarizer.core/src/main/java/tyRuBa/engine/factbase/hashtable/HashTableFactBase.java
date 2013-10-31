@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import junit.framework.Assert;
+
 import tyRuBa.engine.Frame;
 import tyRuBa.engine.QueryEngine;
 import tyRuBa.engine.RBComponent;
@@ -188,6 +190,7 @@ public class HashTableFactBase extends FactBase {
      * @see tyRuBa.engine.factbase.FactBase#insert(tyRuBa.engine.RBComponent)
      */
     public void insert(RBComponent f) {
+        Assert.assertTrue("Only ground facts should be insterted in to FactBases", f.isGroundFact());
         isEmpty = false;
 
         Validator v = f.getValidator();

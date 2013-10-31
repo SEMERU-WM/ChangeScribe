@@ -7,6 +7,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import junit.framework.Assert;
+
 import org.apache.regexp.RE;
 
 import tyRuBa.engine.compilation.CompilationContext;
@@ -362,6 +364,7 @@ public class NativePredicate extends RBComponent {
 
 	public static void defineTypeTest(ModedRuleBaseIndex rb, PredicateIdentifier id, final TypeConstructor t)
 	throws TypeModeError {
+		Assert.assertEquals(1,id.getArity());
 		String javaName = t.getName();
 		NativePredicate type_test = new NativePredicate(id.getName(), Factory.makeAtomicType(t));
 		

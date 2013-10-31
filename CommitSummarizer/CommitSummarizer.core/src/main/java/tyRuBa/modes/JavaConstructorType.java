@@ -4,13 +4,10 @@
 package tyRuBa.modes;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
-import tyRuBa.engine.FrontEnd;
 import tyRuBa.engine.FunctorIdentifier;
 import tyRuBa.engine.RBCompoundTerm;
-import tyRuBa.engine.RBGenericCompoundTerm;
 import tyRuBa.engine.RBJavaObjectCompoundTerm;
 import tyRuBa.engine.RBTerm;
 

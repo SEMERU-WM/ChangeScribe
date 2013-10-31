@@ -2,6 +2,7 @@ package tyRuBa.engine;
 
 import java.util.Collection;
 
+import junit.framework.Assert;
 
 import tyRuBa.engine.compilation.CompilationContext;
 import tyRuBa.engine.compilation.Compiled;
@@ -142,6 +143,7 @@ public abstract class RBExpression implements Cloneable {
     }
 
     public ModeCheckContext getNewContext() {
+        Assert.assertNotNull(newContext);
         return newContext;
     }
 

@@ -23,4 +23,10 @@ Bundle-ClassPath: .,
  lib/stanford-postagger.jar,
  lib/jakarta-regexp-1.5.jar,
  lib/changetypes.jar,
- lib/lsd.jar
+ lib/lsd.jar,
+ lib/junit-4.7.jar,
+ lib/guice-3.0.jar,
+ lib/guice-assistedinject-3.0.jar,
+ lib/javax.inject-1.jar,
+ lib/aopalliance-1.0.jar,
+ lib/commons-lang3-3.1.jar

@@ -8,12 +8,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.Currency;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import junit.framework.Assert;
 
 import tyRuBa.util.DoubleLinkedList;
 
@@ -94,6 +95,7 @@ public class Pager {
 		 * resource is dirty.
 		 */
 		final protected void changedResource(Resource changedResource) {
+			Assert.assertTrue(mayChangeResource);
 			isChangedResource = true;
 			updatedResource = changedResource;
 		}

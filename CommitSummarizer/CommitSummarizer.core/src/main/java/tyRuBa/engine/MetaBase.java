@@ -3,20 +3,14 @@
  */
 package tyRuBa.engine;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import tyRuBa.modes.CompositeType;
-import tyRuBa.modes.ConstructorType;
 import tyRuBa.modes.TupleType;
 import tyRuBa.modes.Type;
 import tyRuBa.modes.TypeConstructor;
 import tyRuBa.modes.TypeMapping;
 import tyRuBa.modes.TypeModeError;
-import tyRuBa.modes.UserDefinedTypeConstructor;
 import tyRuBa.parser.ParseException;
 import tyRuBa.tdbc.PreparedInsert;
-import tyRuBa.tdbc.PreparedStatement;
 import tyRuBa.tdbc.TyrubaException;
 
 /**

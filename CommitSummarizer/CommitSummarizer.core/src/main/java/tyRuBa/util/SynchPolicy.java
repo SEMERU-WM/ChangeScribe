@@ -4,6 +4,7 @@
 package tyRuBa.util;
 
 import tyRuBa.engine.RuleBase;
+import junit.framework.Assert;
 
 public final class SynchPolicy {
 	
@@ -21,6 +22,7 @@ public final class SynchPolicy {
 		synchronized(resource) {
 			busySources--;
 			debug_message("--");
+			Assert.assertTrue(busySources>=0);
 			//Assert.assertTrue(busySources>0 ||
 			//        ResultSetElementSource.active.size()==0);
 			if (busySources==0)
@@ -84,6 +86,7 @@ public final class SynchPolicy {
 
 	public void allowSources() {
 		synchronized (resource) {
+			Assert.assertTrue(stopSources>0);
 			stopSources--;
 			debug_message("allow");
 			resource.notifyAll();

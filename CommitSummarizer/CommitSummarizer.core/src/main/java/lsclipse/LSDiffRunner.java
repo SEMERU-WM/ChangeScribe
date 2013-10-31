@@ -25,10 +25,10 @@ import java.util.concurrent.TimeUnit;
 
 import lsclipse.dialogs.ProgressBarDialog;
 import lsclipse.utils.StringCleaner;
-import lsd.lsd.facts.LSDRuleEnumerator;
-import lsd.lsd.rule.LSDFact;
-import lsd.lsd.rule.LSDPredicate;
-import lsd.lsd.rule.LSDRule;
+import lsd.facts.LSDRuleEnumerator;
+import lsd.rule.LSDFact;
+import lsd.rule.LSDPredicate;
+import lsd.rule.LSDRule;
 import metapackage.MetaInfo;
 
 import org.eclipse.core.resources.IProject;

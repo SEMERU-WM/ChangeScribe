@@ -7,6 +7,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
+import junit.framework.Assert;
+
 import tyRuBa.engine.QueryEngine;
 import tyRuBa.engine.factbase.FileBasedValidatorManager;
 import tyRuBa.engine.factbase.NamePersistenceManager;
@@ -48,7 +50,9 @@ public class URLFactLibrary {
         this.engine = qe;
         try {
             nameManager = new NamePersistenceManager(new URL(baseURL + "names.data"));
+            Assert.assertNotNull(nameManager);
             validatorManager = new FileBasedValidatorManager(new URL(baseURL + "validators.data"));
+            Assert.assertNotNull(validatorManager);
         } catch (MalformedURLException e) {
             throw new Error("Library file does not exist");
         }

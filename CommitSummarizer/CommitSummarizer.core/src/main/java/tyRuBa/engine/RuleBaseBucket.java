@@ -2,6 +2,7 @@ package tyRuBa.engine;
 
 import java.io.File;
 
+import junit.framework.Assert;
 import tyRuBa.modes.TypeModeError;
 import tyRuBa.parser.ParseException;
 import tyRuBa.util.Files;
@@ -48,6 +49,7 @@ public abstract class RuleBaseBucket extends QueryEngine {
 	 */
 	public RuleBaseBucket(FrontEnd frontend, String identifyingString) {
 		this.frontend = frontend;
+		Assert.assertTrue(frontend!=null);
 		
 		if(identifyingString == null) {
 			this.temporary = true;
