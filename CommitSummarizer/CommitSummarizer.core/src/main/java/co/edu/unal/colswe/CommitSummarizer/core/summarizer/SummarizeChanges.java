@@ -25,6 +25,11 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.compiler.ast.Assignment;
+import org.eclipse.jdt.internal.compiler.ast.ForeachStatement;
+import org.eclipse.jdt.internal.compiler.ast.LocalDeclaration;
+import org.eclipse.jdt.internal.compiler.ast.MessageSend;
+import org.eclipse.jdt.internal.compiler.ast.SingleNameReference;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
@@ -34,6 +39,11 @@ import org.eclipse.swt.widgets.Display;
 import ch.uzh.ifi.seal.changedistiller.ChangeDistiller;
 import ch.uzh.ifi.seal.changedistiller.ChangeDistiller.Language;
 import ch.uzh.ifi.seal.changedistiller.distilling.FileDistiller;
+import ch.uzh.ifi.seal.changedistiller.model.classifiers.ChangeType;
+import ch.uzh.ifi.seal.changedistiller.model.classifiers.java.JavaEntityType;
+import ch.uzh.ifi.seal.changedistiller.model.entities.Delete;
+import ch.uzh.ifi.seal.changedistiller.model.entities.Insert;
+import ch.uzh.ifi.seal.changedistiller.model.entities.Move;
 import ch.uzh.ifi.seal.changedistiller.model.entities.SourceCodeChange;
 import ch.uzh.ifi.seal.changedistiller.model.entities.Update;
 import co.edu.unal.colswe.CommitSummarizer.core.FilesChangedListDialog;
@@ -45,7 +55,9 @@ import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.Stereotyp
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedElement;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedMethod;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.CommitStereotype;
+import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.NounPhrase;
 import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.util.CompilationUtils;
+import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.tokenizer.Tokenizer;
 import co.edu.unal.colswe.CommitSummarizer.core.util.Utils;
 
 public class SummarizeChanges {
@@ -147,7 +159,7 @@ public class SummarizeChanges {
 			public void run() {
 				if(summarized.size() + modulesAdded.size() + modifiedFiles.size() == differences.length) {
 					String currentPackage = "";
-					StringBuilder desc = new StringBuilder();
+					StringBuilder desc = new StringBuilder(); 
 					desc.append(summarizeCommitStereotype());
 					int i = 1;
 					int j = 1;
@@ -169,24 +181,129 @@ public class SummarizeChanges {
 					}
 					
 					for(ChangedFile file : modifiedFiles) {
-						compareModified(file);
+						try {
+							compareModified(file);
+						} catch(IllegalStateException ex) {
+							ex.printStackTrace();
+							desc.append(i + ". the " + file.getName() + " was renamed:  \n\n");
+						}
 						List<SourceCodeChange> changes = distiller.getSourceCodeChanges();
 						if(changes != null) {
 							desc.append(i + ". Modifications to file " + file.getName() + ":  \n\n");
 						    for(SourceCodeChange change : changes) {
+						    	desc.append("\t\t");
 						    	if(change instanceof Update) {
 						    		Update update = (Update) change;
-						    		desc.append((i) + "." + j + ". " + change.getLabel() + " OLD CODE: " + change.getParentEntity() + 
-							    			" - NEW CODE: " + update.getNewEntity() + " - " + 
-							    			change.getSignificanceLevel() + " change type: " + change.getChangeType() + "\n");
-						    	}
-
+						    		if(update.getChangeType() == ChangeType.STATEMENT_UPDATE) {
+						    			String fType = update.getChangedEntity().getType().name().toLowerCase().replace("_", " ");
+						    			desc.append((i) + "." + j + ". " + fType+ " modified ");
+						    			if(update.getChangedEntity().getType() == JavaEntityType.METHOD_INVOCATION) {
+						    				MessageSend methodC = (MessageSend) update.getChangedEntity().getAstNode();
+						    				MessageSend methodN = (MessageSend) update.getNewEntity().getAstNode();
+						    				
+						    				if(methodC.receiver != methodN.receiver) {
+						    					desc.append("of " + new String(methodC.receiver.toString()) + " to " + new String(methodN.receiver.toString()) + " on " + update.getParentEntity().getName() + " method");
+						    				} else if(methodC.selector != methodN.selector) {
+						    					desc.append("of " + new String(methodC.selector.toString()) + " to " + new String(methodN.selector.toString()) + " on " + update.getParentEntity().getName() + " method");
+						    				}
+						    				//desc.append((i) + "." + j + ". " + fType+ " modified ");
+						    			} else if(update.getChangedEntity().getType() == JavaEntityType.ASSIGNMENT) {
+						    				Assignment asC = (Assignment) update.getChangedEntity().getAstNode();
+						    				Assignment asN = (Assignment) update.getNewEntity().getAstNode();
+						    				
+						    				if(asC.lhs != asN.lhs) {
+						    					desc.append("of " + new String(asC.lhs.toString()) + " to " + new String(asN.lhs.toString()) + " on " + update.getParentEntity().getName() + " method");
+						    				} else if(asC.expression != asN.expression) {
+						    					desc.append("of " + new String(asC.expression.toString()) + " to " + new String(asN.expression.toString()) + " on " + update.getParentEntity().getName() + " method");
+						    				}
+						    			}
+						    			else {
+						    				desc.append((i) + "." + j + ". " + update.getChangedEntity().getName() + " by " + update.getNewEntity().getUniqueName() + " on " + update.getParentEntity().getName()  + " method");
+						    			}
+						    		} else if(update.getChangeType() == ChangeType.METHOD_RENAMING) {
+						    			desc.append((i) + "." + j + ". " + update.getChangedEntity().getName().substring(0, update.getChangedEntity().getName().indexOf("(")) + " method renamed " + " by " + update.getNewEntity().getName().substring(0, update.getNewEntity().getName().indexOf("(")));
+						    		} else if(update.getChangeType() == ChangeType.ATTRIBUTE_RENAMING) {
+						    			desc.append((i) + "." + j + ". " + update.getChangedEntity().getName().substring(0, update.getChangedEntity().getName().indexOf(":")).trim() + " attribute renamed " + " by " + update.getNewEntity().getName().substring(0, update.getNewEntity().getName().indexOf(":")).trim());
+						    		} else if(update.getChangeType() == ChangeType.CONDITION_EXPRESSION_CHANGE) {
+						    			desc.append((i) + "." + j + ". " + "Conditional expression " + update.getChangedEntity().getName().substring(1, update.getChangedEntity().getName().length() - 1) + " was modified for " + update.getNewEntity().getUniqueName() + " on " + update.getParentEntity().getName() + " method");
+						    		} else if(update.getChangeType() == ChangeType.INCREASING_ACCESSIBILITY_CHANGE) {
+						    			desc.append((i) + "." + j + ". " + "Accessibility was increased of " + update.getChangedEntity().getUniqueName() + " to " + update.getNewEntity().getUniqueName() + " for " + update.getRootEntity().getJavaStructureNode().getName().substring(0, update.getRootEntity().getJavaStructureNode().getName().indexOf(":") - 1) + " " + update.getRootEntity().getType().name().toLowerCase());
+						    		} else if(update.getChangeType() == ChangeType.DECREASING_ACCESSIBILITY_CHANGE) {
+						    			desc.append((i) + "." + j + ". " + "Accessibility was decreased of " + update.getChangedEntity().getUniqueName() + " to " + update.getNewEntity().getUniqueName() + " for " + update.getRootEntity().getJavaStructureNode().getName() + " " + update.getRootEntity().getType().name().toLowerCase());
+						    		} else if(update.getChangeType() == ChangeType.COMMENT_INSERT || update.getChangeType() == ChangeType.DOC_INSERT) {
+						    			String type = update.getChangedEntity().getType().name().toLowerCase().replace("_", " ");
+						    			String entityType = update.getRootEntity().getJavaStructureNode().getType().name().toLowerCase();
+						    			desc.append((i) + "." + j + ". " + type +" updated on " + update.getRootEntity().getJavaStructureNode().getName() + " " + entityType);
+						    		}
+						    		else {
+							    		desc.append((i) + "." + j + ". " + change.getLabel() + " OLD CODE: " + change.getParentEntity() + 
+								    			" - NEW CODE: " + update.getNewEntity() + " - " + 
+								    			change.getSignificanceLevel() + " change type: " + change.getChangeType() + "\n");
+						    		}
+						    		
+						    	} else if(change instanceof Insert) {
+						    		Insert insert = (Insert) change;
+						    		String fType = insert.getChangedEntity().getType().name().toLowerCase().replace("_", " ");
+						    		if(insert.getChangeType() == ChangeType.ADDITIONAL_FUNCTIONALITY) {
+						    			desc.append((i) + "." + j + ". " + "An additional funtionality for " + insert.getChangedEntity().getName().substring(0, insert.getChangedEntity().getName().indexOf("(")) + " was added");
+						    		} else if(insert.getChangeType() == ChangeType.COMMENT_INSERT || insert.getChangeType() == ChangeType.DOC_INSERT) {
+						    			String type = insert.getChangedEntity().getType().name().toLowerCase().replace("_", " ");
+						    			String entityType = insert.getRootEntity().getJavaStructureNode().getType().name().toLowerCase();
+						    			desc.append((i) + "." + j + ". " + type +" added on " + insert.getRootEntity().getJavaStructureNode().getName() + " " + entityType);
+						    		} else if(insert.getChangedEntity().getType() == JavaEntityType.METHOD_INVOCATION) {
+						    			String type = insert.getChangedEntity().getType().name().toLowerCase().replace("_", " ");
+						    			MessageSend methodC = (MessageSend) insert.getChangedEntity().getAstNode();
+					    				
+					    				desc.append((i) + "." + j + ". " + type + " was added for " + new String(methodC.selector) + " on " + insert.getRootEntity().getJavaStructureNode().getName() + " method");
+					    			} 
+					    			
+					    		} else if(change instanceof Delete) {
+					    			Delete delete = (Delete) change;
+					    			if(delete.getChangeType() == ChangeType.STATEMENT_DELETE) {
+					    				desc.append((i) + "." + j + ". " );
+					    				
+					    				String statementType = delete.getChangedEntity().getType().name().toLowerCase().replace("statement", "").replace("_", " ");
+					    				desc.append(statementType);
+					    				if(delete.getChangedEntity().getAstNode() != null && delete.getChangedEntity().getAstNode() instanceof LocalDeclaration) {
+					    					LocalDeclaration localDec = (LocalDeclaration) delete.getChangedEntity().getAstNode();
+					    					NounPhrase phrase = new NounPhrase(Tokenizer.split(new String(localDec.name)));
+					    					phrase.generate();
+					    					desc.append(" for " + phrase.toString() + " was removed on " + delete.getRootEntity().getJavaStructureNode().getName() + " method");
+					    				} else if(delete.getChangedEntity().getAstNode() != null && delete.getChangedEntity().getAstNode() instanceof ForeachStatement) {
+					    					ForeachStatement forDec = (ForeachStatement) delete.getChangedEntity().getAstNode();
+					    					NounPhrase phrase = new NounPhrase(Tokenizer.split(((MessageSend)forDec.collection).receiver.toString()));
+					    					phrase.generate();
+					    					desc.append(" loop on " + phrase.toString() + " collection was removed on " + delete.getRootEntity().getJavaStructureNode().getName() + " method");
+					    				} else if(delete.getChangedEntity().getAstNode() != null && delete.getChangedEntity().getAstNode() instanceof MessageSend) {
+					    					MessageSend messageSend = (MessageSend) delete.getChangedEntity().getAstNode();
+					    					NounPhrase phrase = new NounPhrase(Tokenizer.split(new String(messageSend.selector)));
+					    					phrase.generate();
+					    					desc.append(" to " + phrase.toString());
+					    					if(messageSend.arguments != null && messageSend.arguments.length > 0) {
+					    						phrase = new NounPhrase(Tokenizer.split(new String(((SingleNameReference)messageSend.arguments[0]).token)));
+					    						phrase.generate();
+					    					}
+					    					if(!desc.toString().endsWith(phrase.toString())) {
+					    						desc.append(" " + phrase.toString());
+					    					}
+					    					desc.append("  was removed on " + delete.getRootEntity().getJavaStructureNode().getName() + " method");
+					    				}
+					    				else {
+					    					System.out.println("other");
+					    				}
+						    		} else if(delete.getChangeType() == ChangeType.COMMENT_INSERT || delete.getChangeType() == ChangeType.DOC_INSERT) {
+						    			String type = delete.getChangedEntity().getType().name().toLowerCase().replace("_", " ");
+						    			String entityType = delete.getRootEntity().getJavaStructureNode().getType().name().toLowerCase();
+						    			desc.append((i) + "." + j + ". " + type +" removed on " + delete.getRootEntity().getJavaStructureNode().getName() + " " + entityType);
+						    		}
+					    		} else if(change instanceof Move) {
+					    			
+					    		}
+						    	desc.append("\n");
 						    	j++;
-						    	
 						    }
 						    i++;
 						}
-						
 					}
 					
 					getChangedListDialog().getEditor().getText().setText(desc.toString());
@@ -194,8 +311,6 @@ public class SummarizeChanges {
 						getChangedListDialog().updateSignatureCanvas();
 					}
 					
-					
-
 					removeCreatedPackages();
 				}
 			}
@@ -208,7 +323,6 @@ public class SummarizeChanges {
 		try {
 			folder.delete(true, null);
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
