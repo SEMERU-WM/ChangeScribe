@@ -41,7 +41,7 @@ public class SignatureCanvas {
 	}
 
 	public void redraw() {
-		if (getSignatureMap() != null && getSignatureMap().size() > 0) {
+		if (getSignatureMap() != null) {
 			canvas.getParent().layout(true, true);
 			canvas.redraw();
 			canvas.update();

@@ -12,6 +12,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import co.edu.unal.colswe.CommitSummarizer.core.ast.JParser;
+import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 
 public class StereotypeIdentifier {
 	private JParser parser;
@@ -21,6 +22,7 @@ public class StereotypeIdentifier {
 	private ICompilationUnit compilationUnit;
 	private String scmOperation; 
 	private StringBuilder builder;
+	private ChangedFile changedFile;
 
 	public StereotypeIdentifier() {
 		super();
@@ -129,6 +131,14 @@ public class StereotypeIdentifier {
 	@Override
 	public String toString() {
 		return builder.toString();
+	}
+
+	public ChangedFile getChangedFile() {
+		return changedFile;
+	}
+
+	public void setChangedFile(ChangedFile changedFile) {
+		this.changedFile = changedFile;
 	}
 	
 	
