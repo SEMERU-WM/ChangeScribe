@@ -11,6 +11,7 @@ import org.eclipse.jdt.internal.compiler.ast.CompoundAssignment;
 import org.eclipse.jdt.internal.compiler.ast.ForeachStatement;
 import org.eclipse.jdt.internal.compiler.ast.LocalDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.MessageSend;
+import org.eclipse.jdt.internal.compiler.ast.OperatorIds;
 import org.eclipse.jdt.internal.compiler.ast.PrefixExpression;
 import org.eclipse.jdt.internal.compiler.ast.SingleNameReference;
 import org.eclipse.jgit.api.Git;
@@ -108,9 +109,9 @@ public class ModificationDescriptor {
 				if(delete.getChangedEntity().getAstNode() instanceof PrefixExpression) {
 					PrefixExpression prefixExpression = (PrefixExpression) delete.getChangedEntity().getAstNode();
 					
-					if(prefixExpression.PLUS == prefixExpression.operator) {
+					if(OperatorIds.PLUS == prefixExpression.operator) {
 						desc.append(" to increment ");
-					} else if(prefixExpression.MINUS == prefixExpression.operator) {
+					} else if(OperatorIds.MINUS == prefixExpression.operator) {
 						desc.append(" to decrement ");
 					}
 					
@@ -225,9 +226,9 @@ public class ModificationDescriptor {
 				desc.append(StringUtils.capitalize(fType));
 				PrefixExpression prefixExpression = (PrefixExpression) update.getChangedEntity().getAstNode();
 				
-				if(prefixExpression.PLUS == prefixExpression.operator) {
+				if(OperatorIds.PLUS == prefixExpression.operator) {
 					desc.append(" increment ");
-				} else if(prefixExpression.MINUS == prefixExpression.operator) {
+				} else if(OperatorIds.MINUS == prefixExpression.operator) {
 					desc.append(" decrement ");
 				}
 				
