@@ -126,7 +126,7 @@ public class ModificationDescriptor {
 			String entityType = delete.getRootEntity().getJavaStructureNode().getType().name().toLowerCase();
 			desc.append(type +" removed at " + delete.getRootEntity().getJavaStructureNode().getName() + " " + entityType);
 		} else if(delete.getChangeType() == ChangeType.REMOVED_FUNCTIONALITY) {
-			desc.append("Funtionality for " + delete.getChangedEntity().getName().substring(0, delete.getChangedEntity().getName().indexOf("(")) + " was removed");
+			desc.append("Funtionality to " + delete.getChangedEntity().getName().substring(0, delete.getChangedEntity().getName().indexOf("(")) + " was removed");
 		} else if(delete.getChangeType() == ChangeType.REMOVED_OBJECT_STATE) {
 			desc.append("Object state " + delete.getChangedEntity().getName().substring(0, delete.getChangedEntity().getName().indexOf(":")) + " was removed");
 		} else if(delete.getChangeType() == ChangeType.PARAMETER_DELETE) {
@@ -144,7 +144,7 @@ public class ModificationDescriptor {
 	public static void describeInsert(StringBuilder desc, Insert insert) {
 		String fType = insert.getChangedEntity().getType().name().toLowerCase().replace("_", " ");
 		if(insert.getChangeType() == ChangeType.ADDITIONAL_FUNCTIONALITY) {
-			desc.append("An additional functionality for " + insert.getChangedEntity().getName().substring(0, insert.getChangedEntity().getName().indexOf("(")) + " was added");
+			desc.append("An additional functionality to " + insert.getChangedEntity().getName().substring(0, insert.getChangedEntity().getName().indexOf("(")) + " was added");
 		} else if(insert.getChangeType() == ChangeType.COMMENT_INSERT || insert.getChangeType() == ChangeType.DOC_INSERT) {
 			String entityType = insert.getRootEntity().getJavaStructureNode().getType().name().toLowerCase();
 			desc.append(StringUtils.capitalize(fType) +" added at " + insert.getRootEntity().getJavaStructureNode().getName() + " " + entityType);
@@ -196,30 +196,33 @@ public class ModificationDescriptor {
 	public static void describeUpdate(StringBuilder desc,
 			SourceCodeChange change, Update update) {
 		String fType = StringUtils.capitalize(update.getChangedEntity().getType().name().toLowerCase().replace("_", " "));
-		if(fType.equals("Variable declaration statement ")) {
+		if(fType.equals("Variable declaration statement")) {
 			fType = "Variable declaration ";
 		}
 		if(update.getChangeType() == ChangeType.STATEMENT_UPDATE) {
-			desc.append(StringUtils.capitalize(fType) + " to ");
+			
 			if(update.getChangedEntity().getType() == JavaEntityType.METHOD_INVOCATION) {
+				desc.append(StringUtils.capitalize(fType) + " was modified of ");
 				MessageSend methodC = (MessageSend) update.getChangedEntity().getAstNode();
 				MessageSend methodN = (MessageSend) update.getNewEntity().getAstNode();
 				
 				if(methodC.receiver != methodN.receiver) {
-					desc.append("of " + new String(methodC.receiver.toString()) + " to " + new String(methodN.receiver.toString()) + " at " + update.getParentEntity().getName() + " method");
+					desc.append(new String(methodC.receiver.toString()) + " to " + new String(methodN.receiver.toString()) + " at " + update.getParentEntity().getName() + " method");
 				} else if(methodC.selector != methodN.selector) {
-					desc.append("of " + new String(methodC.selector.toString()) + " to " + new String(methodN.selector.toString()) + " at " + update.getParentEntity().getName() + " method");
+					desc.append(new String(methodC.selector.toString()) + " to " + new String(methodN.selector.toString()) + " at " + update.getParentEntity().getName() + " method");
 				}
 			} else if(update.getChangedEntity().getType() == JavaEntityType.ASSIGNMENT) {
+				desc.append(StringUtils.capitalize(fType) + " was modified of ");
 				Assignment asC = (Assignment) update.getChangedEntity().getAstNode();
 				Assignment asN = (Assignment) update.getNewEntity().getAstNode();
 				
 				if(asC.lhs != asN.lhs) {
-					desc.append("of " + new String(asC.lhs.toString()) + " to " + new String(asN.lhs.toString()) + " at " + update.getParentEntity().getName() + " method");
+					desc.append(new String(asC.lhs.toString()) + " to " + new String(asN.lhs.toString()) + " at " + update.getParentEntity().getName() + " method");
 				} else if(asC.expression != asN.expression) {
-					desc.append("of " + new String(asC.expression.toString()) + " to " + new String(asN.expression.toString()) + " at " + update.getParentEntity().getName() + " method");
+					desc.append(new String(asC.expression.toString()) + " to " + new String(asN.expression.toString()) + " at " + update.getParentEntity().getName() + " method");
 				}
 			} else if(update.getChangedEntity().getAstNode() instanceof PrefixExpression) {
+				desc.append(StringUtils.capitalize(fType));
 				PrefixExpression prefixExpression = (PrefixExpression) update.getChangedEntity().getAstNode();
 				
 				if(prefixExpression.PLUS == prefixExpression.operator) {
@@ -232,7 +235,7 @@ public class ModificationDescriptor {
 				
 				desc.append(" was added ");
 			} else {
-				desc.append(update.getChangedEntity().getName() + " was modified by " + update.getNewEntity().getUniqueName() + " at " + update.getParentEntity().getName()  + " method");
+				desc.append(StringUtils.capitalize(fType) + " " + update.getChangedEntity().getName() + " was modified by " + update.getNewEntity().getUniqueName() + " at " + update.getParentEntity().getName()  + " method");
 			}
 		} else if(update.getChangeType() == ChangeType.METHOD_RENAMING) {
 			desc.append(update.getChangedEntity().getName().substring(0, update.getChangedEntity().getName().indexOf("(")) + " method renamed " + " by " + update.getNewEntity().getName().substring(0, update.getNewEntity().getName().indexOf("(")));
