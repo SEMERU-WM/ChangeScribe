@@ -44,42 +44,42 @@ public class ModificationDescriptor {
 
 	public static void describe(ChangedFile file, Git git, int i, int j, StringBuilder desc) {
 		FileDistiller distiller = ChangeDistiller.createFileDistiller(Language.JAVA); 
-			try {
-				compareModified(file, distiller, git);
-			} catch(IllegalStateException ex) {
-				ex.printStackTrace();
-				desc.append((i - 1) + "." + j + ". " + " The " + file.getName() + " file was renamed:  \n\n");
-			}
-			List<SourceCodeChange> changes = distiller.getSourceCodeChanges();
-			if(changes != null) {
-				if(changes != null && changes.size() > 0) {
-					desc.append((i - 1) + "." + j + ". " + " Modifications to " + file.getName()/*changes.get(1).getRootEntity().getJavaStructureNode().getName() + " " + changes.get(0).getRootEntity().getJavaStructureNode().getType().name().toLowerCase()*/ + ":  \n\n");
-				} else {
-	    			desc.append("Not found modifications");
-	    		}
-				int k = 1;
-			    for(SourceCodeChange change : changes) {
-			    	desc.append("\t\t");
-			    	desc.append((i - 1) + "." + j + "." + k + ". ");
-			    	if(change instanceof Update) {
-			    		Update update = (Update) change;
-			    		describeUpdate(desc, change, update);
-			    		
-			    	} else if(change instanceof Insert) {
-			    		Insert insert = (Insert) change;
-			    		describeInsert(desc, insert); 
-		    			
-		    		} else if(change instanceof Delete) {
-		    			Delete delete = (Delete) change;
-		    			describeDelete(desc, delete);
-		    		} else if(change instanceof Move) {
-		    			
-		    		} 
-			    	desc.append("\n");
-			    	k++;
-			    }
-			    desc.append("\n");
-			}
+		try {
+			compareModified(file, distiller, git);
+		} catch(IllegalStateException ex) {
+			ex.printStackTrace();
+			desc.append((i - 1) + "." + j + ". " + " The " + file.getName() + " file was renamed:  \n\n");
+		}
+		List<SourceCodeChange> changes = distiller.getSourceCodeChanges();
+		if(changes != null) {
+			if(changes != null && changes.size() > 0) {
+				desc.append((i - 1) + "." + j + ". " + " Modifications to " + file.getName()/*changes.get(1).getRootEntity().getJavaStructureNode().getName() + " " + changes.get(0).getRootEntity().getJavaStructureNode().getType().name().toLowerCase()*/ + ":  \n\n");
+			} else {
+    			desc.append("Not found modifications");
+    		}
+			int k = 1;
+		    for(SourceCodeChange change : changes) {
+		    	desc.append("\t\t");
+		    	desc.append((i - 1) + "." + j + "." + k + ". ");
+		    	if(change instanceof Update) {
+		    		Update update = (Update) change;
+		    		describeUpdate(desc, change, update);
+		    		
+		    	} else if(change instanceof Insert) {
+		    		Insert insert = (Insert) change;
+		    		describeInsert(desc, insert); 
+	    			
+	    		} else if(change instanceof Delete) {
+	    			Delete delete = (Delete) change;
+	    			describeDelete(desc, delete);
+	    		} else if(change instanceof Move) {
+	    			
+	    		} 
+		    	desc.append("\n");
+		    	k++;
+		    }
+		    desc.append("\n");
+		}
 	}
 
 	public static void describeDelete(StringBuilder desc, Delete delete) {

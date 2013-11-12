@@ -21,6 +21,11 @@ public class SummarizeType {
 	public void generate() {
 		builder = new StringBuilder();
 		builder.append(GeneralDescriptor.describe(element, identifier.getParser().getCompilationUnit(), identifier.getScmOperation()));
+		
+		if(getElement().getStereoSubElements() != null && getElement().getStereoSubElements().size() > 0) {
+			builder.append(". It allows: \n");
+		}
+		
 		builder.append(StereotypeMethodDescriptor.describe(getElement().getStereoSubElements()));
 		builder.append(ImpactSetDescriptor.describe(identifier.getCompilationUnit(), getDifferences(), identifier.getScmOperation()) + "\n");
 	}

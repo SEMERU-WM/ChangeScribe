@@ -56,9 +56,10 @@ public class SummarizeChanges {
 	private ChangedFile[] differences;
 	private FilesChangedListDialog changedListDialog;
 	private SortedMap<String, StereotypeIdentifier> summarized = new TreeMap<String, StereotypeIdentifier>();
-	private LinkedList<ChangedFile> modulesAdded;
+	//private LinkedList<ChangedFile> modulesAdded;
 	private FileDistiller distiller; 
 	private LinkedList<ChangedFile> modifiedFiles;
+	private LinkedList<ChangedFile> otherFiles;
 	
 	public SummarizeChanges(Git git) {
 		super();
@@ -72,8 +73,9 @@ public class SummarizeChanges {
 		this.differences = differences;
 		this.identifiers = new ArrayList<StereotypeIdentifier>();
 		this.summarized = new TreeMap<String, StereotypeIdentifier>();
-		this.modulesAdded = new LinkedList<>();
+		//this.modulesAdded = new LinkedList<>();
 		this.modifiedFiles = new LinkedList<>();
+		this.otherFiles = new LinkedList<>();
 		getChangedListDialog().getEditor().getText().setText("");
 		removeCreatedPackages();
 		//deleteTmpProject();
@@ -95,22 +97,29 @@ public class SummarizeChanges {
 								StereotypeIdentifier identifier = null;
 								try {
 									System.out.println("CHANGE TYPE: " + file.getChangeType());
-									if(file.getChangeType().equals(TypeChange.UNTRACKED.name()) 
-											|| file.getChangeType().equals(TypeChange.ADDED.name())) {
-										if(file.getAbsolutePath().endsWith(".java")) {
-											monitor.subTask("Identifying stereotypes for " + file.getName());
-											identifier = identifyStereotypes(file, file.getChangeType());
-										} 
-									} else if(file.getChangeType().equals(TypeChange.REMOVED.name())) {
-										if(file.getAbsolutePath().endsWith(".java")) {
-											monitor.subTask("Identifying stereotypes for " + file.getName());
-											identifier = identifyStereotypes(file, file.getChangeType());
+									if(file.getAbsolutePath().endsWith(".java")) {
+										if(file.getChangeType().equals(TypeChange.UNTRACKED.name()) 
+												|| file.getChangeType().equals(TypeChange.ADDED.name())) {
+											if(file.getAbsolutePath().endsWith(".java")) {
+												monitor.subTask("Identifying stereotypes for " + file.getName());
+												identifier = identifyStereotypes(file, file.getChangeType());
+											} 
+										} else if(file.getChangeType().equals(TypeChange.REMOVED.name())) {
+											if(file.getAbsolutePath().endsWith(".java")) {
+												monitor.subTask("Identifying stereotypes for " + file.getName());
+												identifier = identifyStereotypes(file, file.getChangeType());
+											}
+										} else if(file.getChangeType().equals(TypeChange.MODIFIED.name())) {
+											if(file.getAbsolutePath().endsWith(".java")) {
+												monitor.subTask("Identifying stereotypes for " + file.getName());
+												identifier = identifyStereotypes(file, file.getChangeType());
+											}
+											//modifiedFiles.add(file);
 										}
-									} else if(file.getChangeType().equals(TypeChange.MODIFIED.name())) {
-										monitor.subTask("Identifying stereotypes for " + file.getName());
-										identifier = identifyStereotypes(file, file.getChangeType());
-										//modifiedFiles.add(file);
+									} else {
+										otherFiles.add(file);
 									}
+									
 									if(identifier != null) {
 										monitor.subTask("Describing type " + file.getName());
 										summarizeType(identifier);
@@ -145,13 +154,24 @@ public class SummarizeChanges {
 
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
-				if(summarized.size() + modulesAdded.size() + modifiedFiles.size() == differences.length) {
+				if(summarized.size() + modifiedFiles.size() + otherFiles.size() == differences.length) {
 					String currentPackage = "";
 					StringBuilder desc = new StringBuilder(); 
+					//Commit stereotype description
 					desc.append(summarizeCommitStereotype());
 					int i = 1;
 					int j = 1;
+					
+					//General description
+					CommitGeneralDescriptor generalDescriptor = new CommitGeneralDescriptor();
+					generalDescriptor.setDifferences(differences);
+					generalDescriptor.setGit(git);
+					desc.append(generalDescriptor.describe());
+					
 					for(Entry<String, StereotypeIdentifier> identifier : summarized.entrySet()) {
+						if(i == 1) {
+							desc.append(" This change set is composed of this changes:  \n\n");
+						}
 						if(currentPackage.trim().equals("")) {
 							currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
 							System.out.println("current 1: " + currentPackage);
@@ -172,12 +192,9 @@ public class SummarizeChanges {
 						j++;
 					}
 					
-					
-					
 					getChangedListDialog().getEditor().getText().setText(desc.toString());
-					//if(summarized.size() > 0) {
 					getChangedListDialog().updateSignatureCanvas();
-					//}
+					getChangedListDialog().updateMessage();
 					
 					removeCreatedPackages();
 				}
@@ -252,9 +269,8 @@ public class SummarizeChanges {
 			
 			if(stereotype != null) {
 				result = CommitStereotypeDescriptor.describe(stereotypeIdentifier.getCompilationUnit() ,stereotypedCommit);
-				result += CommitStereotypeDescriptor.describeNewModules(git, differences) + "\n\n";
 			} else {
-				result = "Not found commit stereotype\n\n";
+				result = "Not found commit stereotype. ";
 			}
 			changedListDialog.setSignatureMap(stereotypedCommit.getSignatureMap());
 		} else {

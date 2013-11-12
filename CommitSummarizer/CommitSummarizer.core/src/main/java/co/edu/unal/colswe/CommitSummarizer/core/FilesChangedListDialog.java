@@ -1,6 +1,7 @@
 package co.edu.unal.colswe.CommitSummarizer.core;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
@@ -10,6 +11,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -32,7 +34,16 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jgit.api.AddCommand;
+import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.PushCommand;
+import org.eclipse.jgit.api.errors.ConcurrentRefUpdateException;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoHeadException;
+import org.eclipse.jgit.api.errors.NoMessageException;
+import org.eclipse.jgit.api.errors.UnmergedPathsException;
+import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyleRange;
@@ -85,6 +96,7 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 	public static final int COMMIT_AND_PUSH_ID = 30;
 	private TreeMap<MethodStereotype, Integer> signatureMap;
 	private SignatureCanvas signatureCanvas;
+	private boolean isPushRequested;
 
 	public FilesChangedListDialog(Shell shell, Set<ChangedFile> differences, Git git, IJavaProject selection) {
 		super(shell);
@@ -227,6 +239,74 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		createButton(parent, IDialogConstants.CANCEL_ID,
 				IDialogConstants.CANCEL_LABEL, false);
 		updateMessage();
+	}
+	
+	protected void buttonPressed(int buttonId) {
+		if (IDialogConstants.OK_ID == buttonId)
+			okPressed();
+		else if (COMMIT_AND_PUSH_ID == buttonId) {
+			setPushRequested(true);
+			okPressed();
+		} else if (IDialogConstants.CANCEL_ID == buttonId)
+			cancelPressed();
+	}
+	
+	@Override
+	protected void okPressed() {
+		if (!isCommitWithoutFilesAllowed()) {
+			MessageDialog.openWarning(getShell(), "No files selected", "You do not selected files to be commited");
+			return;
+		}
+
+		//if (!commitMessageComponent.checkCommitInfo())
+		//	return;
+		ArrayList<String> selectedFiles = new ArrayList<String>(); 
+		Object[] checkedElements = filesViewer.getCheckedElements(); 
+		selectedFiles.clear(); 
+		for (Object obj : checkedElements)
+			selectedFiles.add(((ChangedFile) obj).getPath());
+
+		/*amending = commitMessageComponent.isAmending();
+		commitMessage = commitMessageComponent.getCommitMessage();
+		author = commitMessageComponent.getAuthor();
+		committer = commitMessageComponent.getCommitter();
+		createChangeId = changeIdItem.getSelection();*/
+
+		try {
+			for(String fileTmp : selectedFiles) {
+				AddCommand add = git.add();
+				add.addFilepattern(fileTmp).call();
+			}
+			
+			CommitCommand commit = git.commit();
+			commit.setMessage(editor.getText().getText());
+			commit.call();
+			
+			if(isPushRequested) {
+				PushCommand push = git.push();
+				push.call();
+			}
+		} catch (NoHeadException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoMessageException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnmergedPathsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ConcurrentRefUpdateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (WrongRepositoryStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (GitAPIException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		super.okPressed();
 	}
 	
 	@Override
@@ -456,9 +536,7 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		};
 	}
 	
-
-	
-	private void updateMessage() {
+	public void updateMessage() {
 		if (commitButton == null)
 			// Not yet fully initialized.
 			return;
@@ -466,7 +544,7 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		String message = null;
 		int type = IMessageProvider.NONE;
 
-		String commitMsg = getEditor().getText().toString();
+		String commitMsg = getEditor().getText().getText().toString();
 		if (commitMsg == null || commitMsg.trim().length() == 0) {
 			message = "Empty message";
 			type = IMessageProvider.INFORMATION;
@@ -523,11 +601,6 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		return true;
 	}
 
-	@Override
-	protected void okPressed() {
-		super.okPressed();
-	}
-
 	public Git getGit() {
 		return git;
 	}
@@ -574,6 +647,14 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 
 	public void setSignatureMap(TreeMap<MethodStereotype, Integer> signatureMap) {
 		this.signatureMap = signatureMap;
+	}
+
+	public boolean isPushRequested() {
+		return isPushRequested;
+	}
+
+	public void setPushRequested(boolean isPushRequested) {
+		this.isPushRequested = isPushRequested;
 	}
 
 }

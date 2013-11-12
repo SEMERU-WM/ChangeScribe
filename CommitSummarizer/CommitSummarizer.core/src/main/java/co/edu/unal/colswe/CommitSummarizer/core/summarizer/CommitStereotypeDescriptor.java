@@ -1,20 +1,9 @@
 package co.edu.unal.colswe.CommitSummarizer.core.summarizer;
 
-import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.Status;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.errors.NoWorkTreeException;
 
-import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
-import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile.TypeChange;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedCommit;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.CommitStereotype;
-import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.MethodStereotype;
 
 public class CommitStereotypeDescriptor {
 	
@@ -25,103 +14,51 @@ public class CommitStereotypeDescriptor {
 		
 		if(stereotypedCommit.getStereotypes().get(0) == CommitStereotype.STRUCTURE_MODIFIER) {
 			description.append("This is a structure modifier commit. ");
-			description.append("Commit is composed only of setter and getter methods. " );
+			description.append("This change set is composed only of setter and getter methods. " );
+			description.append("These methods perform simple access and modifications to the data. " );
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.STATE_ACCESS_MODIFIER) {
 			description.append("This is a state access modifier commit. ");
-			description.append("Commit is composed only of accessor methods. " );
+			description.append("This change set is composed only of accessor methods. " );
+			description.append("These methods provide a client with information, but the data members are not modified. ");
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.STATE_UPDATE_MODIFIER) {
 			description.append("This is a state update modifier commit. ");
-			description.append("Commit is composed only of mutator methods. " );
+			description.append("This change set is composed only of mutator methods. " );
+			description.append("These methods provide changes related to updates of an object's state. ");
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.BEHAVIOR_MODIFIER) {
 			description.append("This is a behavior modifier commit. ");
-			description.append("Commit is composed of command and non-void-command methods. " );
+			description.append("This change set is composed of command and non-void-command methods. " );
+			description.append("These methods execute complex internal behavioral changes within an object. ");
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.OBJECT_CREATION_MODIFIER) {
 			description.append("This is an object creation modifier commit. ");
-			description.append("Commit is composed of factory, constructor, copy constructor and destructor methods. " );
+			description.append("This change set is composed of factory, constructor, copy constructor and destructor methods. " );
+			description.append("These methods allow the creation of objects. ");
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.RELATIONSHIP_MODIFIER) {
 			description.append("This is a relationship modifier commit. ");
-			description.append("Commit is composed mainly of collaborators and low number of controller methods. " );
+			description.append("This change set is composed mainly of collaborators and low number of controller methods. " );
+			description.append("These methods implement generalization, dependency and association performing calls on parameters or local variable objects. ");
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.CONTROL_MODIFIER) {
 			description.append("This is a control modifier commit. ");
-			description.append("Commit is composed mainly of controller, factory, constructor, copy-constructor and destructor methods. " );
+			description.append("This change set is composed mainly of controller, factory, constructor, copy-constructor and destructor methods. " );
+			description.append("These methods modify the external behavior of the participating classes  ");
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.LARGE_MODIFIER) {
 			description.append("This is a large modifier commit. ");
-			//description.append("Commit is composed of " + stereotypedCommit.getMethods().size() + "\n" );
-			int constructor = (stereotypedCommit.getSignatureMap().get(MethodStereotype.CONSTRUCTOR) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.CONSTRUCTOR) : 0;
-			int copyConstructor = (stereotypedCommit.getSignatureMap().get(MethodStereotype.COPY_CONSTRUCTOR) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.COPY_CONSTRUCTOR) : 0;
-			int destructor = (stereotypedCommit.getSignatureMap().get(MethodStereotype.DESTRUCTOR) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.DESTRUCTOR) : 0;
-			int factory = (stereotypedCommit.getSignatureMap().get(MethodStereotype.FACTORY) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.FACTORY) : 0;
-			int creational = factory + destructor + copyConstructor + constructor;
-			//int controller = (stereotypedCommit.getSignatureMap().get(MethodStereotype.CONTROLLER) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.CONTROLLER) : 0;
-			if(creational > 0) {
-				//description.append(", " + creational + " methods are creational category\n" );
-			}
-			if(creational > 0) {
-				//description.append(", and " + controller + " methods are controller.\n" );
-			}
+			description.append("This is a commit with many methods and combines multiple roles. " );
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.LAZY_MODIFIER) {
-			int get = (stereotypedCommit.getSignatureMap().get(MethodStereotype.GET) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.GET) : 0;
-			int set = (stereotypedCommit.getSignatureMap().get(MethodStereotype.SET) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.SET) : 0;
-			int getSet = get + set;
-			
 			description.append("This is a lazy modifier commit. ");
-			description.append("Commit is composed of " + getSet + " getter and setter methods, and other degenerate methods." );
+			description.append("This change set is composed of getter and setter methods mainly, and a low percentage of other methods. " );
+			description.append("Generaly, these methods denote new or planned feature that is not yet completed. ");
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.DEGENERATE_MODIFIER) {
-			int empty = (stereotypedCommit.getSignatureMap().get(MethodStereotype.EMPTY) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.EMPTY) : 0;
-			int incidental = (stereotypedCommit.getSignatureMap().get(MethodStereotype.INCIDENTAL) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.INCIDENTAL) : 0;
-			int abs = (stereotypedCommit.getSignatureMap().get(MethodStereotype.ABSTRACT) != null) ? stereotypedCommit.getSignatureMap().get(MethodStereotype.ABSTRACT) : 0;
-			int degenerate = incidental + empty + abs;
 			description.append("This is a degenerate modifier commit. ");
-			description.append("Commit is composed of " + degenerate + " degenerate methods (empty, incidental, and abstract methods)." );
+			description.append("This change set is composed of empty, incidental, and abstract methods. " );
+			description.append("These methods indicate that a new feature is planned. " );
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.SMALL_MODIFIER) {
 			description.append("This is a small modifier commit. ");
-			description.append("Commit is composed only of " + stereotypedCommit.getMethods().size() + " methods. " );
+			description.append("This change set is composed only of " + stereotypedCommit.getMethods().size() + " methods,  " );
+			description.append(" and does not change the system significantly. " );
 		}
 		
 		return description.toString();
 	}
 	
-	public static String describeNewModules(Git git, ChangedFile[] differences) {
-		
-		Status repositoryStatus = null;
-		try {
-			repositoryStatus = git.status().call();
-		} catch (NoWorkTreeException | GitAPIException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		SortedMap<String, ChangedFile> newModules = new TreeMap<>();		
-		for (String string : repositoryStatus.getUntrackedFolders()) {
-			System.out.println("NEW MODULE: " + string);
-			for(ChangedFile file : differences) {
-				System.out.println("SUBSTRING : " + file.getPath().substring(0, file.getPath().lastIndexOf("/")));
-				if(file.getPath().substring(0, file.getPath().lastIndexOf("/")).equals(string) && !newModules.containsKey(string)) {
-					ChangedFile changedFile = new ChangedFile(string, TypeChange.UNTRACKED_FOLDERS.name(), git.getRepository().getWorkTree().getAbsolutePath());
-					newModules.put(string, changedFile);
-					break;
-				}
-			}
-		}
-		
-		StringBuilder builder = new StringBuilder(" New");
-		
-		if(newModules.entrySet().size() == 1) {
-			builder.append(" module was added to system: ");
-		} else {
-			builder.append(" modules were added to system: ");
-		}
-		int i = 1;
-		for(Entry<String, ChangedFile> entry : newModules.entrySet()) {
-			builder.append(entry.getValue().getName());
-			if(newModules.entrySet().size() > 1 && i < newModules.entrySet().size() - 2) {
-				builder.append(", ");
-			} else if(newModules.entrySet().size() > 1 && i == newModules.entrySet().size() - 1) {
-				builder.append(" and ");
-			}
-			i++;
-		}
-		builder.append(". ");
-		return newModules.size() > 0 ? builder.toString():"";
-	}
 
 }

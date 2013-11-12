@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
@@ -19,6 +20,7 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
 
+import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import edu.stanford.nlp.io.IOUtils;
 
 public class Utils {
@@ -112,6 +114,30 @@ public class Utils {
 			newPath.replaceAll("/", System.getProperty("file.separator"));
 		}
 		return newPath;
+		
+	}
+	
+	public static void compareModified(ChangedFile file,Git git) {
+		File previousType = null;
+		
+		try {
+			previousType = Utils.getFileContentOfLastCommit(file.getPath(), git.getRepository());
+			
+			if(previousType == null) {
+				throw new Exception("File renamed");
+			}
+			
+		} catch (RevisionSyntaxException e) {
+			e.printStackTrace();
+		} catch (AmbiguousObjectException e) {
+			e.printStackTrace();
+		} catch (IncorrectObjectTypeException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 	}
 

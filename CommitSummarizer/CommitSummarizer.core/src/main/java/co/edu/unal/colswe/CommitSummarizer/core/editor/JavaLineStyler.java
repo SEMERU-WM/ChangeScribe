@@ -91,7 +91,7 @@ class JavaLineStyler implements LineStyleListener {
     tokenColors[WHITE] = 0;
     tokenColors[KEY] = 3;
     tokenColors[COMMENT] = 1;
-    tokenColors[STRING] = 2;
+    tokenColors[STRING] = 0;
     tokenColors[OTHER] = 0;
     tokenColors[NUMBER] = 0;
   }
