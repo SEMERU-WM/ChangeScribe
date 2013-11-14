@@ -44,6 +44,8 @@ import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.api.errors.NoMessageException;
 import org.eclipse.jgit.api.errors.UnmergedPathsException;
 import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
+import org.eclipse.jgit.lib.RepositoryState;
+import org.eclipse.jgit.util.RawParseUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyleRange;
@@ -60,6 +62,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
@@ -68,6 +71,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.dialogs.PatternFilter;
+import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -97,6 +101,10 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 	private TreeMap<MethodStereotype, Integer> signatureMap;
 	private SignatureCanvas signatureCanvas;
 	private boolean isPushRequested;
+	private Text authorText;
+	private Text committerText;
+	private String committer = null;
+	private String author = null;
 
 	public FilesChangedListDialog(Shell shell, Set<ChangedFile> differences, Git git, IJavaProject selection) {
 		super(shell);
@@ -256,21 +264,16 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		if (!isCommitWithoutFilesAllowed()) {
 			MessageDialog.openWarning(getShell(), "No files selected", "You do not selected files to be commited");
 			return;
+		} else if(!validateCommit().equals("")) {
+			MessageDialog.openWarning(getShell(), "Error", validateCommit());
+			return;
 		}
 
-		//if (!commitMessageComponent.checkCommitInfo())
-		//	return;
 		ArrayList<String> selectedFiles = new ArrayList<String>(); 
 		Object[] checkedElements = filesViewer.getCheckedElements(); 
 		selectedFiles.clear(); 
 		for (Object obj : checkedElements)
 			selectedFiles.add(((ChangedFile) obj).getPath());
-
-		/*amending = commitMessageComponent.isAmending();
-		commitMessage = commitMessageComponent.getCommitMessage();
-		author = commitMessageComponent.getAuthor();
-		committer = commitMessageComponent.getCommitter();
-		createChangeId = changeIdItem.getSelection();*/
 
 		try {
 			for(String fileTmp : selectedFiles) {
@@ -279,6 +282,8 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 			}
 			
 			CommitCommand commit = git.commit();
+			commit.setAuthor(getAuthorText().getText(), "lf@gmail.com");
+			commit.setCommitter(getCommitterText().getText(), "");
 			commit.setMessage(editor.getText().getText());
 			commit.call();
 			
@@ -307,6 +312,21 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		}
 		
 		super.okPressed();
+	}
+	
+	protected String validateCommit() {
+		String authorValue = authorText.getText();
+		if (authorValue.length() == 0 /*|| RawParseUtils.parsePersonIdent(authorValue) == null*/) {
+			return "Empty or Invalid author";
+		}
+
+		String committerValue = committerText.getText();
+		if (committerValue.length() == 0 /*|| RawParseUtils.parsePersonIdent(committerValue) == null*/) {
+			return "Empty or Invalid committer";
+		}
+		
+		return "";
+
 	}
 	
 	@Override
@@ -370,13 +390,37 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		viewer.setShell(getShell());
 		viewer.setComposite(messageAndPersonArea);
 		viewer.createStyledText();
-		int minHeight = 164;
+		int minHeight = 134;
 		Point size = container.getSize();
 		viewer.getText().setLayoutData(GridDataFactory.fillDefaults()
 				.grab(true, true).hint(size).minSize(size.x, minHeight)
 				.align(SWT.FILL, SWT.FILL).create());
 		setEditor(viewer);
 		messageSection.setClient(messageArea);
+		
+//		///////////////////
+		
+		Composite personArea = toolkit.createComposite(messageAndPersonArea);
+		toolkit.paintBordersFor(personArea);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(personArea);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(personArea);
+
+		toolkit.createLabel(personArea, "Author: ").setForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
+		setAuthorText(toolkit.createText(personArea, null));
+		getAuthorText().setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
+		getAuthorText().setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+		if (git.getRepository() != null && git.getRepository().getRepositoryState().equals(RepositoryState.CHERRY_PICKING_RESOLVED)) {
+			getAuthorText().setEnabled(false);
+		}
+		
+		toolkit.createLabel(personArea, "Committer").setForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
+		setCommitterText(toolkit.createText(personArea, null));
+		getCommitterText().setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+		if (getCommitter() != null) {
+			getCommitterText().setText(getCommitter());
+		}
+
+		/////////////////////
 		
 		signatureCanvas = new SignatureCanvas(signatureMap, messageAndPersonArea, getShell());
 		signatureCanvas.createContents();
@@ -655,6 +699,38 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 
 	public void setPushRequested(boolean isPushRequested) {
 		this.isPushRequested = isPushRequested;
+	}
+
+	public Text getAuthorText() {
+		return authorText;
+	}
+
+	public void setAuthorText(Text authorText) {
+		this.authorText = authorText;
+	}
+
+	public Text getCommitterText() {
+		return committerText;
+	}
+
+	public void setCommitterText(Text committerText) {
+		this.committerText = committerText;
+	}
+
+	public String getCommitter() {
+		return committer;
+	}
+
+	public void setCommitter(String committer) {
+		this.committer = committer;
+	}
+
+	public String getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
 	}
 
 }
