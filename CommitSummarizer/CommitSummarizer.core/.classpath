@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/stanford-postagger.jar" sourcepath="lib/stanford-postagger-src.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/changedistiller-0.0.1-SNAPSHOT.jar" sourcepath="/changedistiller"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="src" path="src/main/java"/>
-	<classpathentry kind="lib" path="lib"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="lib/jakarta-regexp-1.5.jar"/>
-	<classpathentry kind="lib" path="lib/junit-4.7.jar"/>
-	<classpathentry kind="lib" path="lib/guice-3.0.jar"/>
-	<classpathentry kind="lib" path="lib/guice-assistedinject-3.0.jar"/>
-	<classpathentry kind="lib" path="lib/javax.inject-1.jar"/>
-	<classpathentry kind="lib" path="lib/aopalliance-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/commons-lang3-3.1.jar"/>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry exported="true" kind="lib" path="lib/changedistiller-0.0.1-SNAPSHOT.jar" sourcepath="/changedistiller"/>
+	<classpathentry exported="true" kind="lib" path="lib/stanford-postagger.jar" sourcepath="lib/stanford-postagger-src.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jakarta-regexp-1.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/changetypes.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lsd.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/junit-4.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/guice-3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/guice-assistedinject-3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javax.inject-1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/aopalliance-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-lang3-3.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

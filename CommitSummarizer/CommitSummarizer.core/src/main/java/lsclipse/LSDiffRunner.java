@@ -386,7 +386,7 @@ public class LSDiffRunner {
 		@Override
 		public FactBase call() throws Exception {
 			//do some parsing
-	        ASTParser parser = ASTParser.newParser(AST.JLS3);
+	        ASTParser parser = ASTParser.newParser(AST.JLS4);
 	        parser.setResolveBindings(true);
 	        parser.setSource(file_);
 	        try {

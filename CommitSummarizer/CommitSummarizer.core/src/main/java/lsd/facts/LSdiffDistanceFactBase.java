@@ -73,6 +73,7 @@ public class LSdiffDistanceFactBase {
 		ArrayList<LSDFact> facts = new ArrayList<LSDFact>(working2KB); 
 		return facts;
 	}
+	@SuppressWarnings("unused")
 	private void printWorkingSetBinding(PrintStream p) {
 		
 		for (LSDBinding b : workingSetBinding) {
@@ -81,6 +82,7 @@ public class LSdiffDistanceFactBase {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void printWorking2KBFact(PrintStream p) {
 		
 		for (LSDFact f : working2KB) {

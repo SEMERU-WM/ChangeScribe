@@ -169,8 +169,8 @@ public class LSDRuleEnumerator {
 		startTimer();
 		read2kbFacts = new LSDTyrubaFactReader(twoKBFile).getFacts();
 		readDeltaFacts = new LSDTyrubaFactReader(deltaKBFile).getFacts();
-		winnowingRules = new LSDAlchemyRuleReader(winnowingRulesFile) 
-				.getRules();
+		setWinnowingRules(new LSDAlchemyRuleReader(winnowingRulesFile) 
+				.getRules());
 
 		// set onDemand database manipulators
 		onDemand2KB = new LSdiffDistanceFactBase(read2kbFacts, readDeltaFacts);
@@ -636,7 +636,6 @@ public class LSDRuleEnumerator {
 		List<LSDRule> fieldLevelRules = null;
 			
 		try { 
-			List<LSDRule> previouslyLearnedRule = null; 
 			for (int level = 0; level <= LSdiffHierarchialDeltaKB.BODY_LEVEL; level++) {
 				// load fact bases
 				if (level == LSdiffHierarchialDeltaKB.PACKAGE_LEVEL)
@@ -673,7 +672,6 @@ public class LSDRuleEnumerator {
 				case LSdiffHierarchialDeltaKB.FIELD_LEVEL:
 					System.out.println("**FIELD_LEVEL**");
 					
-					fieldLevelRules = extendPreviouslyLearnedRules(typeLevelRules); 
 					fb.loadWinnowingRules(fieldLevelRules);
 					break;
 				case LSdiffHierarchialDeltaKB.BODY_LEVEL:  
@@ -1118,6 +1116,7 @@ public class LSDRuleEnumerator {
 
 
 
+	@SuppressWarnings("unused")
 	private void LogData(File rf, List<LSDFact> remainingFacts,
 			List<LSDRule> chosenRules, int startingNumFacts) throws IOException {
 		BufferedWriter output = new BufferedWriter(new FileWriter(rf));
@@ -1364,6 +1363,14 @@ public class LSDRuleEnumerator {
 				conclusions.add(rule);
 		}
 		return conclusions;
+	}
+
+	public ArrayList<LSDRule> getWinnowingRules() {
+		return winnowingRules;
+	}
+
+	public void setWinnowingRules(ArrayList<LSDRule> winnowingRules) {
+		this.winnowingRules = winnowingRules;
 	}
 		
 }

@@ -42,8 +42,6 @@ import lsclipse.rules.ReplaceMethodWithMethodObject;
 import lsclipse.rules.ReplaceNestedCondWithGuardClauses;
 import lsclipse.rules.ReplaceParameterWithExplicitMethods;
 import lsclipse.rules.ReplaceSubclassWithField;
-import lsclipse.rules.ReplaceTypeCodeWithState;
-import lsclipse.rules.ReplaceTypeCodeWithSubclasses;
 import lsclipse.rules.Rule;
 import lsclipse.rules.RuleFactory;
 import lsclipse.rules.SeparateQueryFromModifier;
@@ -576,9 +574,6 @@ public class TopologicalSort {
 						+ "added_fieldoftype(?fFullName, ?tCodeFullName)");
 		replace_type_code_with_class_query.addType("?tFullName");
 		replace_type_code_with_class_query.addType("?tCodeFullName");
-		Node replace_type_code_with_class_node = new Node(
-				replace_type_code_with_class_query);
-		// graph.add(replace_type_code_with_class_node);
 
 		Node remove_assignment_to_parameters_node = new Node(
 				(new RemoveAssignmentToParameters()).getRefactoringQuery());
@@ -615,19 +610,11 @@ public class TopologicalSort {
 				replace_error_code_with_exception);
 		graph.add(replace_error_code_with_exception_node);
 
-		Node replace_type_code_with_subclasses_node = new Node(
-				(new ReplaceTypeCodeWithSubclasses()).getRefactoringQuery());
-		// graph.add(replace_type_code_with_subclasses_node);
-
 		Node introduce_parameter_object_node = new Node(
 				(new IntroduceParamObject()).getRefactoringQuery());
 		introduce_parameter_object_node.addChild(remove_parameter_node);
 		introduce_parameter_object_node.addChild(add_parameter_node);
 		graph.add(introduce_parameter_object_node);
-
-		Node replace_type_code_with_state_node = new Node(
-				(new ReplaceTypeCodeWithState()).getRefactoringQuery());
-		// graph.add(replace_type_code_with_state_node);
 
 		Node replace_conditional_with_polymorphism_node = new Node(
 				(new ReplaceConditionalWithPolymorphism())

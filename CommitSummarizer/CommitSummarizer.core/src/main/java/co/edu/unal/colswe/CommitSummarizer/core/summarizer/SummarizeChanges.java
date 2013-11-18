@@ -56,10 +56,10 @@ public class SummarizeChanges {
 	private ChangedFile[] differences;
 	private FilesChangedListDialog changedListDialog;
 	private SortedMap<String, StereotypeIdentifier> summarized = new TreeMap<String, StereotypeIdentifier>();
-	//private LinkedList<ChangedFile> modulesAdded;
 	private FileDistiller distiller; 
 	private LinkedList<ChangedFile> modifiedFiles;
 	private LinkedList<ChangedFile> otherFiles;
+	private List<StereotypeIdentifier> typesProblem;
 	
 	public SummarizeChanges(Git git) {
 		super();
@@ -73,9 +73,9 @@ public class SummarizeChanges {
 		this.differences = differences;
 		this.identifiers = new ArrayList<StereotypeIdentifier>();
 		this.summarized = new TreeMap<String, StereotypeIdentifier>();
-		//this.modulesAdded = new LinkedList<>();
 		this.modifiedFiles = new LinkedList<>();
 		this.otherFiles = new LinkedList<>();
+		this.typesProblem = new LinkedList<>();
 		getChangedListDialog().getEditor().getText().setText("");
 		removeCreatedPackages();
 		//deleteTmpProject();
@@ -154,7 +154,7 @@ public class SummarizeChanges {
 
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
-				if(summarized.size() + modifiedFiles.size() + otherFiles.size() == differences.length) {
+				if(summarized.size() + modifiedFiles.size() + otherFiles.size() + typesProblem.size() == differences.length) {
 					String currentPackage = "";
 					StringBuilder desc = new StringBuilder(); 
 					//Commit stereotype description
@@ -238,6 +238,9 @@ public class SummarizeChanges {
 	}
 
 	public void summarizeType(StereotypeIdentifier identifier) {
+		if(identifier.getStereotypedElements().size() == 0) {
+			typesProblem.add(identifier);
+		}
 		for(StereotypedElement element : identifier.getStereotypedElements()) {
 				SummarizeType summarizeType = new SummarizeType(element, identifier, differences);
 				if(!identifier.getScmOperation().equals(TypeChange.MODIFIED.toString())) {

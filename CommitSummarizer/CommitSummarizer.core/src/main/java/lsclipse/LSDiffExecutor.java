@@ -224,7 +224,7 @@ public class LSDiffExecutor {
 		//Extraction for FB1
 		FactBase fb1 = new FactBase();
 		try { 
-			Set<ICompilationUnit> cuCollection = new HashSet<>();
+			Set<ICompilationUnit> cuCollection = new HashSet<ICompilationUnit>();
 			cuCollection.add(currentCU);
 			allFiles = cuCollection;
 		} catch (Exception e) {}
@@ -269,7 +269,7 @@ public class LSDiffExecutor {
 		//Extraction for FB2
 		FactBase fb2 = new FactBase();
 		try {
-			Set<ICompilationUnit> cuCollection = new HashSet<>();
+			Set<ICompilationUnit> cuCollection = new HashSet<ICompilationUnit>();
 			cuCollection.add(previousCU);
 			allFiles = cuCollection;
 			

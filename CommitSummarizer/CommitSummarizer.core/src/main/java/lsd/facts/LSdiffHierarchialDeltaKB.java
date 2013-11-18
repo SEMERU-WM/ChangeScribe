@@ -304,22 +304,26 @@ public class LSdiffHierarchialDeltaKB {
 	}
 
 
+	@SuppressWarnings("unused")
 	private void printPakcageLevelFactStat(PrintStream p) { 
 		if (p!=null) p.println("# added_package:\t"+packageLevel.get(ADDED).size()); 
 		if (p!=null) p.println("# deleted_package:\t"+packageLevel.get(DELETED).size());  
 		if (p!=null) p.println("# modified_package:\t"+packageLevel.get(MODIFIED).size()); 
 		
 	}
+	@SuppressWarnings("unused")
 	private void printTypeLevelFactStat(PrintStream p) { 
 		if (p!=null) p.println("# added_type:\t"+typeLevel.get(ADDED).size()); 
 		if (p!=null) p.println("# deleted_type:\t"+typeLevel.get(DELETED).size());  
 		if (p!=null) p.println("# modified_type:\t"+typeLevel.get(MODIFIED).size()); 	
 	}
+	@SuppressWarnings("unused")
 	private void printMethodLevelFactStat(PrintStream p) { 
 		if (p!=null) p.println("# added_method:\t"+methodLevel.get(ADDED).size()); 
 		if (p!=null) p.println("# deleted_method:\t"+methodLevel.get(DELETED).size());  
 		if (p!=null) p.println("# modified_method:\t"+methodLevel.get(MODIFIED).size()); 
 	}
+	@SuppressWarnings("unused")
 	private void printFieldLevelFactStat(PrintStream p) { 
 		if (p!=null) p.println("# added_field:\t"+fieldLevel.get(ADDED).size()); 
 		if (p!=null) p.println("# deleted_field:\t"+fieldLevel.get(DELETED).size());  
@@ -434,6 +438,7 @@ public class LSdiffHierarchialDeltaKB {
 		methodLevel.put(MODIFIED, modifiedMethod);
 		
 	}
+	@SuppressWarnings("unused")
 	private void constructTypeLevel() { 
 		TreeSet<LSDFact> addedType = new TreeSet<LSDFact>(); 
 		TreeSet<LSDFact> deletedType = new TreeSet<LSDFact>(); 
@@ -570,6 +575,7 @@ public class LSdiffHierarchialDeltaKB {
 	}
 
 
+@SuppressWarnings("unused")
 private void filterFacts2 (PrintStream p, TreeSet<LSDFact> output, LSdiffFilter filter ) { 
 	if (filter==null) return; 
 	this.filter = filter;

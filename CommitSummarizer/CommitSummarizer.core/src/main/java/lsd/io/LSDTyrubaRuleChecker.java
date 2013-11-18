@@ -93,6 +93,7 @@ public class LSDTyrubaRuleChecker {
 	// If the returned map.isEmpty(), then the rule is true (no counter-examples found).
 	// (If the rule is A(x) ^ B(y) => C(x,y), return all sets of constants to bind to ?x and ?y
 	// such that A(x) ^ B(y) ^ NOT C(x, y) is true 
+	@SuppressWarnings("unchecked")
 	public List<Map<LSDVariable, String>> getCounterExamples(LSDRule rule) {
 		return (List<Map<LSDVariable, String>>) invokeQuery(rule, false);
 	}
@@ -100,11 +101,13 @@ public class LSDTyrubaRuleChecker {
 	// Returns the conclusion of the rule for each set of substitutions which satisfy the antecedent and conclusion.
 	// Only return unique conclusions.
 	// (If the rule is A ^ B => C, returns all unique facts (actually, Rules composed of facts) C such that A ^ B ^ C.)
+	@SuppressWarnings("unchecked")
 	public ArrayList<LSDRule> getTrueConclusions(LSDRule rule) {
 		return (ArrayList<LSDRule>) invokeQuery(rule, true);
 	}
 
 	// See comments on getCounterExamples or getTrueConclusions for the two modes of behavior of this function.
+	@SuppressWarnings("unchecked")
 	private Object invokeQuery(LSDRule rule, boolean returnConclusions) {
 		LSDRule substitute = (returnConclusions ? rule.getConclusions() : rule);
 		String query = (returnConclusions ? rule.convertAllToAntecedents() : rule).toTyrubaQuery(false);
@@ -182,6 +185,7 @@ public class LSDTyrubaRuleChecker {
 			return exceptions;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<LSDFact> get2KBMatches(LSDRule rule) {
 		LSDRule substitute = rule;
 		String query = rule.convertAllToAntecedents().toTyrubaQuery(false);
@@ -246,6 +250,7 @@ public class LSDTyrubaRuleChecker {
 	// Count the number of distinct matches we have to the Tyruba query query.
 	// Only consider matches which have a unique assignment of constants to the variables in freeVars.
 	// If max > 0, only count at most max matches before returning.
+	@SuppressWarnings("unchecked")
 	private int countMatches(String query, List<LSDVariable> freeVars, int max) {
 		Set<Set<String>> matches = new HashSet<Set<String>>();
 		try {
@@ -299,6 +304,7 @@ public class LSDTyrubaRuleChecker {
 	
 	// Return a set of the constants which could replace the given variable in the rule
 	// and have it still have matches.
+	@SuppressWarnings("unchecked")
 	public Set<String> getReplacementConstants(LSDRule rule, LSDVariable match) {
 		assert rule.getFreeVariables().contains(match); 
 		String query = rule.convertAllToAntecedents().toTyrubaQuery(false);

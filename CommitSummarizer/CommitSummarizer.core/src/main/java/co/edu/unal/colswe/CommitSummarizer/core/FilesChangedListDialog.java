@@ -397,7 +397,7 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		setEditor(viewer);
 		messageSection.setClient(messageArea);
 		
-//		///////////////////
+		///////////////////
 		
 		Composite personArea = toolkit.createComposite(messageAndPersonArea);
 		toolkit.paintBordersFor(personArea);
@@ -481,18 +481,14 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		resourcesTree.setData(FormToolkit.KEY_DRAW_BORDER,FormToolkit.TREE_BORDER);
 		resourcesTreeComposite.setLayoutData(GridDataFactory.fillDefaults().hint(600, 200).grab(true, true).create());
 
-		//resourcesTree.addSelectionListener(new CommitItemSelectionListener());
-
 		resourcesTree.setHeaderVisible(true);
 		TreeColumn statCol = new TreeColumn(resourcesTree, SWT.LEFT);
 		statCol.setText("Status");
 		statCol.setWidth(150);
-		//statCol.addSelectionListener(new HeaderSelectionListener(CommitItem.Order.ByStatus));
 
 		TreeColumn resourceCol = new TreeColumn(resourcesTree, SWT.LEFT);
 		resourceCol.setText("Path");
 		resourceCol.setWidth(415);
-		//resourceCol.addSelectionListener(new HeaderSelectionListener(CommitItem.Order.ByFile));
 
 		filesViewer = resourcesTreeComposite.getCheckboxTreeViewer();
 		new TreeViewerColumn(filesViewer, statCol).setLabelProvider(createStatusLabelProvider());
@@ -521,15 +517,12 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		
 		ToolItem describeChangesItem = new ToolItem(filesToolbar, SWT.PUSH);
 		Image describeImage = UIIcons.ANNOTATE.createImage();
-		//UIUtils.hookDisposal(checkAllItem, checkImage);
 		describeChangesItem.setImage(describeImage);
-		//describeChangesItem.setText("Describe changes");
 		describeChangesItem.setToolTipText("Describe changes");
 		describeChangesItem.addSelectionListener(new SummarizeChangeListener(this));
 
 		ToolItem checkAllItem = new ToolItem(filesToolbar, SWT.PUSH);
 		Image checkImage = UIIcons.CHECK_ALL.createImage();
-		//UIUtils.hookDisposal(checkAllItem, checkImage);
 		checkAllItem.setImage(checkImage);
 		checkAllItem.setToolTipText("Select All");
 		checkAllItem.addSelectionListener(new SelectionAdapter() {
@@ -544,7 +537,6 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 
 		ToolItem uncheckAllItem = new ToolItem(filesToolbar, SWT.PUSH);
 		Image uncheckImage = UIIcons.UNCHECK_ALL.createImage();
-		//UIUtils.hookDisposal(uncheckAllItem, uncheckImage);
 		uncheckAllItem.setImage(uncheckImage);
 		uncheckAllItem.setToolTipText("Deselect All");
 		uncheckAllItem.addSelectionListener(new SelectionAdapter() {

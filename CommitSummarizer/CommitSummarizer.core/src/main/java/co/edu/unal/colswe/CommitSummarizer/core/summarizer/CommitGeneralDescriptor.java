@@ -58,7 +58,7 @@ public class CommitGeneralDescriptor {
 		} catch (NoWorkTreeException | GitAPIException e) {
 			e.printStackTrace();
 		}
-		newModules = new TreeMap<>();		
+		newModules = new TreeMap<String, ChangedFile>();		
 		for (String string : repositoryStatus.getUntrackedFolders()) {
 			for(ChangedFile file : differences) {
 				if(file.getPath().substring(0, file.getPath().lastIndexOf("/")).equals(string) && !newModules.containsKey(string)) {

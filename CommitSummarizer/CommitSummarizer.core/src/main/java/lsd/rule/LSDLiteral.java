@@ -325,6 +325,7 @@ public class LSDLiteral {
 		return predicate.isDependencyPredicate();
 	}
 	
+	@SuppressWarnings("unused")
 	public List<LSDLiteral> getCompatibles() {
 		ArrayList<LSDLiteral> newliterals = new ArrayList<LSDLiteral>();
 		for (LSDPredicate pred : this.predicate.getMethodLevelDependency()) {

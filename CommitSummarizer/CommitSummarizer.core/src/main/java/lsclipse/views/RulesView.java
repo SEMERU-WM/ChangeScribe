@@ -247,7 +247,6 @@ public class RulesView extends ViewPart {
 
     @SuppressWarnings({ "unchecked", "deprecation", "rawtypes" })
 	public static void openInEditor(IFile file, int startpos, int length) {
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		HashMap map = new HashMap();
 		map.put(IMarker.CHAR_START, new Integer(startpos));
 		map.put(IMarker.CHAR_END, new Integer(startpos+length));
