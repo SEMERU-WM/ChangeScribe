@@ -54,9 +54,7 @@ public class ModificationDescriptor {
 		if(changes != null) {
 			if(changes != null && changes.size() > 0) {
 				desc.append((i - 1) + "." + j + ". " + " Modifications to " + file.getName()/*changes.get(1).getRootEntity().getJavaStructureNode().getName() + " " + changes.get(0).getRootEntity().getJavaStructureNode().getType().name().toLowerCase()*/ + ":  \n\n");
-			} else {
-    			desc.append("Not found modifications");
-    		}
+			} 
 			int k = 1;
 		    for(SourceCodeChange change : changes) {
 		    	desc.append("\t\t");

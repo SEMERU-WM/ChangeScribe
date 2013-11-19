@@ -4,31 +4,48 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import lsclipse.LSDResult;
+import lsclipse.LSDiffExecutor;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
+import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
+import org.eclipse.jgit.lib.IndexDiff;
+import org.eclipse.jgit.treewalk.FileTreeIterator;
+import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
 import org.eclipse.swt.widgets.Display;
 
 import ch.uzh.ifi.seal.changedistiller.ChangeDistiller;
@@ -38,6 +55,7 @@ import co.edu.unal.colswe.CommitSummarizer.core.FilesChangedListDialog;
 import co.edu.unal.colswe.CommitSummarizer.core.ast.ProjectInformation;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile.TypeChange;
+import co.edu.unal.colswe.CommitSummarizer.core.git.SCMRepository;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypeIdentifier;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedCommit;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedElement;
@@ -78,14 +96,14 @@ public class SummarizeChanges {
 		this.typesProblem = new LinkedList<>();
 		getChangedListDialog().getEditor().getText().setText("");
 		removeCreatedPackages();
-		//deleteTmpProject();
+		deleteTmpProject();
 	}
 
 	@SuppressWarnings("unused")
 	public void summarize(final ChangedFile[] differences) {
 		initSummary(differences);
 		String currentPackage = "";
-		//rebuildVersion();
+		rebuildVersion();
 
 		Job job = new Job("Calculating method and types stereotypes") {
 				@Override
@@ -114,7 +132,6 @@ public class SummarizeChanges {
 												monitor.subTask("Identifying stereotypes for " + file.getName());
 												identifier = identifyStereotypes(file, file.getChangeType());
 											}
-											//modifiedFiles.add(file);
 										}
 									} else {
 										otherFiles.add(file);
@@ -283,7 +300,7 @@ public class SummarizeChanges {
 		return result;
 	}
 	
-	/*public void rebuildVersion() {
+	public void rebuildVersion() {
 		
 		Set<ICompilationUnit> previousCU = new HashSet<>();
 		Set<ICompilationUnit> currentCU = new HashSet<>();
@@ -333,7 +350,7 @@ public class SummarizeChanges {
 		
 	    List<LSDResult> result = (new LSDiffExecutor()).doLSDiff(currentCU, previousCU);
 		if(result != null && !result.isEmpty()) {
-			rules.addAll(result);
+			//rules.addAll(result);
 		}
 	}
 	
@@ -350,9 +367,9 @@ public class SummarizeChanges {
 		}
 		javaProject.close();
 		return files;
-	}*/
+	}
 	
-	/*protected ICompilationUnit findRefactorings(ChangedFile file) {
+	protected ICompilationUnit findRefactorings(ChangedFile file) {
 	IProject project = createProject();
 	IFolder src = null;
 	IJavaProject javaProject = null;
@@ -394,8 +411,8 @@ public class SummarizeChanges {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}*/
-	/*public IProject createProject() {
+	}
+	public IProject createProject() {
 		IProject project = null;
 		IFolder src = null;
 		IJavaProject javaProject = null;
@@ -436,7 +453,7 @@ public class SummarizeChanges {
 			e.printStackTrace();
 		} 
 		return project;
-	}*/
+	}
 	
 	public StereotypeIdentifier identifyStereotypes(ChangedFile file, String scmOperation) {
 		

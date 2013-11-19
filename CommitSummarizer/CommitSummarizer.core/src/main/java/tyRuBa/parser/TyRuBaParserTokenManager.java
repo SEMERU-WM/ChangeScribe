@@ -2005,6 +2005,13 @@ public Token getNextToken()
         input_stream.backup(1);
         error_after = curPos <= 1 ? "" : input_stream.GetImage();
      }
+     
+     /*if(curChar == '.') {
+   	  jjmatchedKind = 0;
+         matchedToken = jjFillToken();
+         return matchedToken;
+     }*/
+     String hex = String.format("%04x", (int) curChar);
      throw new TokenMgrError(EOFSeen, curLexState, error_line, error_column, error_after, curChar, TokenMgrError.LEXICAL_ERROR);
    }
   }

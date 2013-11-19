@@ -183,26 +183,29 @@ public class LSdiffHierarchialDeltaKB {
 			}
 		}
 		for (LSDFact fact:originalDeltaKB) {
-			String involvedType = null; 
-			if (fact.getPredicate().getName().indexOf("_typeintype")>0) { 
-				involvedType= fact.getBindings().get(1).getGroundConst(); 
+			if(fact != null && fact.getPredicate() != null && fact.getPredicate().getName() != null) {
+				String involvedType = null; 
+				if (fact.getPredicate().getName().indexOf("_typeintype")>0) { 
+					involvedType= fact.getBindings().get(1).getGroundConst(); 
+				}
+				// extends (Super, Sub)  => Sub was modified 
+				else if (fact.getPredicate().getName().indexOf("_extends")>0) { 
+					involvedType = fact.getBindings().get(1).getGroundConst(); 
+					// implements (Super, Sub) => Sub was modified
+				}else if (fact.getPredicate().getName().indexOf("_implements")>0) { 
+					involvedType= fact.getBindings().get(1).getGroundConst(); 
+				// FIXME: I want to move inherited files and inherited methods to method level or field level change.  
+				}else if (fact.getPredicate().getName().indexOf("_inheritedfield")>0) { 
+					involvedType = fact.getBindings().get(2).getGroundConst(); 
+				}else if (fact.getPredicate().getName().indexOf("_inheritedmethod")>0) { 
+					involvedType= fact.getBindings().get(2).getGroundConst();
+				}
+				if (involvedType!=null && (typeConstants==null || typeConstants.contains(involvedType))) {
+					if (p!=null) p.println("\t\t\t"+ fact); 
+					ontheflyDeltaKB.add(fact);
+				} 
 			}
-			// extends (Super, Sub)  => Sub was modified 
-			else if (fact.getPredicate().getName().indexOf("_extends")>0) { 
-				involvedType = fact.getBindings().get(1).getGroundConst(); 
-				// implements (Super, Sub) => Sub was modified
-			}else if (fact.getPredicate().getName().indexOf("_implements")>0) { 
-				involvedType= fact.getBindings().get(1).getGroundConst(); 
-			// FIXME: I want to move inherited files and inherited methods to method level or field level change.  
-			}else if (fact.getPredicate().getName().indexOf("_inheritedfield")>0) { 
-				involvedType = fact.getBindings().get(2).getGroundConst(); 
-			}else if (fact.getPredicate().getName().indexOf("_inheritedmethod")>0) { 
-				involvedType= fact.getBindings().get(2).getGroundConst();
-			}
-			if (involvedType!=null && (typeConstants==null || typeConstants.contains(involvedType))) {
-				if (p!=null) p.println("\t\t\t"+ fact); 
-				ontheflyDeltaKB.add(fact);
-			} 
+			
 		}
 		return ontheflyDeltaKB;
 	}
@@ -229,11 +232,13 @@ public class LSdiffHierarchialDeltaKB {
 		}
 		// add _return facts that are related to added method level facts. 
 		for (LSDFact fact : originalDeltaKB) { 
-			if (fact.getPredicate().getName().indexOf("_return") > 0) { 
-				String involvedMethod =  fact.getBindings().get(0).getGroundConst();
-				if (methodConstants.contains(involvedMethod)) { 
-					ontheflyDeltaKB.add(fact);
-
+			if(fact != null && fact.getPredicate() != null && fact.getPredicate().getName() != null) {
+				if (fact.getPredicate().getName().indexOf("_return") > 0) { 
+					String involvedMethod =  fact.getBindings().get(0).getGroundConst();
+					if (methodConstants.contains(involvedMethod)) { 
+						ontheflyDeltaKB.add(fact);
+	
+					}
 				}
 			}
 		}	
@@ -267,11 +272,13 @@ public class LSdiffHierarchialDeltaKB {
 		}
 
 		for (LSDFact fact : originalDeltaKB) {
-			if (fact.getPredicate().getName().indexOf("_fieldoftype") > 0) { 
-				String involvedField = fact.getBindings().get(0).getGroundConst();
-				if (fieldConstants.contains(involvedField)) { 
-					ontheflyDeltaKB.add(fact); 
-
+			if(fact != null && fact.getPredicate() != null && fact.getPredicate().getName() != null) {
+				if (fact.getPredicate().getName().indexOf("_fieldoftype") > 0) { 
+					String involvedField = fact.getBindings().get(0).getGroundConst();
+					if (fieldConstants.contains(involvedField)) { 
+						ontheflyDeltaKB.add(fact); 
+	
+					}
 				}
 			}
 		}
@@ -288,16 +295,18 @@ public class LSdiffHierarchialDeltaKB {
 		}
 
 		for (LSDFact fact:originalDeltaKB) {
-			String involvedMethod =null;  
-			if (fact.getPredicate().getName().indexOf("_calls")>0) { 
-				involvedMethod= fact.getBindings().get(0).getGroundConst(); 
-			}
-			else if (fact.getPredicate().getName().indexOf("_accesses")>0) { 
-				involvedMethod = fact.getBindings().get(1).getGroundConst(); 
-			}
-			if (involvedMethod!=null && (methodConstants==null || methodConstants.contains(involvedMethod))){
-				if (p!=null) p.println("\t\t\t"+ fact); 
-				ontheflyDeltaKB.add(fact);
+			if(fact != null && fact.getPredicate() != null && fact.getPredicate().getName() != null) {
+				String involvedMethod =null;  
+				if (fact.getPredicate().getName().indexOf("_calls")>0) { 
+					involvedMethod= fact.getBindings().get(0).getGroundConst(); 
+				}
+				else if (fact.getPredicate().getName().indexOf("_accesses")>0) { 
+					involvedMethod = fact.getBindings().get(1).getGroundConst(); 
+				}
+				if (involvedMethod!=null && (methodConstants==null || methodConstants.contains(involvedMethod))){
+					if (p!=null) p.println("\t\t\t"+ fact); 
+					ontheflyDeltaKB.add(fact);
+				}
 			}
 		}
 		return ontheflyDeltaKB;
@@ -337,41 +346,45 @@ public class LSdiffHierarchialDeltaKB {
 		TreeSet<LSDFact> deletedField = new TreeSet<LSDFact>();
 		TreeSet<LSDFact> modifiedField = new TreeSet<LSDFact>();
 		for (LSDFact fact : originalDeltaKB) {
-			String predName = "";
-			if(fact != null && fact.getPredicate() != null) {
-				predName = fact .getPredicate().getName();
-			}
-			if (predName.equals("added_field")) {
-				// for all added_field (fieldFullName, ... ,...) => added_field
-				// (fieldFullName)
-				addedField.add(fact);
-			} else if (predName.equals("deleted_field")) {
-				// for all deleted_field (fieldFullName, ..., ...) =>
-				// deleted_field (fieldFullName)
-				deletedField.add(fact);
+			if(fact != null && fact.getPredicate() != null && fact.getPredicate().getName() != null) {
+				String predName = "";
+				if(fact != null && fact.getPredicate() != null) {
+					predName = fact .getPredicate().getName();
+				}
+				if (predName.equals("added_field")) {
+					// for all added_field (fieldFullName, ... ,...) => added_field
+					// (fieldFullName)
+					addedField.add(fact);
+				} else if (predName.equals("deleted_field")) {
+					// for all deleted_field (fieldFullName, ..., ...) =>
+					// deleted_field (fieldFullName)
+					deletedField.add(fact);
+				}
 			}
 		}
 		int counter = 0;
 		for (LSDFact fact : originalDeltaKB) {
-			String predName = "";
-			if(fact != null && fact.getPredicate() != null) {
-				predName = fact .getPredicate().getName();
+			if(fact != null && fact.getPredicate() != null && fact.getPredicate().getName() != null) {
+				String predName = "";
+				if(fact != null && fact.getPredicate() != null) {
+					predName = fact .getPredicate().getName();
+				}
+				counter++;
+				System.out.println(counter+". \""+predName+"\":"+fact);
+				if (predName.equals("added_fieldoftype")
+						|| predName.equals("deleted_fieldoftype")) {
+					// for all fieldoftype (fieldFullName, ..., ...) =>
+					// changed_field (fieldFullName)
+					List<LSDBinding> bindings = fact.getBindings();
+					LSDBinding firstBinding = bindings.get(0);
+					LSDFact mfield = LSDConst.createModifiedField(firstBinding
+							.getGroundConst());
+					if (!containsTheSameFact(addedField, deletedField, mfield))
+						modifiedField.add(mfield);
+	
+					// add only if it is not already in added or deleted fields. 			
+				} 
 			}
-			counter++;
-			System.out.println(counter+". \""+predName+"\":"+fact);
-			if (predName.equals("added_fieldoftype")
-					|| predName.equals("deleted_fieldoftype")) {
-				// for all fieldoftype (fieldFullName, ..., ...) =>
-				// changed_field (fieldFullName)
-				List<LSDBinding> bindings = fact.getBindings();
-				LSDBinding firstBinding = bindings.get(0);
-				LSDFact mfield = LSDConst.createModifiedField(firstBinding
-						.getGroundConst());
-				if (!containsTheSameFact(addedField, deletedField, mfield))
-					modifiedField.add(mfield);
-
-				// add only if it is not already in added or deleted fields. 			
-			} 
 		}
 		fieldLevel.put(ADDED, addedField);
 		fieldLevel.put(DELETED, deletedField); 

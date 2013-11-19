@@ -85,7 +85,7 @@ public class LSDTyrubaRuleChecker {
 
 	public void loadFact(LSDFact fact)
 			throws TypeModeError, ParseException {
-		frontend.parse(fact.toString() + ".");
+		frontend.parse(fact.toString().replaceAll("\"\"","\"") + ".");
 	}
 
 	// Invokes a query in TyRuBa.
