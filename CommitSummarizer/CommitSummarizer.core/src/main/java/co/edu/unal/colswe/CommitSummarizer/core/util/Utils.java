@@ -7,6 +7,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.LogCommand;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
@@ -138,7 +141,35 @@ public class Utils {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static boolean isInitialCommit(Git git) {
+		boolean isInitialCommit = true;
+		LogCommand log = git.log();
 		
+		Iterable<RevCommit> commits = null;
+		try {
+			commits = log.all().call();
+			
+			for (RevCommit revCommit : commits) {
+				revCommit.getId();
+				isInitialCommit = false;
+				break;
+			}
+		} catch (NoHeadException e) {
+			// TODO Auto-generated catch block
+			System.out.println("NO HEAD: INITIAL COMMIT");
+			isInitialCommit = true;
+		} catch (GitAPIException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		return isInitialCommit;
 	}
 
 }

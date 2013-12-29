@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.search.SearchMatch;
 
 import co.edu.unal.colswe.CommitSummarizer.core.ast.JParser;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
@@ -23,6 +24,8 @@ public class StereotypeIdentifier {
 	private String scmOperation; 
 	private StringBuilder builder;
 	private ChangedFile changedFile;
+	private List<SearchMatch> relatedTypes;
+	private double impactPercentaje;
 
 	public StereotypeIdentifier() {
 		super();
@@ -139,6 +142,22 @@ public class StereotypeIdentifier {
 
 	public void setChangedFile(ChangedFile changedFile) {
 		this.changedFile = changedFile;
+	}
+
+	public List<SearchMatch> getRelatedTypes() {
+		return relatedTypes;
+	}
+
+	public void setRelatedTypes(List<SearchMatch> relatedTypes) {
+		this.relatedTypes = relatedTypes;
+	}
+
+	public double getImpactPercentaje() {
+		return impactPercentaje;
+	}
+
+	public void setImpactPercentaje(double impactPercentaje) {
+		this.impactPercentaje = impactPercentaje;
 	}
 	
 	

@@ -4,48 +4,31 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import lsclipse.LSDResult;
-import lsclipse.LSDiffExecutor;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
-import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
-import org.eclipse.jgit.lib.IndexDiff;
-import org.eclipse.jgit.treewalk.FileTreeIterator;
-import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
 import org.eclipse.swt.widgets.Display;
 
 import ch.uzh.ifi.seal.changedistiller.ChangeDistiller;
@@ -55,7 +38,7 @@ import co.edu.unal.colswe.CommitSummarizer.core.FilesChangedListDialog;
 import co.edu.unal.colswe.CommitSummarizer.core.ast.ProjectInformation;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile.TypeChange;
-import co.edu.unal.colswe.CommitSummarizer.core.git.SCMRepository;
+import co.edu.unal.colswe.CommitSummarizer.core.impactanalysis.Impact;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypeIdentifier;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedCommit;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypedElement;
@@ -96,16 +79,17 @@ public class SummarizeChanges {
 		this.typesProblem = new LinkedList<>();
 		getChangedListDialog().getEditor().getText().setText("");
 		removeCreatedPackages();
-		deleteTmpProject();
+		//deleteTmpProject();
 	}
 
 	@SuppressWarnings("unused")
 	public void summarize(final ChangedFile[] differences) {
 		initSummary(differences);
 		String currentPackage = "";
-		rebuildVersion();
-
-		Job job = new Job("Calculating method and types stereotypes") {
+		//rebuildVersion();
+		
+		if (!Utils.isInitialCommit(git)) {
+			Job job = new Job("Calculating method and types stereotypes") {
 				@Override
 				protected IStatus run(IProgressMonitor externalMonitor) {
 					for (final ChangedFile file : differences) {
@@ -115,44 +99,45 @@ public class SummarizeChanges {
 								StereotypeIdentifier identifier = null;
 								try {
 									System.out.println("CHANGE TYPE: " + file.getChangeType());
-									if(file.getAbsolutePath().endsWith(".java")) {
-										if(file.getChangeType().equals(TypeChange.UNTRACKED.name()) 
-												|| file.getChangeType().equals(TypeChange.ADDED.name())) {
-											if(file.getAbsolutePath().endsWith(".java")) {
+									if (file.getAbsolutePath().endsWith(".java")) {
+										if (file.getChangeType().equals(TypeChange.UNTRACKED.name()) || file.getChangeType().equals(TypeChange.ADDED.name())) {
+											if (file.getAbsolutePath().endsWith(".java")) {
 												monitor.subTask("Identifying stereotypes for " + file.getName());
-												identifier = identifyStereotypes(file, file.getChangeType());
-											} 
-										} else if(file.getChangeType().equals(TypeChange.REMOVED.name())) {
-											if(file.getAbsolutePath().endsWith(".java")) {
+												identifier = identifyStereotypes(file,file.getChangeType());
+											}
+										} else if (file.getChangeType().equals(
+												TypeChange.REMOVED.name())) {
+											if (file.getAbsolutePath().endsWith(".java")) {
 												monitor.subTask("Identifying stereotypes for " + file.getName());
 												identifier = identifyStereotypes(file, file.getChangeType());
 											}
-										} else if(file.getChangeType().equals(TypeChange.MODIFIED.name())) {
-											if(file.getAbsolutePath().endsWith(".java")) {
-												monitor.subTask("Identifying stereotypes for " + file.getName());
-												identifier = identifyStereotypes(file, file.getChangeType());
+										} else if (file.getChangeType().equals(TypeChange.MODIFIED.name())) {
+											if (file.getAbsolutePath().endsWith(".java")) {
+												monitor.subTask("Identifying stereotypes for "+ file.getName());
+												identifier = identifyStereotypes(file,file.getChangeType());
 											}
 										}
 									} else {
 										otherFiles.add(file);
 									}
-									
-									if(identifier != null) {
+
+									if (identifier != null) {
 										monitor.subTask("Describing type " + file.getName());
 										summarizeType(identifier);
 									}
-								} catch(Exception e) {
-								    e.printStackTrace();
+								} catch (Exception e) {
+									e.printStackTrace();
 								}
-								
+
 								return Status.OK_STATUS;
 							}
 						};
-						internalJob.addJobChangeListener(new JobChangeAdapter() {
-							public void done(IJobChangeEvent event) {
-								updateTextInputDescription();					           
-						    }
-						});
+						internalJob
+								.addJobChangeListener(new JobChangeAdapter() {
+									public void done(IJobChangeEvent event) {
+										updateTextInputDescription();
+									}
+								});
 						internalJob.schedule();
 						try {
 							internalJob.join();
@@ -160,11 +145,24 @@ public class SummarizeChanges {
 							e.printStackTrace();
 						}
 					}
-					
+
 					return Status.OK_STATUS;
 				}
 			};
 			job.schedule();
+		} else {
+			describeInitialCommit(); 
+		}
+	}
+	
+	public void describeInitialCommit() {
+		StringBuilder desc = new StringBuilder("Initial commit. "); 
+		CommitGeneralDescriptor generalDescriptor = new CommitGeneralDescriptor();
+		generalDescriptor.setDifferences(differences);
+		generalDescriptor.setGit(git);
+		desc.append(generalDescriptor.describe());
+		
+		getChangedListDialog().getEditor().getText().setText(desc.toString());
 	}
 
 	public void updateTextInputDescription() {
@@ -172,6 +170,10 @@ public class SummarizeChanges {
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
 				if(summarized.size() + modifiedFiles.size() + otherFiles.size() + typesProblem.size() == differences.length) {
+					
+					Impact impact = new Impact(identifiers);
+					impact.calculateImpactSet();
+					
 					String currentPackage = "";
 					StringBuilder desc = new StringBuilder(); 
 					//Commit stereotype description
@@ -300,7 +302,7 @@ public class SummarizeChanges {
 		return result;
 	}
 	
-	public void rebuildVersion() {
+	/*ppublic void rebuildVersion() {
 		
 		Set<ICompilationUnit> previousCU = new HashSet<>();
 		Set<ICompilationUnit> currentCU = new HashSet<>();
@@ -403,7 +405,7 @@ public class SummarizeChanges {
 	return cu;
 	}
 
-	protected void deleteTmpProject() {
+	rotected void deleteTmpProject() {
 		IProject project = createProject();
 		try {
 			project.delete(true, null);
@@ -453,7 +455,7 @@ public class SummarizeChanges {
 			e.printStackTrace();
 		} 
 		return project;
-	}
+	}*/
 	
 	public StereotypeIdentifier identifyStereotypes(ChangedFile file, String scmOperation) {
 		
@@ -479,7 +481,12 @@ public class SummarizeChanges {
 		
 		if(changedListDialog.getSelection() != null) {
 			projectName = changedListDialog.getSelection().getElementName();
-			res = changedListDialog.getSelection().getProject().findMember(file.getPath().replaceFirst(projectName, ""));
+			
+			if(file.getPath().startsWith(projectName)) {
+				res = changedListDialog.getSelection().getProject().findMember(file.getPath().replaceFirst(projectName, ""));
+			} else {
+				res = changedListDialog.getSelection().getProject().findMember(file.getPath());
+			}
 			stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(res, changedListDialog.getSelection()), 0, 0);
 		} else {
 			projectName = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).getName();
