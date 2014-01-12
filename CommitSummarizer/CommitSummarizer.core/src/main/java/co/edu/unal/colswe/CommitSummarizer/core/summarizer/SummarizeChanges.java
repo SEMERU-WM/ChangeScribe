@@ -25,6 +25,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
@@ -34,6 +35,7 @@ import org.eclipse.swt.widgets.Display;
 import ch.uzh.ifi.seal.changedistiller.ChangeDistiller;
 import ch.uzh.ifi.seal.changedistiller.ChangeDistiller.Language;
 import ch.uzh.ifi.seal.changedistiller.distilling.FileDistiller;
+import co.edu.unal.colswe.CommitSummarizer.core.Activator;
 import co.edu.unal.colswe.CommitSummarizer.core.FilesChangedListDialog;
 import co.edu.unal.colswe.CommitSummarizer.core.ast.ProjectInformation;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
@@ -47,6 +49,8 @@ import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.CommitStereo
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.MethodStereotype;
 import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.util.CompilationUtils;
 import co.edu.unal.colswe.CommitSummarizer.core.util.Utils;
+
+import commitsummarizer.core.preferences.PreferenceConstants;
 
 public class SummarizeChanges {
 	
@@ -186,8 +190,17 @@ public class SummarizeChanges {
 					generalDescriptor.setDifferences(differences);
 					generalDescriptor.setGit(git);
 					desc.append(generalDescriptor.describe());
+
+					IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+
+					boolean filtering = store.getBoolean(PreferenceConstants.P_FILTER_COMMIT_MESSAGE);
+					double factor = store.getDouble(PreferenceConstants.P_FILTER_FACTOR);
 					
 					for(Entry<String, StereotypeIdentifier> identifier : summarized.entrySet()) {
+						StereotypeIdentifier calculated = identifiers.get(identifiers.indexOf(identifier.getValue()));
+						if(filtering && calculated != null && calculated.getImpactPercentaje() <= (factor * 100) ) {
+							continue;
+						}
 						if(i == 1) {
 							desc.append(" This change set is composed of this changes:  \n\n");
 						}
@@ -277,7 +290,15 @@ public class SummarizeChanges {
 	public String summarizeCommitStereotype() {
 		List<StereotypedMethod> methods = new ArrayList<StereotypedMethod>();
 		String result = "";
+		
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		boolean filtering = store.getBoolean(PreferenceConstants.P_FILTER_COMMIT_MESSAGE);
+		double factor = store.getDouble(PreferenceConstants.P_FILTER_FACTOR);
+		
 		for(StereotypeIdentifier identifier : identifiers) {
+			if(filtering && identifier != null && identifier.getImpactPercentaje() <= (factor * 100) ) {
+				continue;
+			}
 			for(StereotypedElement element : identifier.getStereotypedElements()) {
 				if(!identifier.getScmOperation().equals(TypeChange.MODIFIED.name())) {
 					methods.addAll((Collection<? extends StereotypedMethod>) element.getStereoSubElements());

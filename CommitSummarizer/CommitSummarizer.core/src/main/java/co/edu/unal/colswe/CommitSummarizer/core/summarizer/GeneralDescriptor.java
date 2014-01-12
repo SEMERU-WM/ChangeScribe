@@ -49,17 +49,19 @@ public class GeneralDescriptor {
             } else {
                 description.append("class");
             } if (type.getElement().resolveBinding() != null &&Modifier.isAbstract(type.getElement().resolveBinding().getModifiers())) {
-                description.insert(0, "An abstract ");
+                description.insert(0, "an abstract ");
             } else {
                 description.insert(0, PhraseUtils.getIndefiniteArticle(description.toString()).concat(" "));
             }
 		}
 		
+		description.insert(0, describeOperation(operation) + " ");
+		
 		description.append(" for ");
 		NounPhrase classNamePhrase = new NounPhrase(Tokenizer.split(type.getElement().getName().getFullyQualifiedName()));
 		classNamePhrase.generate();
 		description.append(classNamePhrase.toString());
-		description.append(" was " + describeOperation(operation));
+		
 
 		return description.toString();
 	}
@@ -67,9 +69,9 @@ public class GeneralDescriptor {
 	private static String describeOperation(String operation) {
 		String description = "";
 		if(operation.equals(TypeChange.ADDED.toString()) || operation.equals(TypeChange.UNTRACKED.toString())) {
-			description = "added";
+			description = "add";
 		} else if(operation.equals(TypeChange.REMOVED.toString())) {
-			description = "removed";
+			description = "remove";
 		}
 		return description;
 	}

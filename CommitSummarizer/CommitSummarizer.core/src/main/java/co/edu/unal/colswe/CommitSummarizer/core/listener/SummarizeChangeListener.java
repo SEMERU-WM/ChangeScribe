@@ -27,8 +27,6 @@ public class SummarizeChangeListener implements SelectionListener {
 					"You do not select any change");
 			
 		}
-		
-		
 	}
 
 	public void widgetDefaultSelected(SelectionEvent e) {

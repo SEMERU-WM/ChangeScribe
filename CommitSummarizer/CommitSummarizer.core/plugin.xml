@@ -39,6 +39,20 @@
          </menu>
       </menuContribution>
       
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="commitsummarizer.core.preferences.PreferencePage"
+            id="commitsummarizer.core.preferences.PreferencePage"
+            name="Commit Summarizer Preferences">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="commitsummarizer.core.preferences.PreferenceInitializer">
+      </initializer>
    </extension> 
    
    

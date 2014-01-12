@@ -10,11 +10,13 @@ import java.util.TreeMap;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -44,7 +46,6 @@ import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.api.errors.NoMessageException;
 import org.eclipse.jgit.api.errors.UnmergedPathsException;
 import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
-import org.eclipse.jgit.lib.RepositoryState;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyleRange;
@@ -57,9 +58,12 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
@@ -70,7 +74,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.dialogs.PatternFilter;
-import org.eclipse.ui.forms.IFormColors;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -83,6 +87,9 @@ import co.edu.unal.colswe.CommitSummarizer.core.editor.JavaViewer;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import co.edu.unal.colswe.CommitSummarizer.core.listener.SummarizeChangeListener;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.MethodStereotype;
+import co.edu.unal.colswe.CommitSummarizer.core.util.UIPreferences;
+
+import commitsummarizer.core.preferences.PreferenceConstants;
 
 public class FilesChangedListDialog extends TitleAreaDialog {
 	private StyledText text;
@@ -104,6 +111,8 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 	private Text committerText;
 	private String committer = null;
 	private String author = null;
+	private static final String DIALOG_SETTINGS_SECTION_NAME = Activator.getDefault() + ".COMMIT_DIALOG_SECTION"; //$NON-NLS-1$
+	//private static final String SHOW_UNTRACKED_PREF = "CommitDialog.showUntracked"; //$NON-NLS-1$
 
 	public FilesChangedListDialog(Shell shell, Set<ChangedFile> differences, Git git, IJavaProject selection) {
 		super(shell);
@@ -114,6 +123,8 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		this.git = git;
 		this.setSelection(selection);
 		this.setHelpAvailable(false);
+		setAuthor("anonymous");
+		setCommitter("anonymous");
 	}
 	
 	static class CommitFileContentProvider extends BaseWorkbenchContentProvider {
@@ -248,6 +259,15 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		updateMessage();
 	}
 	
+	@Override
+	protected IDialogSettings getDialogBoundsSettings() {
+		IDialogSettings settings = Activator.getDefault().getDialogSettings();
+		IDialogSettings section = settings.getSection(DIALOG_SETTINGS_SECTION_NAME);
+		if (section == null)
+			section = settings.addNewSection(DIALOG_SETTINGS_SECTION_NAME);
+		return section;
+	}
+	
 	protected void buttonPressed(int buttonId) {
 		if (IDialogConstants.OK_ID == buttonId)
 			okPressed();
@@ -256,6 +276,50 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 			okPressed();
 		} else if (IDialogConstants.CANCEL_ID == buttonId)
 			cancelPressed();
+	}
+	
+	/**
+	 * Add message drop down toolbar item
+	 *
+	 * @param parent
+	 * @return toolbar
+	 */
+	protected ToolBar addMessageDropDown(Composite parent) {
+		final ToolBar dropDownBar = new ToolBar(parent, SWT.FLAT | SWT.RIGHT);
+		final ToolItem dropDownItem = new ToolItem(dropDownBar, SWT.PUSH);
+		dropDownItem.setImage(PlatformUI.getWorkbench().getSharedImages()
+				.getImage("IMG_LCL_RENDERED_VIEW_MENU")); //$NON-NLS-1$
+		final Menu menu = new Menu(dropDownBar);
+		dropDownItem.addDisposeListener(new DisposeListener() {
+
+			public void widgetDisposed(DisposeEvent e) {
+				menu.dispose();
+			}
+		});
+		MenuItem preferencesItem = new MenuItem(menu, SWT.PUSH);
+		preferencesItem.setText("Configure link");
+		preferencesItem.addSelectionListener(new SelectionAdapter() {
+
+			public void widgetSelected(SelectionEvent e) {
+				String[] pages = new String[] { UIPreferences.PAGE_COMMIT_PREFERENCES_SUMMARY };
+				Activator.getDefault().getDialogSettings();
+				PreferencesUtil.createPreferenceDialogOn(getShell(), pages[0],
+						pages, null).open();
+			}
+
+		});
+		dropDownItem.addSelectionListener(new SelectionAdapter() {
+
+			public void widgetSelected(SelectionEvent e) {
+				Rectangle b = dropDownItem.getBounds();
+				Point p = dropDownItem.getParent().toDisplay(
+						new Point(b.x, b.y + b.height));
+				menu.setLocation(p.x, p.y);
+				menu.setVisible(true);
+			}
+
+		});
+		return dropDownBar;
 	}
 	
 	@Override
@@ -281,8 +345,8 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 			}
 			
 			CommitCommand commit = git.commit();
-			commit.setAuthor(getAuthorText().getText(), "lf@gmail.com");
-			commit.setCommitter(getCommitterText().getText(), "");
+			commit.setAuthor(getAuthor(), getAuthor());
+			commit.setCommitter(getCommitter(), "");
 			commit.setMessage(editor.getText().getText());
 			commit.call();
 			
@@ -314,12 +378,12 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 	}
 	
 	protected String validateCommit() {
-		String authorValue = authorText.getText();
+		String authorValue = author;
 		if (authorValue.length() == 0 /*|| RawParseUtils.parsePersonIdent(authorValue) == null*/) {
 			return "Empty or Invalid author";
 		}
 
-		String committerValue = committerText.getText();
+		String committerValue = committer;
 		if (committerValue.length() == 0 /*|| RawParseUtils.parsePersonIdent(committerValue) == null*/) {
 			return "Empty or Invalid committer";
 		}
@@ -382,7 +446,8 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 
 		ToolBar messageToolbar = new ToolBar(headerArea, SWT.FLAT | SWT.HORIZONTAL);
 		GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).grab(true, false).applyTo(messageToolbar);
-
+		addMessageDropDown(headerArea);
+		
 		messageSection.setTextClient(headerArea);
 		
 		JavaViewer viewer = new JavaViewer();
@@ -404,7 +469,7 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(personArea);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(personArea);
 
-		toolkit.createLabel(personArea, "Author: ").setForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
+		/*toolkit.createLabel(personArea, "Author: ").setForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
 		setAuthorText(toolkit.createText(personArea, null));
 		getAuthorText().setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
 		getAuthorText().setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
@@ -417,7 +482,7 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		getCommitterText().setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 		if (getCommitter() != null) {
 			getCommitterText().setText(getCommitter());
-		}
+		}*/
 
 		/////////////////////
 		
@@ -505,6 +570,17 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 			}
 		});
 		
+		/*IDialogSettings settings = Activator.getDefault().getDialogSettings();
+		if (settings.get("") != null) {
+			// note, no matter how the dialog settings are, if
+			// the preferences force us to include untracked files
+			// we must show them
+			showUntracked = Boolean.valueOf(settings.get(SHOW_UNTRACKED_PREF))
+					.booleanValue()
+					|| getPreferenceStore().getBoolean(
+							UIPreferences.COMMIT_DIALOG_INCLUDE_UNTRACKED);
+		}*/
+		
 		ToolItem help = createHelpButton(filesToolbar);
 		help.addSelectionListener(new SelectionAdapter() {
 		    @Override
@@ -552,6 +628,10 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		statCol.pack();
 		resourceCol.pack();
 		return filesSection;
+	}
+	
+	private static IPreferenceStore getPreferenceStore() {
+		return Activator.getDefault().getPreferenceStore();
 	}
 	
 	private void updateFileSectionText() {
@@ -713,7 +793,12 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 	}
 
 	public void setCommitter(String committer) {
-		this.committer = committer;
+		IDialogSettings settings = Activator.getDefault().getDialogSettings();
+		if (settings != null) {
+			this.committer = getPreferenceStore().getString(PreferenceConstants.P_COMMITER);
+		} else {
+			this.committer = committer;
+		}
 	}
 
 	public String getAuthor() {
@@ -721,7 +806,12 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 	}
 
 	public void setAuthor(String author) {
-		this.author = author;
+		IDialogSettings settings = Activator.getDefault().getDialogSettings();
+		if (settings != null) {
+			this.author = getPreferenceStore().getString(PreferenceConstants.P_AUTHOR);
+		} else {
+			this.author = author;
+		}
 	}
 
 }

@@ -12,7 +12,7 @@ import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.pos.POSTagger;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "CommitSummarizer.core";
+	public static final String PLUGIN_ID = "co.edu.unal.colswe.CommitSummarizer";
 
 	// The shared instance
 	private static Activator plugin;

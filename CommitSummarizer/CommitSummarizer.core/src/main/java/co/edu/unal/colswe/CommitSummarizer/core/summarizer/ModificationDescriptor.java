@@ -48,12 +48,12 @@ public class ModificationDescriptor {
 			compareModified(file, distiller, git);
 		} catch(IllegalStateException ex) {
 			ex.printStackTrace();
-			desc.append((i - 1) + "." + j + ". " + " The " + file.getName() + " file was renamed:  \n\n");
+			desc.append((i - 1) + "." + j + ". " + " Rename the " + file.getName() + " file:  \n\n");
 		}
 		List<SourceCodeChange> changes = distiller.getSourceCodeChanges();
 		if(changes != null) {
 			if(changes != null && changes.size() > 0) {
-				desc.append((i - 1) + "." + j + ". " + " Modifications to " + file.getName()/*changes.get(1).getRootEntity().getJavaStructureNode().getName() + " " + changes.get(0).getRootEntity().getJavaStructureNode().getType().name().toLowerCase()*/ + ":  \n\n");
+				desc.append((i - 1) + "." + j + ". " + " Modifications to " + file.getName() + ":  \n\n");
 			} 
 			int k = 1;
 		    for(SourceCodeChange change : changes) {
@@ -83,17 +83,18 @@ public class ModificationDescriptor {
 	public static void describeDelete(StringBuilder desc, Delete delete) {
 		if(delete.getChangeType() == ChangeType.STATEMENT_DELETE) {
 			String statementType = delete.getChangedEntity().getType().name().toLowerCase().replace("statement", "").replace("_", " ");
-			desc.append(StringUtils.capitalize(statementType));
+			desc.append("Remove ");
+			desc.append(statementType);
 			if(delete.getChangedEntity().getAstNode() != null && delete.getChangedEntity().getAstNode() instanceof LocalDeclaration) {
 				LocalDeclaration localDec = (LocalDeclaration) delete.getChangedEntity().getAstNode();
 				NounPhrase phrase = new NounPhrase(Tokenizer.split(new String(localDec.name)));
 				phrase.generate();
-				desc.append(" to " + phrase.toString() + " was removed at " + delete.getRootEntity().getJavaStructureNode().getName() + " method");
+				desc.append(" to " + phrase.toString() + " at " + delete.getRootEntity().getJavaStructureNode().getName() + " method");
 			} else if(delete.getChangedEntity().getAstNode() != null && delete.getChangedEntity().getAstNode() instanceof ForeachStatement) {
 				ForeachStatement forDec = (ForeachStatement) delete.getChangedEntity().getAstNode();
 				NounPhrase phrase = new NounPhrase(Tokenizer.split(((MessageSend)forDec.collection).receiver.toString()));
 				phrase.generate();
-				desc.append(" loop on " + phrase.toString() + " collection was removed at " + delete.getRootEntity().getJavaStructureNode().getName() + " method");
+				desc.append(" loop for " + phrase.toString() + " collection at " + delete.getRootEntity().getJavaStructureNode().getName() + " method");
 			} else if(delete.getChangedEntity().getAstNode() != null && delete.getChangedEntity().getAstNode() instanceof MessageSend) {
 				MessageSend messageSend = (MessageSend) delete.getChangedEntity().getAstNode();
 				NounPhrase phrase = new NounPhrase(Tokenizer.split(new String(messageSend.selector)));
@@ -106,7 +107,7 @@ public class ModificationDescriptor {
 				if(!desc.toString().endsWith(phrase.toString())) {
 					desc.append(" " + phrase.toString());
 				}
-				desc.append("  was removed at " + delete.getRootEntity().getJavaStructureNode().getName() + " method");
+				desc.append(" at " + delete.getRootEntity().getJavaStructureNode().getName() + " method");
 			} else if(delete.getChangedEntity().getAstNode() != null && delete.getChangedEntity().getAstNode() instanceof CompoundAssignment) {
 				CompoundAssignment statement = (CompoundAssignment) delete.getChangedEntity().getAstNode();
 				if(delete.getChangedEntity().getAstNode() instanceof PrefixExpression) {
@@ -122,58 +123,62 @@ public class ModificationDescriptor {
 				} else {
 					desc.append(" to " + statement.lhs.toString());
 				}
-				desc.append(" was removed ");
 				desc.append(" at " + delete.getRootEntity().getJavaStructureNode().getName() + " " + delete.getRootEntity().getJavaStructureNode().getType().name().toLowerCase());
 			} else if(delete.getChangedEntity().getAstNode() != null && delete.getChangedEntity().getAstNode() instanceof ReturnStatement) {
-				desc.append(" statement removed");
+				desc.append(" statement ");
 				desc.append(" at " + delete.getRootEntity().getJavaStructureNode().getName() + " " + delete.getRootEntity().getJavaStructureNode().getType().name().toLowerCase());
 			} else if(delete.getChangedEntity().getAstNode() != null && delete.getChangedEntity().getAstNode() instanceof IfStatement) {
-				desc.append(" statement removed");
+				desc.append(" statement ");
 				desc.append(" at " + delete.getRootEntity().getJavaStructureNode().getName() + " " + delete.getRootEntity().getJavaStructureNode().getType().name().toLowerCase());
 			}
 		} else if(delete.getChangeType() == ChangeType.PARENT_CLASS_DELETE) {
-			desc.append(StringUtils.capitalize("Parent class ") + delete.getChangedEntity().getUniqueName() + " was removed");
+			desc.append(StringUtils.capitalize("Remove parent class ") + delete.getChangedEntity().getUniqueName());
 		} else if(delete.getChangeType() == ChangeType.PARENT_INTERFACE_DELETE) {
-			desc.append(StringUtils.capitalize("Parent interface ") + delete.getChangedEntity().getUniqueName() + " was removed");
+			desc.append(StringUtils.capitalize("Remove parent interface ") + delete.getChangedEntity().getUniqueName());
 		} else if(delete.getChangeType() == ChangeType.ADDING_METHOD_OVERRIDABILITY || delete.getChangeType() == ChangeType.ADDING_ATTRIBUTE_MODIFIABILITY) {
-			desc.append(StringUtils.capitalize("Final modifier was removed of ") + delete.getRootEntity().getJavaStructureNode().getName().toString() + " " + delete.getRootEntity().getJavaStructureNode().getType().name().toString().toLowerCase());
+			desc.append(StringUtils.capitalize("Remove final modifier of ") + delete.getRootEntity().getJavaStructureNode().getName().toString() + " " + delete.getRootEntity().getJavaStructureNode().getType().name().toString().toLowerCase());
 		} else if(delete.getChangeType() == ChangeType.ALTERNATIVE_PART_DELETE) {
-			desc.append(StringUtils.capitalize("Else part of ") + delete.getChangedEntity().getUniqueName() + " condition was removed");
+			desc.append(StringUtils.capitalize("Remove else part of ") + delete.getChangedEntity().getUniqueName() + " condition ");
 		} else if(delete.getChangeType() == ChangeType.COMMENT_DELETE || delete.getChangeType() == ChangeType.DOC_DELETE) {
 			String type = delete.getChangedEntity().getType().name().toLowerCase().replace("_", " ");
 			String entityType = delete.getRootEntity().getJavaStructureNode().getType().name().toLowerCase();
-			desc.append(type +" removed at " + delete.getRootEntity().getJavaStructureNode().getName() + " " + entityType);
+			desc.append("Remove " + type +" at " + delete.getRootEntity().getJavaStructureNode().getName() + " " + entityType);
 		} else if(delete.getChangeType() == ChangeType.REMOVED_FUNCTIONALITY) {
-			desc.append("Funtionality to " + delete.getChangedEntity().getName().substring(0, delete.getChangedEntity().getName().indexOf("(")) + " was removed");
+			desc.append("Remove funtionality to " + delete.getChangedEntity().getName().substring(0, delete.getChangedEntity().getName().indexOf("(")));
 		} else if(delete.getChangeType() == ChangeType.REMOVED_OBJECT_STATE) {
-			desc.append("Object state " + delete.getChangedEntity().getName().substring(0, delete.getChangedEntity().getName().indexOf(":")) + " was removed");
+			desc.append("Remove object state " + delete.getChangedEntity().getName().substring(0, delete.getChangedEntity().getName().indexOf(":")));
 		} else if(delete.getChangeType() == ChangeType.PARAMETER_DELETE) {
 			if(delete.getChangedEntity().getAstNode() instanceof Argument) { 
 				Argument arg = (Argument) delete.getChangedEntity().getAstNode(); 
 				Parameter parameter = new Parameter(arg.type.toString(), new String(arg.name));
 				ParameterPhrase phrase = new ParameterPhrase(parameter);
 				phrase.generate();
-				desc.append("Parameter " + phrase.toString() + " was deleted at " + delete.getRootEntity().getJavaStructureNode().getName() + " " + delete.getRootEntity().getJavaStructureNode().getType().name().toLowerCase());
+				desc.append("Remove parameter " + phrase.toString() + " at " + delete.getRootEntity().getJavaStructureNode().getName() + " " + delete.getRootEntity().getJavaStructureNode().getType().name().toLowerCase());
 			}
 		}  
 	}
 
 	@SuppressWarnings("static-access")
 	public static void describeInsert(StringBuilder desc, Insert insert) {
+		
 		String fType = insert.getChangedEntity().getType().name().toLowerCase().replace("_", " ");
+		//String article = PhraseUtils.getIndefiniteArticle(fType).concat(" ");
+		
+		fType = "Add " + fType;
+		
 		if(insert.getChangeType() == ChangeType.ADDITIONAL_FUNCTIONALITY) {
-			desc.append("An additional functionality to " + insert.getChangedEntity().getName().substring(0, insert.getChangedEntity().getName().indexOf("(")) + " was added");
+			desc.append("Add an additional functionality to " + insert.getChangedEntity().getName().substring(0, insert.getChangedEntity().getName().indexOf("(")));
 		} else if(insert.getChangeType() == ChangeType.COMMENT_INSERT || insert.getChangeType() == ChangeType.DOC_INSERT) {
 			String entityType = insert.getRootEntity().getJavaStructureNode().getType().name().toLowerCase();
-			desc.append(StringUtils.capitalize(fType) +" added at " + insert.getRootEntity().getJavaStructureNode().getName() + " " + entityType);
+			desc.append(StringUtils.capitalize(fType) +" at " + insert.getRootEntity().getJavaStructureNode().getName() + " " + entityType);
 		} else if(insert.getChangeType() == ChangeType.PARENT_CLASS_INSERT) {
-			desc.append(StringUtils.capitalize("Parent class ") + insert.getChangedEntity().getUniqueName() + " was added");
+			desc.append(StringUtils.capitalize("Add parent class ") + insert.getChangedEntity().getUniqueName());
 		} else if(insert.getChangeType() == ChangeType.PARENT_INTERFACE_INSERT) {
-			desc.append(StringUtils.capitalize("Parent interface ") + insert.getChangedEntity().getUniqueName() + " was added");
+			desc.append(StringUtils.capitalize("Add parent interface ") + insert.getChangedEntity().getUniqueName());
 		} else if(insert.getChangeType() == ChangeType.REMOVING_METHOD_OVERRIDABILITY || insert.getChangeType() == ChangeType.REMOVING_ATTRIBUTE_MODIFIABILITY) {
-			desc.append(StringUtils.capitalize("Final modifier was added to ") + insert.getRootEntity().getJavaStructureNode().getName().toString() + " " + insert.getRootEntity().getJavaStructureNode().getType().name().toString().toLowerCase());
+			desc.append(StringUtils.capitalize("Add final modifier to ") + insert.getRootEntity().getJavaStructureNode().getName().toString() + " " + insert.getRootEntity().getJavaStructureNode().getType().name().toString().toLowerCase());
 		} else if(insert.getChangeType() == ChangeType.ALTERNATIVE_PART_INSERT) {
-			desc.append(StringUtils.capitalize("Else part of ") + insert.getChangedEntity().getUniqueName() + " condition was added");
+			desc.append(StringUtils.capitalize("Add else part of ") + insert.getChangedEntity().getUniqueName() + " condition ");
 		} else if(insert.getChangedEntity().getType() == JavaEntityType.METHOD_INVOCATION) {
 			MessageSend methodC = (MessageSend) insert.getChangedEntity().getAstNode();
 			String referencedObject = "";
@@ -192,7 +197,7 @@ public class ModificationDescriptor {
 				Parameter parameter = new Parameter(arg.type.toString(), new String(arg.name));
 				ParameterPhrase phrase = new ParameterPhrase(parameter);
 				phrase.generate();
-				desc.append("Parameter " + phrase.toString() + " was added at " + insert.getRootEntity().getJavaStructureNode().getName() + " " + insert.getRootEntity().getJavaStructureNode().getType().name().toLowerCase());
+				desc.append("Add parameter " + phrase.toString() + " at " + insert.getRootEntity().getJavaStructureNode().getName() + " " + insert.getRootEntity().getJavaStructureNode().getType().name().toLowerCase());
 			}
 		} else if(insert.getChangeType() == ChangeType.STATEMENT_INSERT)  {
 			desc.append(StringUtils.capitalize(fType) + " ");
@@ -208,10 +213,9 @@ public class ModificationDescriptor {
 				
 				desc.append(" " + prefixExpression.lhs.toString());
 				
-				desc.append(" was added ");
 			} else if(insert.getChangedEntity().getAstNode() != null && insert.getChangedEntity().getAstNode() instanceof CompoundAssignment) {
 				CompoundAssignment statement = (CompoundAssignment) insert.getChangedEntity().getAstNode();
-				desc.append(" " + statement.lhs.toString() + " variable was modified to " + statement.expression.toString()+ " at " + insert.getRootEntity().getJavaStructureNode().getName() + " " + insert.getRootEntity().getJavaStructureNode().getType().name().toLowerCase());
+				desc.append(" " + statement.lhs.toString() + " variable to " + statement.expression.toString()+ " at " + insert.getRootEntity().getJavaStructureNode().getName() + " " + insert.getRootEntity().getJavaStructureNode().getType().name().toLowerCase());
 			} else {
 				fType = insert.getChangeType().name().toLowerCase().replace("_", " ");
 				desc.append(" at " + insert.getRootEntity().getJavaStructureNode().getName() + " method");
@@ -221,14 +225,14 @@ public class ModificationDescriptor {
 
 	public static void describeUpdate(StringBuilder desc,
 			SourceCodeChange change, Update update) {
-		String fType = StringUtils.capitalize(update.getChangedEntity().getType().name().toLowerCase().replace("_", " "));
-		if(fType.equals("Variable declaration statement")) {
-			fType = "Variable declaration ";
+		String fType = "Modify " + update.getChangedEntity().getType().name().toLowerCase().replace("_", " ");
+		if(fType.equals("Modify variable declaration statement")) {
+			fType = "Modify variable declaration ";
 		}
 		if(update.getChangeType() == ChangeType.STATEMENT_UPDATE) {
 			
 			if(update.getChangedEntity().getType() == JavaEntityType.METHOD_INVOCATION) {
-				desc.append(StringUtils.capitalize(fType) + " was modified of ");
+				desc.append(StringUtils.capitalize(fType));
 				MessageSend methodC = (MessageSend) update.getChangedEntity().getAstNode();
 				MessageSend methodN = (MessageSend) update.getNewEntity().getAstNode();
 				
@@ -238,7 +242,7 @@ public class ModificationDescriptor {
 					desc.append(new String(methodC.selector.toString()) + " to " + new String(methodN.selector.toString()) + " at " + update.getParentEntity().getName() + " method");
 				}
 			} else if(update.getChangedEntity().getType() == JavaEntityType.ASSIGNMENT) {
-				desc.append(StringUtils.capitalize(fType) + " was modified of ");
+				desc.append(StringUtils.capitalize(fType));
 				Assignment asC = (Assignment) update.getChangedEntity().getAstNode();
 				Assignment asN = (Assignment) update.getNewEntity().getAstNode();
 				
@@ -250,43 +254,40 @@ public class ModificationDescriptor {
 			} else if(update.getChangedEntity().getAstNode() instanceof PrefixExpression) {
 				desc.append(StringUtils.capitalize(fType));
 				PrefixExpression prefixExpression = (PrefixExpression) update.getChangedEntity().getAstNode();
-				
 				if(OperatorIds.PLUS == prefixExpression.operator) {
 					desc.append(" increment ");
 				} else if(OperatorIds.MINUS == prefixExpression.operator) {
 					desc.append(" decrement ");
 				}
-				
 				desc.append(" " + prefixExpression.lhs.toString());
-				
-				desc.append(" was added ");
+				//desc.append(" was added ");
 			} else {
-				desc.append(StringUtils.capitalize(fType) + " " + update.getChangedEntity().getName() + " was modified by " + update.getNewEntity().getUniqueName() + " at " + update.getParentEntity().getName()  + " method");
+				desc.append(StringUtils.capitalize(fType) + " " + update.getChangedEntity().getName() + " by " + update.getNewEntity().getUniqueName() + " at " + update.getParentEntity().getName()  + " method");
 			}
 		} else if(update.getChangeType() == ChangeType.METHOD_RENAMING) {
-			desc.append(update.getChangedEntity().getName().substring(0, update.getChangedEntity().getName().indexOf("(")) + " method renamed " + " by " + update.getNewEntity().getName().substring(0, update.getNewEntity().getName().indexOf("(")));
+			desc.append("Rename " + update.getChangedEntity().getName().substring(0, update.getChangedEntity().getName().indexOf("(")) + " method " + " with " + update.getNewEntity().getName().substring(0, update.getNewEntity().getName().indexOf("(")));
 		} else if(update.getChangeType() == ChangeType.ATTRIBUTE_RENAMING) {
-			desc.append(update.getChangedEntity().getName().substring(0, update.getChangedEntity().getName().indexOf(":")).trim() + " attribute renamed " + " by " + update.getNewEntity().getName().substring(0, update.getNewEntity().getName().indexOf(":")).trim());
+			desc.append("Rename " + update.getChangedEntity().getName().substring(0, update.getChangedEntity().getName().indexOf(":")).trim() + " attribute " + " with " + update.getNewEntity().getName().substring(0, update.getNewEntity().getName().indexOf(":")).trim());
 		} else if(update.getChangeType() == ChangeType.ATTRIBUTE_TYPE_CHANGE) {
 			if(update.getChangedEntity().getAstNode() != null && update.getChangedEntity().getJavaStructureNode().getASTNode() instanceof FieldDeclaration) {
 				FieldDeclaration field = (FieldDeclaration) update.getChangedEntity().getJavaStructureNode().getASTNode();
-				desc.append("Attribute type of " + new String(field.name) + " was changed " + " with " + update.getNewEntity().getAstNode().toString());
+				desc.append("Change attribute type of " + new String(field.name) + " with " + update.getNewEntity().getAstNode().toString());
 			} else {
-				desc.append("Attribute type " + update.getChangedEntity().getName() + " attribute changed " + " with " + update.getNewEntity().getAstNode().toString());
+				desc.append("Change attribute type " + update.getChangedEntity().getName() + " with " + update.getNewEntity().getAstNode().toString());
 			}
 		} else if(update.getChangeType() == ChangeType.CONDITION_EXPRESSION_CHANGE) {
-			desc.append("Conditional expression " + update.getChangedEntity().getName().substring(1, update.getChangedEntity().getName().length() - 1) + " was modified with " + update.getNewEntity().getUniqueName() + " at " + update.getParentEntity().getName() + " method");
+			desc.append("Modify conditional expression " + update.getChangedEntity().getName().substring(1, update.getChangedEntity().getName().length() - 1) + " with " + update.getNewEntity().getUniqueName() + " at " + update.getParentEntity().getName() + " method");
 		} else if(update.getChangeType() == ChangeType.INCREASING_ACCESSIBILITY_CHANGE) {
-			desc.append("Accessibility was increased of " + update.getChangedEntity().getUniqueName() + " to " + update.getNewEntity().getUniqueName() + " for " + update.getRootEntity().getJavaStructureNode().getName().substring(0, update.getRootEntity().getJavaStructureNode().getName().indexOf(":") - 1) + " " + update.getRootEntity().getType().name().toLowerCase());
+			desc.append("Increase accessibility of " + update.getChangedEntity().getUniqueName() + " to " + update.getNewEntity().getUniqueName() + " for " + update.getRootEntity().getJavaStructureNode().getName().substring(0, update.getRootEntity().getJavaStructureNode().getName().indexOf(":") - 1) + " " + update.getRootEntity().getType().name().toLowerCase());
 		} else if(update.getChangeType() == ChangeType.PARENT_CLASS_CHANGE) {
-			desc.append(StringUtils.capitalize("Parent class ") + update.getChangedEntity().getUniqueName() + " was changed with " + update.getNewEntity().getUniqueName());
+			desc.append("Modify the " + "parent class " + update.getChangedEntity().getUniqueName() + " with " + update.getNewEntity().getUniqueName());
 		} else if(update.getChangeType() == ChangeType.PARENT_INTERFACE_CHANGE) {
-			desc.append(StringUtils.capitalize("Parent interface ") + update.getChangedEntity().getUniqueName() + " was changed with " + update.getNewEntity().getUniqueName());
+			desc.append("Modify the " + "parent interface " + update.getChangedEntity().getUniqueName() + " with " + update.getNewEntity().getUniqueName());
 		} else if(update.getChangeType() == ChangeType.DECREASING_ACCESSIBILITY_CHANGE) {
-			desc.append("Accessibility was decreased of " + update.getChangedEntity().getUniqueName() + " to " + update.getNewEntity().getUniqueName() + " for " + update.getRootEntity().getJavaStructureNode().getName() + " " + update.getRootEntity().getType().name().toLowerCase());
+			desc.append("Decrease accessibility of " + update.getChangedEntity().getUniqueName() + " to " + update.getNewEntity().getUniqueName() + " for " + update.getRootEntity().getJavaStructureNode().getName() + " " + update.getRootEntity().getType().name().toLowerCase());
 		} else if(update.getChangeType() == ChangeType.COMMENT_UPDATE || update.getChangeType() == ChangeType.DOC_UPDATE) {
 			String entityType = update.getRootEntity().getJavaStructureNode().getType().name().toLowerCase();
-			desc.append(fType +" updated at " + update.getRootEntity().getJavaStructureNode().getName() + " " + entityType);
+			desc.append(fType +" at " + update.getRootEntity().getJavaStructureNode().getName() + " " + entityType);
 		}
 		
 	}
