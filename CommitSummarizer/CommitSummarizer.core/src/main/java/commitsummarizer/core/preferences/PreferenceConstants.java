@@ -13,4 +13,6 @@ public class PreferenceConstants {
 	
 	public static final String P_FILTER_FACTOR = "filterFactorPreference";
 	
+	public static final String P_COMMIT_SIGNATURE_ACTIVE = "commitSignatureActivePreference";
+	
 }

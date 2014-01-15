@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -37,6 +38,7 @@ import ch.uzh.ifi.seal.changedistiller.ChangeDistiller.Language;
 import ch.uzh.ifi.seal.changedistiller.distilling.FileDistiller;
 import co.edu.unal.colswe.CommitSummarizer.core.Activator;
 import co.edu.unal.colswe.CommitSummarizer.core.FilesChangedListDialog;
+import co.edu.unal.colswe.CommitSummarizer.core.Module;
 import co.edu.unal.colswe.CommitSummarizer.core.ast.ProjectInformation;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile.TypeChange;
@@ -56,6 +58,7 @@ public class SummarizeChanges {
 	
 	private Git git;
 	private StereotypeIdentifier stereotypeIdentifier;
+	private List<Module> modules;
 	private List<StereotypeIdentifier> identifiers;
 	private StringBuilder comment = new StringBuilder();
 	private ChangedFile[] differences;
@@ -81,6 +84,7 @@ public class SummarizeChanges {
 		this.modifiedFiles = new LinkedList<>();
 		this.otherFiles = new LinkedList<>();
 		this.typesProblem = new LinkedList<>();
+		this.modules = new ArrayList<>();
 		getChangedListDialog().getEditor().getText().setText("");
 		removeCreatedPackages();
 		//deleteTmpProject();
@@ -92,7 +96,7 @@ public class SummarizeChanges {
 		String currentPackage = "";
 		//rebuildVersion();
 		
-		if (!Utils.isInitialCommit(git)) {
+		//if (!Utils.isInitialCommit(git)) {
 			Job job = new Job("Calculating method and types stereotypes") {
 				@Override
 				protected IStatus run(IProgressMonitor externalMonitor) {
@@ -136,8 +140,7 @@ public class SummarizeChanges {
 								return Status.OK_STATUS;
 							}
 						};
-						internalJob
-								.addJobChangeListener(new JobChangeAdapter() {
+						internalJob.addJobChangeListener(new JobChangeAdapter() {
 									public void done(IJobChangeEvent event) {
 										updateTextInputDescription();
 									}
@@ -154,9 +157,9 @@ public class SummarizeChanges {
 				}
 			};
 			job.schedule();
-		} else {
+		/*} else {
 			describeInitialCommit(); 
-		}
+		}*/
 	}
 	
 	public void describeInitialCommit() {
@@ -185,11 +188,22 @@ public class SummarizeChanges {
 					int i = 1;
 					int j = 1;
 					
-					//General description
+					boolean isInitialCommit = Utils.isInitialCommit(git); 
+					
 					CommitGeneralDescriptor generalDescriptor = new CommitGeneralDescriptor();
 					generalDescriptor.setDifferences(differences);
+					generalDescriptor.setInitialCommit(isInitialCommit);
 					generalDescriptor.setGit(git);
 					desc.append(generalDescriptor.describe());
+					
+					//General description
+					if(isInitialCommit) {
+						desc.insert(0, "Initial commit. "); 
+						getNewModules();
+						describeNewModules(desc);
+					} else { 
+						desc.insert(0, "BUG - FEATURE: <type-ID> \n\n");
+					}
 
 					IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 
@@ -198,7 +212,7 @@ public class SummarizeChanges {
 					
 					for(Entry<String, StereotypeIdentifier> identifier : summarized.entrySet()) {
 						StereotypeIdentifier calculated = identifiers.get(identifiers.indexOf(identifier.getValue()));
-						if(filtering && calculated != null && calculated.getImpactPercentaje() <= (factor * 100) ) {
+						if(filtering && calculated != null && calculated.getImpactPercentaje() <= (factor /* 100*/) ) {
 							continue;
 						}
 						if(i == 1) {
@@ -235,6 +249,45 @@ public class SummarizeChanges {
 
 	}
 	
+	protected void describeNewModules(StringBuilder desc) {
+		
+		if(modules != null && modules.size() == 0) {
+			return;
+		}
+		desc.append(" New modules to: \n\n");
+		for (Module module : modules) {
+			desc.append("\t- " + module.getModuleName() + "\n");
+		}
+		desc.append("\n");
+		
+	}
+
+	protected void getNewModules() {
+		for (StereotypeIdentifier identifier : identifiers) {
+			try {
+				IType[] allTypes = identifier.getCompilationUnit().getAllTypes();
+				
+				for (IType iType : allTypes) {
+					String packageName = iType.getPackageFragment().getElementName();
+					String extractedName = packageName.substring(packageName.lastIndexOf(".") + 1, packageName.length());
+					
+					Module module = new Module();
+					module.setModuleName(extractedName);
+					module.setPackageName(packageName);
+					
+					if(!modules.contains(module)) {
+						modules.add(module);
+					}
+				}
+			} catch (JavaModelException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+
+
 	protected void removeCreatedPackages() {
 		IFolder folder = ((IJavaProject)changedListDialog.getSelection()).getProject().getFolder("src/commsummtmp");
 		try {
@@ -615,6 +668,14 @@ public class SummarizeChanges {
 
 	public void setModifiedFiles(LinkedList<ChangedFile> modifiedFiles) {
 		this.modifiedFiles = modifiedFiles;
+	}
+
+	public List<Module> getModules() {
+		return modules;
+	}
+
+	public void setModules(List<Module> modules) {
+		this.modules = modules;
 	}
 
 }

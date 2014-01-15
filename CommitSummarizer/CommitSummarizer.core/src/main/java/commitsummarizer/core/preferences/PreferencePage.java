@@ -2,7 +2,13 @@ package commitsummarizer.core.preferences;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.ScaleFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -42,11 +48,35 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 				PreferenceConstants.P_FILTER_COMMIT_MESSAGE,
 				"&Filter commit message",
 				getFieldEditorParent());
+		filterCk.setPropertyChangeListener(new IPropertyChangeListener() {
+			
+			@Override
+			public void propertyChange(PropertyChangeEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
 		addField(filterCk);
 		
-		final StringFieldEditor fieldEditor = new StringFieldEditor(PreferenceConstants.P_FILTER_FACTOR, "&Filter factor:", getFieldEditorParent());
+		//final StringFieldEditor fieldEditor = new StringFieldEditor(PreferenceConstants.P_FILTER_FACTOR, "&Filter factor:", getFieldEditorParent());
+		final ScaleFieldEditor scaleFieldEditor = new ScaleFieldEditor(PreferenceConstants.P_FILTER_FACTOR, "&Filter factor:", getFieldEditorParent());
+		scaleFieldEditor.setMinimum(0);
+		scaleFieldEditor.setMaximum(100);
+		scaleFieldEditor.setPageIncrement(1);
+		final StringFieldEditor fieldEditor = new StringFieldEditor(PreferenceConstants.P_FILTER_FACTOR, "", getFieldEditorParent());
+		fieldEditor.setEnabled(false, getFieldEditorParent());
+		scaleFieldEditor.getScaleControl().addListener(SWT.Selection,
+				new Listener() {
+					public void handleEvent(Event event) {
+						int perspectiveValue = scaleFieldEditor.getScaleControl().getSelection() + scaleFieldEditor.getMinimum();
+						fieldEditor.setStringValue("" + perspectiveValue + " % ");
+					}
+		});
 		
-		addField(fieldEditor);
+		fieldEditor.setStringValue(Activator.getDefault().getPreferenceStore().getDouble(PreferenceConstants.P_FILTER_FACTOR) + " % ");
+		
+		addField(scaleFieldEditor);
 		addField(new StringFieldEditor(PreferenceConstants.P_AUTHOR, "&Author:", getFieldEditorParent()));
 		addField(new StringFieldEditor(PreferenceConstants.P_COMMITER, "&Commiter:", getFieldEditorParent()));
 		

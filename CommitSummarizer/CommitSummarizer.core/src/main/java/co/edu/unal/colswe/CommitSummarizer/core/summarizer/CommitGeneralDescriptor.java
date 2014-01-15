@@ -21,6 +21,7 @@ public class CommitGeneralDescriptor {
 	private SortedMap<String, ChangedFile> newModules;
 	private LinkedList<ChangedFile> newProperties;
 	private LinkedList<ChangedFile> renames;
+	private boolean isInitialCommit;
 	
 	public CommitGeneralDescriptor() {
 		
@@ -34,7 +35,7 @@ public class CommitGeneralDescriptor {
 		
 		StringBuilder descriptionBuilder = new StringBuilder();
 		
-		if(newModules != null && newModules.size() > 0) {
+		if(!isInitialCommit && newModules != null && newModules.size() > 0) {
 			describeNewModules(descriptionBuilder);
 		}
 		if(newProperties != null && newProperties.size() > 0) {
@@ -43,7 +44,6 @@ public class CommitGeneralDescriptor {
 		if(renames != null && renames.size() > 0) {
 			describeRenamed(descriptionBuilder);
 		}
-		
 		return descriptionBuilder.toString();
 	}
 	
@@ -202,6 +202,14 @@ public class CommitGeneralDescriptor {
 
 	public void setRenames(LinkedList<ChangedFile> renames) {
 		this.renames = renames;
+	}
+
+	public boolean isInitialCommit() {
+		return isInitialCommit;
+	}
+
+	public void setInitialCommit(boolean isInitialCommit) {
+		this.isInitialCommit = isInitialCommit;
 	}
 
 

@@ -10,8 +10,6 @@ public class CommitStereotypeDescriptor {
 	public static String describe(ICompilationUnit cu, StereotypedCommit stereotypedCommit) {
 		StringBuilder description = new StringBuilder();
 		
-		description.append("BUG - FEATURE: <type-ID> \n\n");
-		
 		if(stereotypedCommit.getStereotypes().get(0) == CommitStereotype.STRUCTURE_MODIFIER) {
 			description.append("This is a structure modifier commit. ");
 			description.append("This change set is composed only of setter and getter methods. " );
