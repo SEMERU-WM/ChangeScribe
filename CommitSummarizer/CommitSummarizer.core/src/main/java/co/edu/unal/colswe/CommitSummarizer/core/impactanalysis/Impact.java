@@ -3,10 +3,13 @@ package co.edu.unal.colswe.CommitSummarizer.core.impactanalysis;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
@@ -25,6 +28,7 @@ public class Impact {
 	private List<StereotypeIdentifier> identifiers;
 	private long impactSet;
 	private long total;
+	private IProject project;
 
 	public Impact(List<StereotypeIdentifier> identifiers) {
 		super();
@@ -48,7 +52,13 @@ public class Impact {
 	            }
 	        };
 	        SearchEngine engine = new SearchEngine();
-	        IJavaSearchScope workspaceScope = SearchEngine.createWorkspaceScope();
+	        IJavaSearchScope workspaceScope = null;
+	        
+	        if(getProject() != null) {
+	        	workspaceScope = SearchEngine.createJavaSearchScope(createSearchScope());
+	        } else {
+	        	workspaceScope = SearchEngine.createWorkspaceScope();
+	        }
 	        SearchPattern pattern = SearchPattern
 	                .createPattern(
 	                		identifier.getCompilationUnit().findPrimaryType().getElementName(),
@@ -57,12 +67,28 @@ public class Impact {
 	                        SearchPattern.R_PATTERN_MATCH);
 	        SearchParticipant[] participant = new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() };
 	        try {
-				engine.search(pattern, participant, workspaceScope, findMethod, new NullProgressMonitor());
+				engine.search(pattern, participant, workspaceScope, findMethod, new NullProgressMonitor()); 
 			} catch (CoreException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public IJavaElement[] createSearchScope() {
+		final IJavaElement[] scope = new IJavaElement[identifiers.size()];
+		String projectName = project.getName();
+		int i = 0;
+		for(final StereotypeIdentifier cf : identifiers) {
+			if(cf.getChangedFile().getPath().startsWith(projectName)) {
+				scope[i] = JavaCore.create(project.findMember(cf.getChangedFile().getPath().replaceFirst(projectName, "")));
+			} else {
+				scope[i] = JavaCore.create(project.findMember(cf.getChangedFile().getPath()));
+			}
+			
+			i++;
+		}
+		return scope;
 	}
 	
 	public void calculateImpactPercenje() {
@@ -158,5 +184,13 @@ public class Impact {
 
 	public void setIdentifiers(List<StereotypeIdentifier> identifiers) {
 		this.identifiers = identifiers;
+	}
+
+	public IProject getProject() {
+		return project;
+	}
+
+	public void setProject(IProject project) {
+		this.project = project;
 	}
 }

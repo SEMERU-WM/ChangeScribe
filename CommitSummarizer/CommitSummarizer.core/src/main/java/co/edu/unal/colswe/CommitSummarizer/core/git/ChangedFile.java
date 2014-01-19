@@ -42,7 +42,7 @@ public class ChangedFile implements Comparable {
 	public String getChangeTypeToShow() {
 		String type = getChangeType();
 		if(changeType.equals(TypeChange.UNTRACKED_FOLDERS.toString()) || changeType.equals(TypeChange.UNTRACKED.toString())) {
-			type = "ADDED";
+			type = "ADD";
 		}
 		return type;
 	}

@@ -85,9 +85,9 @@ public class TypeDependencySummary implements DependencySummary {
             		type = ((ResolvedSourceType )match.getElement()).getParent();
             	} else if(match.getElement() instanceof ResolvedSourceField) {
             		type = ((ResolvedSourceField)match.getElement()).getParent();
-            	} else {
+            	} /*else {
             		System.out.println("hola");
-            	}
+            	}*/
             	if(null != type && inChangedFiles(type.getElementName())) {
             		addMatched(match);
             	} 

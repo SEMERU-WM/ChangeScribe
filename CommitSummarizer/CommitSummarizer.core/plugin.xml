@@ -54,7 +54,4 @@
             class="commitsummarizer.core.preferences.PreferenceInitializer">
       </initializer>
    </extension> 
-   
-   
-
 </plugin>

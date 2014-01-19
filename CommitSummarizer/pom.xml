@@ -61,6 +61,33 @@
         <artifactId>target-platform-configuration</artifactId>
         <version>${tycho.version}</version>
         <configuration>
+          <environments>
+            <environment>
+              <os>linux</os>
+              <ws>gtk</ws>
+              <arch>x86</arch>
+            </environment>
+            <environment>
+              <os>linux</os>
+              <ws>gtk</ws>
+              <arch>x86_64</arch>
+            </environment>
+            <environment>
+              <os>win32</os>
+              <ws>win32</ws>
+              <arch>x86</arch>
+            </environment>
+            <environment>
+              <os>win32</os>
+              <ws>win32</ws>
+              <arch>x86_64</arch>
+            </environment>
+            <environment>
+              <os>macosx</os>
+              <ws>cocoa</ws>
+              <arch>x86_64</arch>
+            </environment>
+          </environments>
           <resolver>p2</resolver>
           <pomDependencies>consider</pomDependencies>
           <ignoreTychoRepositories>true</ignoreTychoRepositories>
@@ -164,7 +191,7 @@
   </build>  
   <modules>
     <module>CommitSummarizer.core</module>
-    <module>CommitSummarizer.test</module>
+<!--     <module>CommitSummarizer.test</module> -->
     <module>CommitSummarizer.feature</module>
     <module>CommitSummarizer.site</module>
   </modules>

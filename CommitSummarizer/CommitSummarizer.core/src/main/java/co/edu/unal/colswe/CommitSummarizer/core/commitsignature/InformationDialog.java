@@ -46,9 +46,9 @@ public class InformationDialog extends TitleAreaDialog {
 		
 	    Browser browser = null;
 	    try {
-	    browser = new Browser(container, SWT.NONE);
+	    	browser = new Browser(container, SWT.NONE);
 	    } catch(SWTError e) {
-	    	browser = new Browser(container, SWT.WEBKIT);
+	    	browser = new Browser(container, SWT.MOZILLA);
 	    	
 	    }
 	    if(browser != null) {

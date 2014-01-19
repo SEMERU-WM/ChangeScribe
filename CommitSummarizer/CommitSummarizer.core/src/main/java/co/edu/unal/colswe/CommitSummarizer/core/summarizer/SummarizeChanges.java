@@ -179,7 +179,9 @@ public class SummarizeChanges {
 				if(summarized.size() + modifiedFiles.size() + otherFiles.size() + typesProblem.size() == differences.length) {
 					
 					Impact impact = new Impact(identifiers);
+					impact.setProject(ProjectInformation.getProject(ProjectInformation.getSelectedProject()));
 					impact.calculateImpactSet();
+					
 					
 					String currentPackage = "";
 					StringBuilder desc = new StringBuilder(); 
@@ -221,12 +223,12 @@ public class SummarizeChanges {
 						if(currentPackage.trim().equals("")) {
 							currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
 							System.out.println("current 1: " + currentPackage);
-							desc.append(i + ". Modifications to package " + currentPackage + ":  \n\n");
+							desc.append(i + ". Changes to package " + currentPackage + ":  \n\n");
 							i++;
 						} else if(!currentPackage.equals(identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName())) {
 							currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
 							System.out.println("current 2: " + currentPackage);
-							desc.append(i + ". Modifications to package " + currentPackage + ":  \n\n");
+							desc.append(i + ". Changes to package " + currentPackage + ":  \n\n");
 							j = 1;
 							i++;
 						}
@@ -349,7 +351,7 @@ public class SummarizeChanges {
 		double factor = store.getDouble(PreferenceConstants.P_FILTER_FACTOR);
 		
 		for(StereotypeIdentifier identifier : identifiers) {
-			if(filtering && identifier != null && identifier.getImpactPercentaje() <= (factor * 100) ) {
+			if(filtering && identifier != null && identifier.getImpactPercentaje() <= (factor/* * 100*/) ) {
 				continue;
 			}
 			for(StereotypedElement element : identifier.getStereotypedElements()) {

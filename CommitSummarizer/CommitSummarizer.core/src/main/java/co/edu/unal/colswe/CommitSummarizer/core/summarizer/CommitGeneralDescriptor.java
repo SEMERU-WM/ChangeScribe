@@ -76,12 +76,12 @@ public class CommitGeneralDescriptor {
 	 * @param descriptionBuilder
 	 */
 	public void describeNewModules(StringBuilder descriptionBuilder) {
-		descriptionBuilder.append(" New");
-		
+		descriptionBuilder.append("Add ");
+		 
 		if(newModules.entrySet().size() == 1) {
-			descriptionBuilder.append(" package ");
+			descriptionBuilder.append(" a new package ");
 		} else {
-			descriptionBuilder.append(" packages ");
+			descriptionBuilder.append(" new packages ");
 		}
 		int i = 1;
 		for(Entry<String, ChangedFile> entry : newModules.entrySet()) {
@@ -93,14 +93,6 @@ public class CommitGeneralDescriptor {
 			}
 			i++;
 		}
-		
-		if(i > 1) {
-			if(newModules.entrySet().size() == 1) {
-				descriptionBuilder.append(" was added. ");
-			} else {
-				descriptionBuilder.append(" were added. ");
-			}
-		}
 	}
 	
 	/**
@@ -109,15 +101,11 @@ public class CommitGeneralDescriptor {
 	 * @param descriptionBuilder
 	 */
 	public void describeProperties(StringBuilder descriptionBuilder) {
-		StringBuilder propsBuilder = new StringBuilder();
-		descriptionBuilder.append(" Internationalization, properties or configuration files ");
-		
-		if(newProperties.size() > 1) {
-			descriptionBuilder.append(" were ");
-		} else {
-			descriptionBuilder.append(" was ");
+		if(newProperties == null && newProperties.size() == 0) {
+			return;
 		}
-
+		StringBuilder propsBuilder = new StringBuilder();
+		
 		int i = 0;
 		for(ChangedFile file : newProperties) {
 			if(!propsBuilder.toString().contains(file.getChangeTypeToShow().toLowerCase())) {
@@ -128,8 +116,10 @@ public class CommitGeneralDescriptor {
 				i++;
 			}
 		}
+		descriptionBuilder.append(propsBuilder.toString());
+		descriptionBuilder.append(" internationalization, properties or configuration files");
+		descriptionBuilder.append(". ");
 		
-		descriptionBuilder.append(propsBuilder.toString() + ". ");
 	}
 	
 	/**
@@ -173,7 +163,7 @@ public class CommitGeneralDescriptor {
 	 * @param descriptionBuilder
 	 */
 	public void describeRenamed(StringBuilder descriptionBuilder) {
-		descriptionBuilder.append(" Some files renamed.");
+		descriptionBuilder.append(" Rename some files.");
 	}
 	
 	public void extractNewFeatures() {
