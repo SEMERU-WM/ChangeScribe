@@ -39,10 +39,20 @@ public class ChangedFile implements Comparable {
 		return changeType;
 	}
 	
-	public String getChangeTypeToShow() {
+	public String getChangeTypeToShow(boolean thirdPerson) {
 		String type = getChangeType();
-		if(changeType.equals(TypeChange.UNTRACKED_FOLDERS.toString()) || changeType.equals(TypeChange.UNTRACKED.toString())) {
+		if(!thirdPerson && changeType.equals(TypeChange.UNTRACKED_FOLDERS.toString()) || !thirdPerson && changeType.equals(TypeChange.UNTRACKED.toString())) {
 			type = "ADD";
+		} else if(thirdPerson && changeType.equals(TypeChange.UNTRACKED_FOLDERS.toString()) || changeType.equals(TypeChange.UNTRACKED.toString())) { 
+			type = "ADDS";
+		} else if(!thirdPerson && changeType.equals(TypeChange.MODIFIED.toString())) {
+			type = "MODIFY";
+		} else if(thirdPerson && changeType.equals(TypeChange.MODIFIED.toString())) {
+			type = "MODIFIES";
+		} else if(!thirdPerson && changeType.equals(TypeChange.REMOVED.toString())) {
+			type = "REMOVE";
+		} else if(thirdPerson && changeType.equals(TypeChange.REMOVED.toString())) {
+			type = "REMOVES";
 		}
 		return type;
 	}

@@ -33,10 +33,11 @@ public class CommitGeneralDescriptor {
 		extractNewFeatures();
 		extractRenames();
 		
-		StringBuilder descriptionBuilder = new StringBuilder();
+		StringBuilder descriptionBuilder = new StringBuilder(" This commit ");
 		
 		if(!isInitialCommit && newModules != null && newModules.size() > 0) {
 			describeNewModules(descriptionBuilder);
+			descriptionBuilder.append(", and ");
 		}
 		if(newProperties != null && newProperties.size() > 0) {
 			describeProperties(descriptionBuilder);
@@ -76,12 +77,12 @@ public class CommitGeneralDescriptor {
 	 * @param descriptionBuilder
 	 */
 	public void describeNewModules(StringBuilder descriptionBuilder) {
-		descriptionBuilder.append("Add ");
+		descriptionBuilder.append("adds ");
 		 
 		if(newModules.entrySet().size() == 1) {
-			descriptionBuilder.append(" a new package ");
+			descriptionBuilder.append("new package ");
 		} else {
-			descriptionBuilder.append(" new packages ");
+			descriptionBuilder.append("new packages ");
 		}
 		int i = 1;
 		for(Entry<String, ChangedFile> entry : newModules.entrySet()) {
@@ -108,15 +109,15 @@ public class CommitGeneralDescriptor {
 		
 		int i = 0;
 		for(ChangedFile file : newProperties) {
-			if(!propsBuilder.toString().contains(file.getChangeTypeToShow().toLowerCase())) {
+			if(!propsBuilder.toString().contains(file.getChangeTypeToShow(true).toLowerCase())) {
 				if(i > 0) {
 					propsBuilder.append(", ");
 				}
-				propsBuilder.append(file.getChangeTypeToShow().toLowerCase());
+				propsBuilder.append(file.getChangeTypeToShow(true).toLowerCase());
 				i++;
 			}
 		}
-		descriptionBuilder.append(propsBuilder.toString());
+		descriptionBuilder.append(" " + propsBuilder.toString());
 		descriptionBuilder.append(" internationalization, properties or configuration files");
 		descriptionBuilder.append(". ");
 		
@@ -201,6 +202,4 @@ public class CommitGeneralDescriptor {
 	public void setInitialCommit(boolean isInitialCommit) {
 		this.isInitialCommit = isInitialCommit;
 	}
-
-
 }

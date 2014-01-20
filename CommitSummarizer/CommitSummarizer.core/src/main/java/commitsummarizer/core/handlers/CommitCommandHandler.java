@@ -25,6 +25,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import co.edu.unal.colswe.CommitSummarizer.core.FilesChangedListDialog;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
+import co.edu.unal.colswe.CommitSummarizer.core.git.GitException;
 import co.edu.unal.colswe.CommitSummarizer.core.git.SCMRepository;
 
 /**
@@ -105,21 +106,30 @@ public class CommitCommandHandler extends AbstractHandler {
 		monitor.beginTask("Getting status for git repository ", 1);
 		
 		git = repo.getGit();
-		Status status = null;
-		try {
-			status = repo.getStatus();
-		} catch (NoWorkTreeException e) {
-			e.printStackTrace();
-		} catch (GitAPIException e) {
-			e.printStackTrace();
-		} 
 		
 		if(git != null) {
+			Status status = null;
+			try {
+				status = repo.getStatus();
+			} catch (NoWorkTreeException e) {
+				e.printStackTrace();
+			} catch (GitAPIException e) {
+				e.printStackTrace();
+			} catch (final GitException e) {
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run() {
+						MessageDialog.openInformation(window.getShell(), "Info", e.getMessage());
+					}});
+			}
+			
 			monitor.beginTask("Extracting source code differences ", 2);
 			this.differences = SCMRepository.getDifferences(status,git.getRepository().getWorkTree().getAbsolutePath());
 			
 		} else {
-			MessageDialog.openInformation(window.getShell(), "Info", "Git repository not found!");
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run() {
+					MessageDialog.openInformation(window.getShell(), "Info", "Git repository not found!");
+			}});
 		}
 		return org.eclipse.core.runtime.Status.OK_STATUS;
 	}

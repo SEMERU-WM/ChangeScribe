@@ -44,6 +44,9 @@ public class SCMRepository {
 	}
 	
 	public Status getStatus() throws NoWorkTreeException, GitAPIException {
+		if(git == null) {
+			throw new GitException("No share this project with Git");
+		}
 		return git.status().call();
 	}
 	

@@ -218,7 +218,7 @@ public class SummarizeChanges {
 							continue;
 						}
 						if(i == 1) {
-							desc.append(" This change set is composed of this changes:  \n\n");
+							desc.append(" This change set is mainly composed of:  \n\n");
 						}
 						if(currentPackage.trim().equals("")) {
 							currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
@@ -256,7 +256,8 @@ public class SummarizeChanges {
 		if(modules != null && modules.size() == 0) {
 			return;
 		}
-		desc.append(" New modules to: \n\n");
+		String connector = (modules.size() == 1)?" this new module ":" these new modules ";
+		desc.append(" The commit includes " + connector + " to: \n\n");
 		for (Module module : modules) {
 			desc.append("\t- " + module.getModuleName() + "\n");
 		}
