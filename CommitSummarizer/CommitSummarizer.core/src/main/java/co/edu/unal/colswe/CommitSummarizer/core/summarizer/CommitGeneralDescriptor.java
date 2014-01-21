@@ -28,23 +28,30 @@ public class CommitGeneralDescriptor {
 	}
 	
 	public String describe() {
-		extractNewModules();
-		extractInternationalization();
-		extractNewFeatures();
-		extractRenames();
+		StringBuilder descriptionBuilder = new StringBuilder("");
+		if(differences != null) {
+			extractNewModules();
+			extractInternationalization();
+			extractNewFeatures();
+			extractRenames();
+			
+			descriptionBuilder = new StringBuilder(" This commit ");
+			
+			if(!isInitialCommit && newModules != null && newModules.size() > 0) {
+				describeNewModules(descriptionBuilder);
+				descriptionBuilder.append(", and ");
+			}
+			if(newProperties != null && newProperties.size() > 0) {
+				describeProperties(descriptionBuilder);
+			}
+			if(renames != null && renames.size() > 0) {
+				describeRenamed(descriptionBuilder);
+			}
+		} else  {
+			return "";
+		}
 		
-		StringBuilder descriptionBuilder = new StringBuilder(" This commit ");
 		
-		if(!isInitialCommit && newModules != null && newModules.size() > 0) {
-			describeNewModules(descriptionBuilder);
-			descriptionBuilder.append(", and ");
-		}
-		if(newProperties != null && newProperties.size() > 0) {
-			describeProperties(descriptionBuilder);
-		}
-		if(renames != null && renames.size() > 0) {
-			describeRenamed(descriptionBuilder);
-		}
 		return descriptionBuilder.toString();
 	}
 	
@@ -62,7 +69,7 @@ public class CommitGeneralDescriptor {
 		newModules = new TreeMap<String, ChangedFile>();		
 		for (String string : repositoryStatus.getUntrackedFolders()) {
 			for(ChangedFile file : differences) {
-				if(file.getPath().substring(0, file.getPath().lastIndexOf("/")).equals(string) && !newModules.containsKey(string)) {
+				if(file.getPath().lastIndexOf("/") != -1 && file.getPath().substring(0, file.getPath().lastIndexOf("/")).equals(string) && !newModules.containsKey(string)) {
 					ChangedFile changedFile = new ChangedFile(string, TypeChange.UNTRACKED_FOLDERS.name(), git.getRepository().getWorkTree().getAbsolutePath());
 					newModules.put(string, changedFile);
 					break;

@@ -63,7 +63,9 @@ public class CommitCommandHandler extends AbstractHandler {
         final Job job = new Job("JSummarizer - Summarizing types") {
             protected IStatus run(final IProgressMonitor monitor) {
             	IStatus status = gettingRepositoryStatus(monitor);
-            	createDialog(getJavaProject(selection.getFirstElement()));
+            	if(status.equals(org.eclipse.core.runtime.Status.OK_STATUS)) {
+            		createDialog(getJavaProject(selection.getFirstElement()));
+            	}
             	return status;
             }
         };
@@ -118,7 +120,7 @@ public class CommitCommandHandler extends AbstractHandler {
 			} catch (final GitException e) {
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
-						MessageDialog.openInformation(window.getShell(), "Info", e.getMessage());
+						MessageDialog.openInformation(window.getShell(), "Information", e.getMessage());
 					}});
 			}
 			
@@ -128,8 +130,9 @@ public class CommitCommandHandler extends AbstractHandler {
 		} else {
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
-					MessageDialog.openInformation(window.getShell(), "Info", "Git repository not found!");
+					MessageDialog.openInformation(window.getShell(), "Information", "Git repository not found!");
 			}});
+			return org.eclipse.core.runtime.Status.CANCEL_STATUS;
 		}
 		return org.eclipse.core.runtime.Status.OK_STATUS;
 	}

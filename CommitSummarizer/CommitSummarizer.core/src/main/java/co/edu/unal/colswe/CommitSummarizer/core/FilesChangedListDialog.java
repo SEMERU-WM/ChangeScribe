@@ -561,7 +561,9 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		ColumnViewerToolTipSupport.enableFor(filesViewer);
 		filesViewer.setContentProvider(new CommitFileContentProvider());
 		filesViewer.setUseHashlookup(true);
-		filesViewer.setInput(items.toArray());
+		if(items != null) {
+			filesViewer.setInput(items.toArray());
+		}
 		
 		filesViewer.addCheckStateListener(new ICheckStateListener() {
 
