@@ -18,6 +18,8 @@ public class Activator extends AbstractUIPlugin {
 	private static Activator plugin;
 	
 	boolean started;
+	
+	private FilesChangedListDialog filesChangedListDialog;
 	/**
 	 * The constructor
 	 */
@@ -63,5 +65,13 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+
+	public FilesChangedListDialog getFilesChangedListDialog() {
+		return filesChangedListDialog;
+	}
+
+	public void setFilesChangedListDialog(FilesChangedListDialog filesChangedListDialog) {
+		this.filesChangedListDialog = filesChangedListDialog;
 	}
 }

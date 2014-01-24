@@ -69,9 +69,9 @@ public class GeneralDescriptor {
 	private static String describeOperation(String operation) {
 		String description = "";
 		if(operation.equals(TypeChange.ADDED.toString()) || operation.equals(TypeChange.UNTRACKED.toString())) {
-			description = "add";
+			description = "Add";
 		} else if(operation.equals(TypeChange.REMOVED.toString())) {
-			description = "remove";
+			description = "Remove";
 		}
 		return description;
 	}

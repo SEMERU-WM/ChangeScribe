@@ -23,7 +23,7 @@ public class SummarizeType {
 		builder.append(GeneralDescriptor.describe(element, identifier.getParser().getCompilationUnit(), identifier.getScmOperation()));
 		
 		if(getElement().getStereoSubElements() != null && getElement().getStereoSubElements().size() > 0) {
-			builder.append(". It allows: \n");
+			builder.append(". It allows: \n\n");
 		}
 		
 		builder.append(StereotypeMethodDescriptor.describe(getElement().getStereoSubElements()));

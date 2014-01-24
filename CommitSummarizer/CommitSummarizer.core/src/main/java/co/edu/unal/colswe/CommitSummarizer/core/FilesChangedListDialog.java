@@ -21,6 +21,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -62,6 +64,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -88,7 +91,6 @@ import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import co.edu.unal.colswe.CommitSummarizer.core.listener.SummarizeChangeListener;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.MethodStereotype;
 import co.edu.unal.colswe.CommitSummarizer.core.util.UIPreferences;
-
 import commitsummarizer.core.preferences.PreferenceConstants;
 
 public class FilesChangedListDialog extends TitleAreaDialog {
@@ -112,6 +114,8 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 	private String committer = null;
 	private String author = null;
 	private static final String DIALOG_SETTINGS_SECTION_NAME = Activator.getDefault() + ".COMMIT_DIALOG_SECTION"; //$NON-NLS-1$
+	private SashForm sashForm;
+	private Composite messageAndPersonArea;
 	//private static final String SHOW_UNTRACKED_PREF = "CommitDialog.showUntracked"; //$NON-NLS-1$
 
 	public FilesChangedListDialog(Shell shell, Set<ChangedFile> differences, Git git, IJavaProject selection) {
@@ -125,6 +129,54 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		this.setHelpAvailable(false);
 		setAuthor("anonymous");
 		setCommitter("anonymous");
+		
+		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(new IPropertyChangeListener() {
+		    @Override
+		    public void propertyChange(PropertyChangeEvent event) {
+		      if (event.getProperty().equals(PreferenceConstants.P_COMMIT_SIGNATURE_ACTIVE)) {
+		        if(getShell() != null) {
+		        	getShell().redraw();
+		        	getShell().layout();
+		        	 refreshView();
+		        }
+		      }
+		    }
+		  }); 
+	}
+	
+	public void refreshView() {
+		//boolean visible = Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.P_COMMIT_SIGNATURE_ACTIVE);
+		
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				MessageDialog.openInformation(getShell(), "Information", "You must close the window for the changes to take effect");
+			}});
+		/*if(signatureCanvas != null) {
+			
+			signatureCanvas.setSignatureMap(signatureMap);
+			
+			signatureCanvas.getCanvas().setVisible(visible);
+			Point size = this.getContents().getSize();
+			if(visible) {
+				signatureCanvas.getCanvas().setLayoutData(GridDataFactory.fillDefaults()
+						.grab(true, true).hint(size).minSize(size.x, 90)
+						.align(SWT.FILL, SWT.FILL).create());
+			} else {
+				signatureCanvas.getCanvas().setLayoutData(GridDataFactory.fillDefaults()
+						.grab(true, true).hint(size).minSize(size.x, 0)
+						.align(SWT.FILL, SWT.FILL).create());
+			}
+			
+			getShell().redraw();
+			getShell().update();
+			signatureCanvas.redraw();
+			messageAndPersonArea.redraw();
+			messageAndPersonArea.update();
+			messageAndPersonArea.layout();
+			sashForm.redraw();
+			
+			
+		}*/
 	}
 	
 	static class CommitFileContentProvider extends BaseWorkbenchContentProvider {
@@ -229,7 +281,6 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 
 		@Override
 		public void dispose() {
-			//SUBMODULE.dispose();
 			resourceManager.dispose();
 			super.dispose();
 		}
@@ -402,7 +453,7 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		toolkit.paintBordersFor(container);
 		GridLayoutFactory.swtDefaults().applyTo(container);
 
-		final SashForm sashForm = new SashForm(container, SWT.VERTICAL | SWT.FILL);
+		sashForm = new SashForm(container, SWT.VERTICAL | SWT.FILL);
 		toolkit.adapt(sashForm, true, true);
 		sashForm.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 		createMessageAndPersonArea(sashForm);
@@ -427,7 +478,7 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 	
 	private Composite createMessageAndPersonArea(Composite container) {
 
-		Composite messageAndPersonArea = toolkit.createComposite(container);
+		messageAndPersonArea = toolkit.createComposite(container);
 		GridDataFactory.fillDefaults().grab(true, true)
 				.applyTo(messageAndPersonArea);
 		GridLayoutFactory.swtDefaults().margins(0, 0).spacing(0, 0)
@@ -454,10 +505,10 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		viewer.setShell(getShell());
 		viewer.setComposite(messageAndPersonArea);
 		viewer.createStyledText();
-		int minHeight = 134;
+		int minHeight = 114;
 		Point size = container.getSize();
 		viewer.getText().setLayoutData(GridDataFactory.fillDefaults()
-				.grab(true, true).hint(size).minSize(size.x, minHeight)
+				.grab(true, true).hint(size).minSize(size.x - 30, minHeight)
 				.align(SWT.FILL, SWT.FILL).create());
 		setEditor(viewer);
 		messageSection.setClient(messageArea);
@@ -486,14 +537,26 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 
 		/////////////////////
 		
+		boolean visible = Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.P_COMMIT_SIGNATURE_ACTIVE);
+		
 		signatureCanvas = new SignatureCanvas(signatureMap, messageAndPersonArea, getShell());
 		signatureCanvas.createContents();
-		signatureCanvas.getCanvas().setLayoutData(GridDataFactory.fillDefaults()
-				.grab(true, true).hint(size).minSize(size.x, 90)
-				.align(SWT.FILL, SWT.FILL).create());
+		if(visible) {
+			signatureCanvas.getCanvas().setLayoutData(GridDataFactory.fillDefaults()
+					.grab(true, true).hint(size).minSize(size.x, 90)
+					.align(SWT.FILL, SWT.FILL).create());
+		} else {
+			signatureCanvas.getCanvas().setLayoutData(GridDataFactory.fillDefaults()
+					.grab(true, true).hint(size).minSize(size.x, 0)
+					.align(SWT.FILL, SWT.FILL).create());
+		}
+		//signatureCanvas.setWidth(getShell().getSize().x - 90);	
+		signatureCanvas.getCanvas().setVisible(visible);
 		
 		return messageAndPersonArea;
 	}
+	
+	
 	
 	public void updateSignatureCanvas() {
 		if(signatureMap != null) {
@@ -544,7 +607,7 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		FilteredCheckboxTree resourcesTreeComposite = new FilteredCheckboxTree(filesArea, toolkit, SWT.FULL_SELECTION, patternFilter);
 		Tree resourcesTree = resourcesTreeComposite.getViewer().getTree();
 		resourcesTree.setData(FormToolkit.KEY_DRAW_BORDER,FormToolkit.TREE_BORDER);
-		resourcesTreeComposite.setLayoutData(GridDataFactory.fillDefaults().hint(600, 200).grab(true, true).create());
+		resourcesTreeComposite.setLayoutData(GridDataFactory.fillDefaults().hint(600, 230).grab(true, true).create());
 
 		resourcesTree.setHeaderVisible(true);
 		TreeColumn statCol = new TreeColumn(resourcesTree, SWT.LEFT);
@@ -571,17 +634,6 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 				updateFileSectionText();
 			}
 		});
-		
-		/*IDialogSettings settings = Activator.getDefault().getDialogSettings();
-		if (settings.get("") != null) {
-			// note, no matter how the dialog settings are, if
-			// the preferences force us to include untracked files
-			// we must show them
-			showUntracked = Boolean.valueOf(settings.get(SHOW_UNTRACKED_PREF))
-					.booleanValue()
-					|| getPreferenceStore().getBoolean(
-							UIPreferences.COMMIT_DIALOG_INCLUDE_UNTRACKED);
-		}*/
 		
 		ToolItem help = createHelpButton(filesToolbar);
 		help.addSelectionListener(new SelectionAdapter() {

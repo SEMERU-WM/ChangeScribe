@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import co.edu.unal.colswe.CommitSummarizer.core.Activator;
 import co.edu.unal.colswe.CommitSummarizer.core.FilesChangedListDialog;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import co.edu.unal.colswe.CommitSummarizer.core.git.GitException;
@@ -79,6 +80,7 @@ public class CommitCommandHandler extends AbstractHandler {
 				FilesChangedListDialog listDialog = new FilesChangedListDialog(window.getShell(), differences, git, selection);
 				listDialog.create();
 				listDialog.open();
+				Activator.getDefault().setFilesChangedListDialog(listDialog);
 			}
 		});
 	}

@@ -347,14 +347,14 @@ public class SummarizeChanges {
 		List<StereotypedMethod> methods = new ArrayList<StereotypedMethod>();
 		String result = "";
 		
-		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		boolean filtering = store.getBoolean(PreferenceConstants.P_FILTER_COMMIT_MESSAGE);
-		double factor = store.getDouble(PreferenceConstants.P_FILTER_FACTOR);
+		//IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		//boolean filtering = store.getBoolean(PreferenceConstants.P_FILTER_COMMIT_MESSAGE);
+		//double factor = store.getDouble(PreferenceConstants.P_FILTER_FACTOR);
 		
 		for(StereotypeIdentifier identifier : identifiers) {
-			if(filtering && identifier != null && identifier.getImpactPercentaje() <= (factor/* * 100*/) ) {
+			/*if(filtering && identifier != null && identifier.getImpactPercentaje() <= (factor) ) {
 				continue;
-			}
+			}*/
 			for(StereotypedElement element : identifier.getStereotypedElements()) {
 				if(!identifier.getScmOperation().equals(TypeChange.MODIFIED.name())) {
 					methods.addAll((Collection<? extends StereotypedMethod>) element.getStereoSubElements());

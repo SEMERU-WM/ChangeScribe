@@ -87,7 +87,7 @@ public class ProjectInformation {
 		IWorkbench iworkbench = PlatformUI.getWorkbench();
 		IWorkbenchWindow iworkbenchwindow = null;
 		IWorkbenchPage iworkbenchpage = null;
-		if (iworkbench != null) {
+		if (iworkbench != null && iworkbench.getWorkbenchWindows().length > 0) {
 			iworkbenchwindow = iworkbench.getWorkbenchWindows()[0];
 		} 
 		if (iworkbenchwindow != null) {

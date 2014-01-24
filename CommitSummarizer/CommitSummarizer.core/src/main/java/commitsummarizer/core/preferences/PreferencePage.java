@@ -44,6 +44,12 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 	 * restore itself.
 	 */
 	public void createFieldEditors() {
+		BooleanFieldEditor commitSignatureActive = new BooleanFieldEditor(
+				PreferenceConstants.P_COMMIT_SIGNATURE_ACTIVE,
+				"&View commit signature",
+				getFieldEditorParent());
+		addField(commitSignatureActive);
+		
 		BooleanFieldEditor filterCk = new BooleanFieldEditor(
 				PreferenceConstants.P_FILTER_COMMIT_MESSAGE,
 				"&Filter commit message",

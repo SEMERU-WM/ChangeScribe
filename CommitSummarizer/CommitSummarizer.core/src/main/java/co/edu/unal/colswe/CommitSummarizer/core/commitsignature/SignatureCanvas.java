@@ -24,7 +24,7 @@ public class SignatureCanvas {
 
 	private TreeMap<MethodStereotype, Integer> signatureMap = new TreeMap<MethodStereotype, Integer>();
 	private int width = 565;
-	private int height = 40;
+	private int height = 30;
 	private Composite composite;
 	private Canvas canvas;
 	private Shell shell;
@@ -45,10 +45,6 @@ public class SignatureCanvas {
 			canvas.getParent().layout(true, true);
 			canvas.redraw();
 			canvas.update();
-
-			composite.getParent().layout(true, true);
-			composite.redraw();
-			composite.update();
 		}
 	}
 	
@@ -66,14 +62,14 @@ public class SignatureCanvas {
 		canvas.addListener(SWT.Paint, new Listener() {
 			public void handleEvent(Event e) {
 				e.gc.setBackground(e.display.getSystemColor(SWT.COLOR_GRAY));
-				e.gc.fillRectangle(0, 10, composite.getClientArea().width + 10,60);
+				e.gc.fillRectangle(0, 5, composite.getClientArea().width + 10,50);
 
 				createPercentageRule(e);
 				// accessor and muttator different nuances of green and blue 
 				// tan factory
 				// Collaborational rose and turquoise
 				// degenerate gray
-				int accum = 20;
+				int accum = (int) ((int)(getShell().getSize().x - width) / 2.0);
 				if (signatureMap != null) {
 					rectangles = new LinkedList<Rectangle>();
 					setTotal();
@@ -184,17 +180,19 @@ public class SignatureCanvas {
 	}
 	
 	public void createPercentageRule(Event e) {
-		int accumulate = 20;
+		//int accumulate = 20;
+		int accumulate = (int) ((int)(getShell().getSize().x - width) / 2.0);
+		int initial = accumulate;
 		int i = 0;
-		while (accumulate <= width + 20) {
+		while (accumulate <= width + initial) {
 			
 			e.gc.setBackground(e.display.getSystemColor(SWT.COLOR_GRAY));
-			e.gc.drawLine(accumulate, 10, accumulate, 70);
+			e.gc.drawLine(accumulate, 5, accumulate, 55);
 			
-			if(accumulate == 20) {
-				e.gc.drawString("" + i + "%", accumulate, 75, true);
+			if(accumulate == initial) {
+				e.gc.drawString("" + i + "%", accumulate, 58, true);
 			} else {
-				e.gc.drawString("" + i + "%", accumulate - 10, 75, true);
+				e.gc.drawString("" + i + "%", accumulate - 10, 58, true);
 			}
 			accumulate = accumulate + width / 10;
 			i = i + 10;
@@ -205,18 +203,22 @@ public class SignatureCanvas {
 		e.gc.setBackground(color);
 		int widthValue = (int)Math.round((percentaje * getWidth())/100);
 		if(accum + widthValue > getWidth() + 20) {
-			widthValue = getWidth() + 15 - accum;
+			//widthValue = getWidth() + 15 - accum;
+			int ruleLenght = ((getShell().getSize().x - width)/ 2) + width ;
+			widthValue = ruleLenght - accum - 5;
 		} else {
-			int diff = (getWidth() + 15) - (accum + widthValue);
-			widthValue = widthValue + diff;
+			/*int diff = (getWidth() + 15) - (accum + widthValue);
+			widthValue = widthValue + diff;*/
+			widthValue = (int) ((width * percentaje) / 100);			
 		}
+
 		
 		Rectangle rect = new Rectangle(accum, 20, widthValue ,getHeight());
 		rectangles.add(rect);
 		
-		e.gc.fillRectangle(accum, 20, widthValue ,getHeight());
+		e.gc.fillRectangle(accum, 15, widthValue ,getHeight());
 		e.gc.textExtent(signature.getKey().name());
-		e.gc.drawText(signature.getValue() + "", (accum + (int)Math.round((percentaje * getWidth())/100)/2), 30);
+		e.gc.drawText(signature.getValue() + "", (accum + (int)Math.round((percentaje * getWidth())/100)/2), 20);
 	}
 
 	public Composite getComposite() {

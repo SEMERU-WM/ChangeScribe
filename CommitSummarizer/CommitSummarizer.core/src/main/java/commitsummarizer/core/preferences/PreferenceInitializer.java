@@ -19,6 +19,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		store.setDefault(PreferenceConstants.P_FILTER_COMMIT_MESSAGE, true);
 		store.setDefault(PreferenceConstants.P_FILTER_FACTOR, 10);
+		store.setDefault(PreferenceConstants.P_COMMIT_SIGNATURE_ACTIVE, true);
 	}
 
 }
