@@ -5,7 +5,7 @@
       version="0.0.1.qualifier">
 
    <description url="http://blobsolutions.com/commitsummarizer/">
-      Commit Summarizer is an Eclipse plug-in to generate commit messages for Java applications and Git SCM. 
+      JComment is an Eclipse plug-in to generate commit messages for Java applications and Git SCM. 
    </description>
 
    <license url="http://www.eclipse.org/legal/epl-v10.html">

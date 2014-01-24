@@ -10,7 +10,7 @@
       <command
             categoryId="CommitSummarizer.core.commands.category"
             id="CommitSummarizer.core.commands.commitCommand"
-            name="Commit Command">
+            name="Commit">
       </command>
    </extension>
    <extension
@@ -29,12 +29,10 @@
             locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
          <menu
                id="CommitSummarizer.core.menus.commitMenu"
-               label="Commit Summarizer"
-               mnemonic="M">
+               label="JComment">
             <command
                   commandId="CommitSummarizer.core.commands.commitCommand"
-                  id="CommitSummarizer.core.menus.commitCommand"
-                  mnemonic="S">
+                  id="CommitSummarizer.core.menus.commitCommand">
             </command>
          </menu>
       </menuContribution>
@@ -45,7 +43,7 @@
       <page
             class="commitsummarizer.core.preferences.PreferencePage"
             id="commitsummarizer.core.preferences.PreferencePage"
-            name="Commit Summarizer Preferences">
+            name="JComment Preferences">
       </page>
    </extension>
    <extension
