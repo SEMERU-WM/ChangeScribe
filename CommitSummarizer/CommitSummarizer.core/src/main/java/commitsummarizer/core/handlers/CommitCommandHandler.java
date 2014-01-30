@@ -54,9 +54,16 @@ public class CommitCommandHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getActiveMenuSelection(event);
 		window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
-		repo = new SCMRepository();
-		initMonitorDialog(selection);
 		
+		try {
+			repo = new SCMRepository();
+			initMonitorDialog(selection);
+		} catch (final RuntimeException e) {
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run() {
+					MessageDialog.openInformation(window.getShell(), "Information", e.getMessage());
+				}});
+		}
 		return null;
 	}
 	

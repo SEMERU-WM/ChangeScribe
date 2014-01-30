@@ -49,10 +49,9 @@ public class InformationDialog extends TitleAreaDialog {
 	    	browser = new Browser(container, SWT.NONE);
 	    } catch(SWTError e) {
 	    	browser = new Browser(container, SWT.MOZILLA);
-	    	
 	    }
 	    if(browser != null) {
-	    	browser.setUrl(ProjectInformation.getAbsoluteURL("html/help/commitstereotypes.html"));
+	    	browser.setUrl(ProjectInformation.getAbsoluteURL("/html/help/commitstereotypes.html"));
 	    	toolkit.adapt(browser, true, true);
 	    	browser.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 	    }

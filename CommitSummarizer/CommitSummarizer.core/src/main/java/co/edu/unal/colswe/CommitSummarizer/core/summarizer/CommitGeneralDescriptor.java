@@ -35,7 +35,7 @@ public class CommitGeneralDescriptor {
 			extractNewFeatures();
 			extractRenames();
 			
-			descriptionBuilder = new StringBuilder(" This commit ");
+			descriptionBuilder = new StringBuilder("");
 			
 			if(!isInitialCommit && newModules != null && newModules.size() > 0) {
 				describeNewModules(descriptionBuilder);
@@ -46,6 +46,10 @@ public class CommitGeneralDescriptor {
 			}
 			if(renames != null && renames.size() > 0) {
 				describeRenamed(descriptionBuilder);
+			}
+			
+			if(descriptionBuilder.length() > 0) {
+				descriptionBuilder.insert(0, "This commit");
 			}
 		} else  {
 			return "";

@@ -256,8 +256,8 @@ public class SummarizeChanges {
 		if(modules != null && modules.size() == 0) {
 			return;
 		}
-		String connector = (modules.size() == 1)?" this new module ":" these new modules ";
-		desc.append(" The commit includes " + connector + " to: \n\n");
+		String connector = (modules.size() == 1)?" this new module":" these new modules";
+		desc.append("The commit includes" + connector + ": \n\n");
 		for (Module module : modules) {
 			desc.append("\t- " + module.getModuleName() + "\n");
 		}

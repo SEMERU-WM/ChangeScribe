@@ -19,19 +19,25 @@ public class SCMRepository {
 	private Git git;
 	private Repository repository;
 
-	public SCMRepository() {
+	public SCMRepository() throws RuntimeException {
 		super();
-		File file = new File(ProjectInformation.getSelectedProject().getProject().getLocationURI().getPath().toString());
-		try {
-			git = Git.open(file);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
+		
+		if(ProjectInformation.getSelectedProject() !=  null) {
+			File file = new File(ProjectInformation.getSelectedProject()
+					.getProject().getLocationURI().getPath().toString());
 			try {
-				git = Git.open(file.getParentFile());
+				git = Git.open(file);
 			} catch (IOException e) {
 				e.printStackTrace();
+			} finally {
+				try {
+					git = Git.open(file.getParentFile());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
+		} else {
+			throw new RuntimeException("You did not select a Java project");
 		}
 	}
 	

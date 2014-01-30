@@ -26,13 +26,42 @@
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
-            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
          <menu
                id="CommitSummarizer.core.menus.commitMenu"
                label="JComment">
             <command
                   commandId="CommitSummarizer.core.commands.commitCommand"
-                  id="CommitSummarizer.core.menus.commitCommand">
+                  id="CommitSummarizer.core.menus.commitCommand"
+                  style="push">
+                  <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <or>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.jdt.core.ICompilationUnit">
+                     </instanceof>
+                  </iterate>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.jdt.core.IPackageFragment">
+                     </instanceof>
+                  </iterate>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.jdt.core.IJavaProject">
+                     </instanceof>
+                  </iterate>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.jdt.core.IType">
+                     </instanceof>
+                  </iterate>
+               </or>
+               </with>
+            </visibleWhen>
             </command>
          </menu>
       </menuContribution>
