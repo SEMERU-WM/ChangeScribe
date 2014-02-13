@@ -295,6 +295,8 @@ public class ModificationDescriptor {
 		} else if(update.getChangeType() == ChangeType.COMMENT_UPDATE || update.getChangeType() == ChangeType.DOC_UPDATE) {
 			String entityType = update.getRootEntity().getJavaStructureNode().getType().name().toLowerCase();
 			desc.append(fType +" at " + update.getRootEntity().getJavaStructureNode().getName() + " " + entityType);
+		} else if(update.getChangeType() == ChangeType.PARAMETER_TYPE_CHANGE) {
+			desc.append("Type's " + update.getChangedEntity().getUniqueName().substring(0, update.getChangedEntity().getUniqueName().indexOf(":") - 1).trim() + " paramater change of " + update.getChangedEntity().getUniqueName().substring(update.getChangedEntity().getUniqueName().indexOf(":") + 1, update.getChangedEntity().getUniqueName().length()).trim()  + " to " + update.getNewEntity().getUniqueName().substring(update.getNewEntity().getUniqueName().indexOf(":") + 1, update.getNewEntity().getUniqueName().length()).trim() + " for " + update.getRootEntity().getJavaStructureNode().getName() + " " + update.getRootEntity().getType().name().toLowerCase());
 		}
 		
 	}

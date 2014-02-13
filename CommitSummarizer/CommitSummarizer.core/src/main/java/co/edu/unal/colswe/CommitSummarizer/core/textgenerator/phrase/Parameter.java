@@ -18,6 +18,7 @@ public class Parameter {
 		Parameter.primitives.add("String");
 		Parameter.primitives.add("boolean");
 		Parameter.primitives.add("Object");
+		Parameter.primitives.add("Long");
 	}
 
 	public Parameter(final String typeName, final String variableName) {
