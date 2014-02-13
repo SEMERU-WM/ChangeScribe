@@ -59,9 +59,20 @@ public class Impact {
 	        } else {
 	        	workspaceScope = SearchEngine.createWorkspaceScope();
 	        }
+	        
+	        String typeName = "";
+	        if(identifier.getCompilationUnit().findPrimaryType() != null) {
+	        	typeName = identifier.getCompilationUnit().findPrimaryType().getElementName();
+	        } else {
+	        	typeName = identifier.getCompilationUnit().getElementName();
+	        	if(typeName.endsWith(".java")) {
+	        		typeName = typeName.replace(".java", "");
+	        	}
+	        }
+	        
 	        SearchPattern pattern = SearchPattern
 	                .createPattern(
-	                		identifier.getCompilationUnit().findPrimaryType().getElementName(),
+	                		typeName,
 	                        IJavaSearchConstants.TYPE,
 	                        IJavaSearchConstants.ALL_OCCURRENCES,
 	                        SearchPattern.R_PATTERN_MATCH);
