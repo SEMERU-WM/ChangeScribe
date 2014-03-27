@@ -1,6 +1,9 @@
 package co.edu.unal.colswe.CommitSummarizer.core.git;
 
 import java.io.File;
+import java.util.List;
+
+import ch.uzh.ifi.seal.changedistiller.model.entities.StructureEntityVersion;
 
 @SuppressWarnings("rawtypes")
 public class ChangedFile implements Comparable {
@@ -11,6 +14,9 @@ public class ChangedFile implements Comparable {
 	private String absolutePath;
 	private String name;
 	private TypeChange typeChange;
+	private boolean isRenamed;
+	private String renamedPath;
+	private List<StructureEntityVersion> modifiedMethods;
 	
 	public ChangedFile() {
 		// TODO Auto-generated constructor stub
@@ -41,9 +47,9 @@ public class ChangedFile implements Comparable {
 	
 	public String getChangeTypeToShow(boolean thirdPerson) {
 		String type = getChangeType();
-		if(!thirdPerson && changeType.equals(TypeChange.UNTRACKED_FOLDERS.toString()) || !thirdPerson && changeType.equals(TypeChange.UNTRACKED.toString())) {
+		if(!thirdPerson && changeType.equals(TypeChange.UNTRACKED_FOLDERS.toString()) || !thirdPerson && changeType.equals(TypeChange.ADDED.toString()) || !thirdPerson && changeType.equals(TypeChange.UNTRACKED.toString())) {
 			type = "ADD";
-		} else if(thirdPerson && changeType.equals(TypeChange.UNTRACKED_FOLDERS.toString()) || changeType.equals(TypeChange.UNTRACKED.toString())) { 
+		} else if(thirdPerson && changeType.equals(TypeChange.UNTRACKED_FOLDERS.toString()) || thirdPerson && changeType.equals(TypeChange.ADDED.toString())  || changeType.equals(TypeChange.UNTRACKED.toString())) { 
 			type = "ADDS";
 		} else if(!thirdPerson && changeType.equals(TypeChange.MODIFIED.toString())) {
 			type = "MODIFY";
@@ -110,6 +116,30 @@ public class ChangedFile implements Comparable {
 
 	public void setTypeChange(TypeChange typeChange) {
 		this.typeChange = typeChange;
+	}
+
+	public boolean isRenamed() {
+		return isRenamed;
+	}
+
+	public void setRenamed(boolean isRenamed) {
+		this.isRenamed = isRenamed;
+	}
+
+	public String getRenamedPath() {
+		return renamedPath;
+	}
+
+	public void setRenamedPath(String renamedPath) {
+		this.renamedPath = renamedPath;
+	}
+
+	public List<StructureEntityVersion> getModifiedMethods() {
+		return modifiedMethods;
+	}
+
+	public void setModifiedMethods(List<StructureEntityVersion> modifiedMethods) {
+		this.modifiedMethods = modifiedMethods;
 	}
     
     

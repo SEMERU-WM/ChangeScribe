@@ -12,12 +12,24 @@
             id="CommitSummarizer.core.commands.commitCommand"
             name="Commit">
       </command>
+      <command
+            categoryId="CommitSummarizer.core.commands.category"
+            id="CommitSummarizer.core.commands.describeVersionsCommand"
+            name="Describe versions">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
             class="commitsummarizer.core.handlers.CommitCommandHandler"
             commandId="CommitSummarizer.core.commands.commitCommand">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="commitsummarizer.core.handlers.CompareVersionsHandler"
+            commandId="CommitSummarizer.core.commands.describeVersionsCommand">
       </handler>
    </extension>
    <extension
@@ -63,6 +75,39 @@
                </with>
             </visibleWhen>
             </command>
+            <command
+                  commandId="CommitSummarizer.core.commands.describeVersionsCommand"
+                  id="CommitSummarizer.core.menus.describeVersionsCommand"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="activeMenuSelection">
+                     <or>
+                        <iterate>
+                           <instanceof
+                                 value="org.eclipse.jdt.core.ICompilationUnit">
+                           </instanceof>
+                        </iterate>
+                        <iterate>
+                           <instanceof
+                                 value="org.eclipse.jdt.core.IPackageFragment">
+                           </instanceof>
+                        </iterate>
+                        <iterate>
+                           <instanceof
+                                 value="org.eclipse.jdt.core.IJavaProject">
+                           </instanceof>
+                        </iterate>
+                        <iterate>
+                           <instanceof
+                                 value="org.eclipse.jdt.core.IType">
+                           </instanceof>
+                        </iterate>
+                     </or>
+                  </with>
+               </visibleWhen>
+            </command>
          </menu>
       </menuContribution>
       
@@ -80,5 +125,5 @@
       <initializer
             class="commitsummarizer.core.preferences.PreferenceInitializer">
       </initializer>
-   </extension> 
+   </extension>
 </plugin>

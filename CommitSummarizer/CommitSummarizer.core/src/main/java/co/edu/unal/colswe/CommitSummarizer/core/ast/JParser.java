@@ -28,8 +28,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jface.text.Document;
 
-public class JParser
-{
+public class JParser {
     private CompilationUnit unit;
     private List<ASTNode> elements;
     private Document document;
@@ -46,12 +45,12 @@ public class JParser
         
         this.unit = (CompilationUnit)parser.createAST((IProgressMonitor)null);
         this.elements = new ArrayList<ASTNode>();
-        try {
-            this.document = new Document(unit.getSource());
-        }
-        catch (JavaModelException ex) {
+        //try {
+            //this.document = new Document(unit.getSource());
+        //}
+        /*catch (JavaModelException ex) {
             System.err.println("Ooops! An error occurred when printing the report.");
-        }
+        }*/
     }
     
     public JParser(final File file) throws CoreException {

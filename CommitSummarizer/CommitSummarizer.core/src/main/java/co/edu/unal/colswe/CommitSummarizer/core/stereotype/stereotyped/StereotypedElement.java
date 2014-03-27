@@ -26,6 +26,8 @@ public interface StereotypedElement {
 	String getName();
 
 	String getQualifiedName();
+	
+	String getFullyQualifiedName();
 
 	String getKey();
 }

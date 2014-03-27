@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.dom.ChildPropertyDescriptor;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
@@ -383,6 +384,20 @@ public class StereotypedType extends TypeStereotypeRules implements StereotypedE
     
     public String getQualifiedName() {
         return (this.type != null && this.type.resolveBinding() != null) ? this.type.resolveBinding().getQualifiedName() : "";
+    }
+    
+    public String getFullyQualifiedName() {
+    	StringBuilder fullyQualifiedClassName = new StringBuilder();
+    	if(this.type.getParent() instanceof CompilationUnit) {
+	    	fullyQualifiedClassName = new StringBuilder((((CompilationUnit) this.type.getParent())).getPackage().getName().getFullyQualifiedName());
+	    	fullyQualifiedClassName.append(".");
+	    	fullyQualifiedClassName.append(type.getName());
+    	} else {
+    		String name = (this.type != null && this.type.resolveBinding() != null) ? this.type.resolveBinding().getQualifiedName() : "";
+    		fullyQualifiedClassName.append(name);
+    	}
+    	
+        return fullyQualifiedClassName.toString();
     }
     
     public String getKey() {

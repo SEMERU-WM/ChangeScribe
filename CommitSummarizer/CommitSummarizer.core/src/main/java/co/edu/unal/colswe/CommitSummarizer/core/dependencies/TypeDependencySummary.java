@@ -63,7 +63,7 @@ public class TypeDependencySummary implements DependencySummary {
         SearchPattern pattern = SearchPattern.createPattern(
                 		getElement().getPrimaryElement().getElementName().replace(".java", ""),
                         IJavaSearchConstants.TYPE,
-                        IJavaSearchConstants.ALL_OCCURRENCES,
+                        IJavaSearchConstants.REFERENCES,
                         SearchPattern.R_EXACT_MATCH);
         SearchParticipant[] participant = new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() };
         try {
@@ -117,9 +117,9 @@ public class TypeDependencySummary implements DependencySummary {
 		if(getDependencies() != null && getDependencies().size() > 0) {
 			String lead = "";
 			if(operation.equals(TypeChange.REMOVED.toString())) {
-				lead = "Was referenced by:";
+				lead = "\nWas referenced by:";
 			} else {
-				lead = "Referenced by:";
+				lead = "\nReferenced by:";
 			}
 			builder = new StringBuilder(lead +"\n");
 		}
@@ -138,7 +138,7 @@ public class TypeDependencySummary implements DependencySummary {
 				builder.append("\t" + " Referenced in comments of " + type.getParent().getElementName() + " " + PhraseUtils.getStringType(type.getDeclaringType()) + "\n");
 			} else if(match.isImplicit()) {
 				builder.append("\t" + " Implicit reference in " + type.getParent().getElementName() + " " + PhraseUtils.getStringType(type.getDeclaringType()) + "\n");
-			} else {
+			} else if(!builder.toString().contains("\t" + type.getParent().getElementName() + " " + PhraseUtils.getStringType(type.getDeclaringType()) + "\n")){
 				builder.append("\t" + type.getParent().getElementName() + " " + PhraseUtils.getStringType(type.getDeclaringType()) + "\n");
 			}
 		}

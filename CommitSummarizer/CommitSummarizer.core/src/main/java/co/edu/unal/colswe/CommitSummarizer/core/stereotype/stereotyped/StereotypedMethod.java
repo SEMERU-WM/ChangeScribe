@@ -7,11 +7,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.dom.ChildPropertyDescriptor;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.analyzer.MethodAnalyzer;
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.information.TypeInfo;
@@ -322,6 +325,55 @@ public class StereotypedMethod extends MethodStereotypeRules implements
 			qName.append(")");
 		} else if (this.method != null) {
 			qName.append(this.method.getName().getFullyQualifiedName());
+		}
+		return qName.toString();
+	}
+	
+	public String getFullyQualifiedName() {
+		final StringBuilder qName = new StringBuilder();
+		if (this.method != null && this.method.resolveBinding() != null) {
+			final IMethodBinding bind = this.method.resolveBinding();
+			qName.append(bind.getDeclaringClass().getPackage().getName());
+			qName.append(".");
+			qName.append(bind.getDeclaringClass().getName());
+			qName.append(".");
+			qName.append(bind.getName());
+			qName.append("(");
+			int nParam = bind.getParameterTypes().length;
+			ITypeBinding[] parameterTypes;
+			for (int length = (parameterTypes = bind.getParameterTypes()).length, i = 0; i < length; ++i) {
+				final ITypeBinding param = parameterTypes[i];
+				qName.append(param.getName().toString());
+				if (nParam > 1) {
+					qName.append(",");
+					--nParam;
+				}
+			}
+			qName.append(")");
+		} else if (this.method != null) {
+			if(this.method.getParent() instanceof TypeDeclaration) { 
+				String fullyQualifiedClassName = ((CompilationUnit)((TypeDeclaration) this.method.getParent()).getParent()).getPackage().getName().getFullyQualifiedName();
+				qName.append(fullyQualifiedClassName);
+				qName.append(".");
+				qName.append(((TypeDeclaration) this.method.getParent()).getName());
+				qName.append(".");
+			}
+			
+			qName.append(this.method.getName().getFullyQualifiedName());
+			qName.append("(");
+			@SuppressWarnings("rawtypes")
+			List parameters = this.method.parameters();
+			int i = 0;
+			for (Object object : parameters) {
+				SingleVariableDeclaration param = (SingleVariableDeclaration) object;
+				qName.append(param.getType().toString());
+				if(i >= 0 && i < parameters.size() - 1) {
+					qName.append(",");
+				}
+				i++;
+			}
+			qName.append(")");
+			
 		}
 		return qName.toString();
 	}

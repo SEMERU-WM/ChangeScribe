@@ -18,6 +18,11 @@ import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
+import org.eclipse.jdt.internal.core.ResolvedSourceField;
+import org.eclipse.jdt.internal.core.ResolvedSourceMethod;
+import org.eclipse.jdt.internal.core.ResolvedSourceType;
+import org.eclipse.jdt.internal.core.SourceField;
+import org.eclipse.jdt.internal.core.SourceMethod;
 import org.eclipse.jdt.internal.core.SourceType;
 
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.stereotyped.StereotypeIdentifier;
@@ -46,9 +51,19 @@ public class Impact {
 			SearchRequestor findMethod = new SearchRequestor() {
 	            @Override
 	            public void acceptSearchMatch(SearchMatch match) throws CoreException {
+	            	IJavaElement type = null;
 	            	if(match.getElement() instanceof SourceType) {
                 		addMatched(identifier, match);
-	            	} 
+	            	} else if(match.getElement() instanceof ResolvedSourceType) {
+	            		type = ((ResolvedSourceType )match.getElement()).getParent();
+	            		addMatched(identifier, match);
+	            	} else if(match.getElement() instanceof ResolvedSourceField) {
+	            		type = ((ResolvedSourceField)match.getElement()).getParent();
+	            		addMatched(identifier, match);
+	            	} else if(match.getElement() instanceof ResolvedSourceMethod) {
+	            		type = ((ResolvedSourceMethod)match.getElement()).getParent();
+	            		addMatched(identifier, match);
+	            	}
 	            }
 	        };
 	        SearchEngine engine = new SearchEngine();
@@ -74,8 +89,8 @@ public class Impact {
 	                .createPattern(
 	                		typeName,
 	                        IJavaSearchConstants.TYPE,
-	                        IJavaSearchConstants.ALL_OCCURRENCES,
-	                        SearchPattern.R_PATTERN_MATCH);
+	                        IJavaSearchConstants.REFERENCES,
+	                        SearchPattern.R_EXACT_MATCH);
 	        SearchParticipant[] participant = new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() };
 	        try {
 				engine.search(pattern, participant, workspaceScope, findMethod, new NullProgressMonitor()); 
@@ -108,11 +123,29 @@ public class Impact {
 			double methods = 0d;
 			if(identifier.getRelatedTypes() != null) {
 				for(SearchMatch match : identifier.getRelatedTypes()) {
-					IType[] types;
+					IType[] types = null;
 					try {
-						types = ((SourceType) match.getElement()).getCompilationUnit().getAllTypes();
+						if(match.getElement() instanceof SourceType) {
+							types = ((SourceType) match.getElement()).getCompilationUnit().getAllTypes();
+						} else if(match.getElement() instanceof ResolvedSourceField) {
+							types = ((SourceField) match.getElement()).getCompilationUnit().getAllTypes();
+						} else if(match.getElement() instanceof ResolvedSourceMethod) {
+							types = ((SourceMethod) match.getElement()).getCompilationUnit().getAllTypes();
+						} else {
+							System.out.println("hola");
+						}
 						for (IType iType : types) {
-							methods += iType.getMethods().length;
+							IType type = null;
+							String typeName = "";
+							if(identifier.getCompilationUnit().getAllTypes() != null && identifier.getCompilationUnit().getAllTypes().length > 0) {
+								type = identifier.getCompilationUnit().getAllTypes()[0];
+								typeName = type.getFullyQualifiedName();
+							}
+							//if(!iType.getFullyQualifiedName().equals(typeName)) {
+								methods += iType.getMethods().length;
+							/*} else {
+								methods += iType.getMethods().length / 4;
+							}*/
 						}
 					} catch (JavaModelException e) {
 						// TODO Auto-generated catch block
@@ -155,13 +188,24 @@ public class Impact {
 	public void calculateSizeModifiedMethods() {
 		for (StereotypeIdentifier identifier : identifiers) {
 			try {
-				IType[] allTypes = identifier.getCompilationUnit().getAllTypes();
-				
-				for (IType iType : allTypes) {
-					IMethod[] methods = iType.getMethods();
-					if(methods != null) {
-						//se acumula la cantidad total de métodos afectados por el conjunto de cambios.
-						total += methods.length;
+				if (identifier.getCompilationUnit().exists()) {
+					IType[] allTypes = identifier.getCompilationUnit().getAllTypes();
+					for (IType iType : allTypes) {
+						//((SourceType)iType.getChildren()[3]).getMethods()
+						if(iType.isAnonymous()) {
+							System.out.println("INNER");
+						}
+						IMethod[] methods = iType.getMethods();
+						if (methods != null) {
+							//se acumula la cantidad total de métodos afectados por el conjunto de cambios.
+							total += methods.length;
+						}
+						IJavaElement[] children = iType.getChildren();
+						for (IJavaElement childrenElement : children) {
+							if(childrenElement instanceof SourceType) {
+								total += ((SourceType) childrenElement).getMethods().length;
+							}
+						}
 					}
 				}
 				
@@ -169,8 +213,8 @@ public class Impact {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
 		}
+		System.out.println("Total methods: " + total);
 	}
 
 	public long getImpactSet() {

@@ -13,7 +13,7 @@ import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.tokenizer.Tokenize
 
 public class GeneralDescriptor {
 	
-	public static String describe(StereotypedElement element, CompilationUnit cu, String operation) {
+	public static String describe(StereotypedElement element, CompilationUnit cu, String operation, boolean isLocal) {
 		StereotypedType type = (StereotypedType) element;
 		StringBuilder description = new StringBuilder();
 		ITypeBinding superclass = null; 
@@ -55,7 +55,11 @@ public class GeneralDescriptor {
             }
 		}
 		
-		description.insert(0, describeOperation(operation) + " ");
+		if(!isLocal) {
+			description.insert(0, describeOperation(operation) + " ");
+		} else {
+			description.insert(0, describeOperation(operation) + " a local ");
+		}
 		
 		description.append(" for ");
 		NounPhrase classNamePhrase = new NounPhrase(Tokenizer.split(type.getElement().getName().getFullyQualifiedName()));
@@ -89,7 +93,7 @@ public class GeneralDescriptor {
             template.append("interface extension");
         }
         else {
-            template.append("An interface declaration");
+            template.append("an interface declaration");
         }
         return template.toString();
     }

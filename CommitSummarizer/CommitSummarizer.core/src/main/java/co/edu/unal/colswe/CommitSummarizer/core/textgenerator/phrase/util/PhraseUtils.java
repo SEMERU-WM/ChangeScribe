@@ -44,6 +44,10 @@ public class PhraseUtils {
 		return Tag.isPastOrPastPartVerb(term.getTag());
 	}
 	
+	public static boolean isVerb(TaggedTerm term) {
+		return Tag.isVerb(term.getTag());
+	}
+	
 	public static boolean hasLeadingNoun(LinkedList<TaggedTerm> taggedTerms) {
         return Tag.isNoun(taggedTerms.getFirst().getTag());
     }

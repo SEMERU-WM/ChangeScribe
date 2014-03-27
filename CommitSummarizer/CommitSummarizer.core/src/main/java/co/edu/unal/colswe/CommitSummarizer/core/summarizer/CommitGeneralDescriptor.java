@@ -12,7 +12,6 @@ import org.eclipse.jgit.errors.NoWorkTreeException;
 
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile.TypeChange;
-import co.edu.unal.colswe.CommitSummarizer.core.util.Utils;
 
 public class CommitGeneralDescriptor {
 
@@ -49,7 +48,7 @@ public class CommitGeneralDescriptor {
 			}
 			
 			if(descriptionBuilder.length() > 0) {
-				descriptionBuilder.insert(0, "This commit");
+				descriptionBuilder.insert(0, "This commit ");
 			}
 		} else  {
 			return "";
@@ -75,7 +74,9 @@ public class CommitGeneralDescriptor {
 			for(ChangedFile file : differences) {
 				if(file.getPath().lastIndexOf("/") != -1 && file.getPath().substring(0, file.getPath().lastIndexOf("/")).equals(string) && !newModules.containsKey(string)) {
 					ChangedFile changedFile = new ChangedFile(string, TypeChange.UNTRACKED_FOLDERS.name(), git.getRepository().getWorkTree().getAbsolutePath());
-					newModules.put(string, changedFile);
+					if(!newModules.containsKey(string)) {
+						newModules.put(string, changedFile);
+					}
 					break;
 				}
 			}
@@ -116,7 +117,7 @@ public class CommitGeneralDescriptor {
 		if(newProperties == null && newProperties.size() == 0) {
 			return;
 		}
-		StringBuilder propsBuilder = new StringBuilder();
+		/*StringBuilder propsBuilder = new StringBuilder();
 		
 		int i = 0;
 		for(ChangedFile file : newProperties) {
@@ -128,7 +129,8 @@ public class CommitGeneralDescriptor {
 				i++;
 			}
 		}
-		descriptionBuilder.append(" " + propsBuilder.toString());
+		descriptionBuilder.append(" " + propsBuilder.toString());*/
+		descriptionBuilder.append(" includes changes to");
 		descriptionBuilder.append(" internationalization, properties or configuration files");
 		descriptionBuilder.append(". ");
 		
@@ -144,7 +146,8 @@ public class CommitGeneralDescriptor {
 		for(ChangedFile changedFile : differences) {
 			if(changedFile.getName().endsWith(".xml") || changedFile.getName().endsWith(".properties")
 					|| changedFile.getName().endsWith(".cfg")
-					|| changedFile.getName().startsWith(".")) {
+					|| changedFile.getName().startsWith(".")
+					|| changedFile.getName().endsWith(".txt")) {
 				newProperties.add(changedFile);
 			}
 		}
@@ -160,11 +163,13 @@ public class CommitGeneralDescriptor {
 		for(ChangedFile file : differences) {
 			if(file.getTypeChange() == TypeChange.MODIFIED) {
 				try {
-					Utils.compareModified(file, git);
+					//Utils.compareModified(file, git);
 				} catch(IllegalStateException ex) {
 					renames.add(file);
 					ex.printStackTrace();
 				}
+			} else if(file.isRenamed()) {
+				renames.add(file);
 			}
 		}
 	}
@@ -175,7 +180,7 @@ public class CommitGeneralDescriptor {
 	 * @param descriptionBuilder
 	 */
 	public void describeRenamed(StringBuilder descriptionBuilder) {
-		descriptionBuilder.append(" Rename some files.");
+		descriptionBuilder.append(" renames some files.");
 	}
 	
 	public void extractNewFeatures() {

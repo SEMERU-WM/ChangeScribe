@@ -39,7 +39,7 @@ import ch.uzh.ifi.seal.changedistiller.ChangeDistiller.Language;
 import ch.uzh.ifi.seal.changedistiller.distilling.FileDistiller;
 import ch.uzh.ifi.seal.changedistiller.model.entities.StructureEntityVersion;
 import co.edu.unal.colswe.CommitSummarizer.core.Activator;
-import co.edu.unal.colswe.CommitSummarizer.core.FilesChangedListDialog;
+import co.edu.unal.colswe.CommitSummarizer.core.DescribeVersionsDialog;
 import co.edu.unal.colswe.CommitSummarizer.core.Module;
 import co.edu.unal.colswe.CommitSummarizer.core.ast.ProjectInformation;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
@@ -53,9 +53,10 @@ import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.CommitStereo
 import co.edu.unal.colswe.CommitSummarizer.core.stereotype.taxonomy.MethodStereotype;
 import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.util.CompilationUtils;
 import co.edu.unal.colswe.CommitSummarizer.core.util.Utils;
+
 import commitsummarizer.core.preferences.PreferenceConstants;
 
-public class SummarizeChanges {
+public class SummarizeChangesTMP {
 	
 	private Git git;
 	private StereotypeIdentifier stereotypeIdentifier;
@@ -63,14 +64,16 @@ public class SummarizeChanges {
 	private List<StereotypeIdentifier> identifiers;
 	private StringBuilder comment = new StringBuilder();
 	private ChangedFile[] differences;
-	private FilesChangedListDialog changedListDialog;
+	private DescribeVersionsDialog changedListDialog;
 	private SortedMap<String, StereotypeIdentifier> summarized = new TreeMap<String, StereotypeIdentifier>();
 	private FileDistiller distiller; 
 	private LinkedList<ChangedFile> modifiedFiles;
 	private LinkedList<ChangedFile> otherFiles;
 	private List<StereotypeIdentifier> typesProblem;
+	private String older = "";
+	private String current = "";
 	
-	public SummarizeChanges(Git git) {
+	public SummarizeChangesTMP(Git git) {
 		super();
 		this.git = git;
 		this.stereotypeIdentifier = new StereotypeIdentifier();
@@ -98,6 +101,8 @@ public class SummarizeChanges {
 	public void summarize(final ChangedFile[] differences) {
 		initSummary(differences);
 		String currentPackage = "";
+		older = changedListDialog.getAuthorText().getText();
+		setCurrent(changedListDialog.getCommitterText().getText());
 		//rebuildVersion();
 		
 		//if (!Utils.isInitialCommit(git)) {
@@ -113,21 +118,14 @@ public class SummarizeChanges {
 									System.out.println("CHANGE TYPE: " + file.getChangeType());
 									if (file.getAbsolutePath().endsWith(".java")) {
 										if (file.getChangeType().equals(TypeChange.UNTRACKED.name()) || file.getChangeType().equals(TypeChange.ADDED.name())) {
-											if (file.getAbsolutePath().endsWith(".java")) {
-												monitor.subTask("Identifying stereotypes for " + file.getName());
-												identifier = identifyStereotypes(file,file.getChangeType());
-											}
-										} else if (file.getChangeType().equals(
-												TypeChange.REMOVED.name())) {
-											if (file.getAbsolutePath().endsWith(".java")) {
-												monitor.subTask("Identifying stereotypes for " + file.getName());
-												identifier = identifyStereotypes(file, file.getChangeType());
-											}
+											monitor.subTask("Identifying stereotypes for " + file.getName());
+											identifier = identifyStereotypes(file,file.getChangeType());
+										} else if (file.getChangeType().equals(TypeChange.REMOVED.name())) {
+											monitor.subTask("Identifying stereotypes for " + file.getName());
+											identifier = identifyStereotypes(file, file.getChangeType());
 										} else if (file.getChangeType().equals(TypeChange.MODIFIED.name())) {
-											if (file.getAbsolutePath().endsWith(".java")) {
-												monitor.subTask("Identifying stereotypes for "+ file.getName());
-												identifier = identifyStereotypes(file,file.getChangeType());
-											}
+											monitor.subTask("Identifying stereotypes for "+ file.getName());
+											identifier = identifyStereotypes(file,file.getChangeType());
 										}
 									} else {
 										otherFiles.add(file);
@@ -185,107 +183,112 @@ public class SummarizeChanges {
 
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
-				//if(summarized.size() + modifiedFiles.size() + otherFiles.size() + typesProblem.size() == differences.length) {
-				Impact impact = new Impact(identifiers);
-				impact.setProject(ProjectInformation.getProject(ProjectInformation.getSelectedProject()));
-				impact.calculateImpactSet();
-				
-				String currentPackage = "";
-				StringBuilder desc = new StringBuilder(); 
-				//Commit stereotype description
-				desc.append(summarizeCommitStereotype());
-				int i = 1;
-				int j = 1;
-				
-				boolean isInitialCommit = Utils.isInitialCommit(git); 
-				if(isInitialCommit) {
-					getNewModules();
-					describeNewModules(desc);
-				} 
-				
-				IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+				/*if(summarized.size() + modifiedFiles.size() + otherFiles.size() + typesProblem.size() == differences.length
+						|| summarized.size() + modifiedFiles.size() + otherFiles.size() + typesProblem.size() == differences.length) {*/
+					
+					Impact impact = new Impact(identifiers);
+					impact.setProject(ProjectInformation.getProject(ProjectInformation.getSelectedProject()));
+					impact.calculateImpactSet();
+					
+					String currentPackage = "";
+					StringBuilder desc = new StringBuilder(); 
+					//Commit stereotype description
+					desc.append(summarizeCommitStereotype());
+					int i = 1;
+					int j = 1;
+					
+					boolean isInitialCommit = Utils.isInitialCommit(git); 
+					//General description
+					if(isInitialCommit) {
+						getNewModules();
+						describeNewModules(desc);
+					} 
+					
+					IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 
-				boolean filtering = store.getBoolean(PreferenceConstants.P_FILTER_COMMIT_MESSAGE);
-				double factor = store.getDouble(PreferenceConstants.P_FILTER_FACTOR);
-				
-				for(Entry<String, StereotypeIdentifier> identifier : summarized.entrySet()) {
-					StringBuilder descTmp = new StringBuilder("");
-					StereotypeIdentifier calculated = identifiers.get(identifiers.indexOf(identifier.getValue()));
-					if(filtering && calculated != null && calculated.getImpactPercentaje() <= (factor /* 100*/) ) {
-						continue;
-					}
-					if(i == 1) {
-						desc.append(" This change set is mainly composed of:  \n\n");
-					}
-					if(currentPackage.trim().equals("")) {
-						currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
-						System.out.println("current 1: " + currentPackage);
-						desc.append(i + ". Changes to package " + currentPackage + ":  \n\n");
-						i++;
-					} else if(!currentPackage.equals(identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName())) {
-						String[] lines = desc.toString().trim().split("\\n");
-						if(lines != null && lines.length > 0) {
-							String lastLine = lines[lines.length - 1];
-							if(lastLine.contains("Changes to package " + currentPackage)) {
-								lines[lines.length - 1] = "\n\n";
-								desc = new StringBuilder(StringUtils.join(lines));
-								i--;
+					boolean filtering = store.getBoolean(PreferenceConstants.P_FILTER_COMMIT_MESSAGE);
+					double factor = store.getDouble(PreferenceConstants.P_FILTER_FACTOR);
+					
+					for(Entry<String, StereotypeIdentifier> identifier : summarized.entrySet()) {
+						StringBuilder descTmp = new StringBuilder("");
+						StereotypeIdentifier calculated = identifiers.get(identifiers.indexOf(identifier.getValue()));
+						if(filtering && calculated != null && calculated.getImpactPercentaje() <= (factor /* 100*/) ) {
+							continue;
+						}
+						if(i == 1) {
+							desc.append(" This change set is mainly composed of:  \n\n");
+						}
+						if(currentPackage.trim().equals("")) {
+							currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
+							System.out.println("current 1: " + currentPackage);
+							desc.append(i + ". Changes to package " + currentPackage + ":  \n\n");
+							i++;
+						} else if(!currentPackage.equals(identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName())) {
+							String[] lines = desc.toString().trim().split("\\n");
+							if(lines != null && lines.length > 0) {
+								String lastLine = lines[lines.length - 1];
+								if(lastLine.contains("Changes to package " + currentPackage)) {
+									lines[lines.length - 1] = "\n\n";
+									desc = new StringBuilder(StringUtils.join(lines));
+									i--;
+								}
+							}
+							currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
+							System.out.println("current 2: " + currentPackage);
+							desc.append(i + ". Changes to package " + currentPackage + ":  \n\n");
+							j = 1;
+							i++;
+						}
+						if(identifier.getValue().getScmOperation().equals(TypeChange.MODIFIED.toString())) {
+							ModificationDescriptor modificationDescriptor = new ModificationDescriptor();
+							modificationDescriptor.setFile(identifier.getValue().getChangedFile());
+							modificationDescriptor.setGit(getGit());
+							modificationDescriptor.extractDifferencesBetweenVersions(identifier.getValue().getChangedFile(), git, changedListDialog.getAuthorText().getText(), changedListDialog.getCommitterText().getText());
+							modificationDescriptor.extractModifiedMethods();
+							modificationDescriptor.describe(i, j, descTmp);
+						} else {
+							if(!identifier.getValue().getChangedFile().isRenamed()) {
+								descTmp.append((i - 1) + "." + j + ". " + identifier.getValue().toString());
+							} else {
+								descTmp.append((i - 1) + "." + j + ". " + "Rename type " + identifier.getValue().getChangedFile().getRenamedPath().substring(identifier.getValue().getChangedFile().getRenamedPath().lastIndexOf("/") + 1).replace(".java", "") + " with " + identifier.getValue().getChangedFile().getName().replace(".java", "\n\n"));
 							}
 						}
-						currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
-						System.out.println("current 2: " + currentPackage);
-						desc.append(i + ". Changes to package " + currentPackage + ":  \n\n");
-						j = 1;
-						i++;
-					}
-					if(identifier.getValue().getScmOperation().equals(TypeChange.MODIFIED.toString())) {
-						ModificationDescriptor modificationDescriptor = new ModificationDescriptor();
-						modificationDescriptor.setFile(identifier.getValue().getChangedFile());
-						modificationDescriptor.setGit(getGit());
-						modificationDescriptor.extractDifferencesBetweenVersions(identifier.getValue().getChangedFile(), git, changedListDialog.getAuthorText().getText(), changedListDialog.getCommitterText().getText());
-						modificationDescriptor.extractModifiedMethods();
-						modificationDescriptor.describe(i, j, descTmp);
-					} else {
-						if(!identifier.getValue().getChangedFile().isRenamed()) {
-							descTmp.append((i - 1) + "." + j + ". " + identifier.getValue().toString());
-						} else {
-							descTmp.append((i - 1) + "." + j + ". " + "Rename type " + identifier.getValue().getChangedFile().getRenamedPath().substring(identifier.getValue().getChangedFile().getRenamedPath().lastIndexOf("/") + 1).replace(".java", "") + " with " + identifier.getValue().getChangedFile().getName().replace(".java", "\n\n"));
+						if(!descTmp.toString().equals("")) {
+							desc.append(descTmp.toString());
+							j++;
 						}
 					}
-					if(!descTmp.toString().equals("")) {
-						desc.append(descTmp.toString());
-						j++;
+					
+					CommitGeneralDescriptor generalDescriptor = new CommitGeneralDescriptor();
+					generalDescriptor.setDifferences(differences);
+					generalDescriptor.setInitialCommit(isInitialCommit);
+					generalDescriptor.setGit(git);
+					desc.insert(0, generalDescriptor.describe());
+					
+					if(isInitialCommit) {
+						desc.insert(0, "Initial commit. "); 
+						getNewModules();
+						describeNewModules(desc);
+					} else { 
+						desc.insert(0, "BUG - FEATURE: <type-ID> \n\n");
 					}
-				}
-				
-				CommitGeneralDescriptor generalDescriptor = new CommitGeneralDescriptor();
-				generalDescriptor.setDifferences(differences);
-				generalDescriptor.setInitialCommit(isInitialCommit);
-				generalDescriptor.setGit(git);
-				desc.insert(0, generalDescriptor.describe());
-				
-				if(isInitialCommit) {
-					desc.insert(0, "Initial commit. "); 
-				} else { 
-					desc.insert(0, "BUG - FEATURE: <type-ID> \n\n");
-				}
-				
-				String[] lines = desc.toString().trim().split("\\n");
-				if(lines != null && lines.length > 0) {
-					String lastLine = lines[lines.length - 1];
-					if(lastLine.contains("Changes to package " + currentPackage)) {
-						lines[lines.length - 1] = "\n\n";
-						desc = new StringBuilder(StringUtils.join(lines, "\n"));
+					
+					String[] lines = desc.toString().trim().split("\\n");
+					if(lines != null && lines.length > 0) {
+						String lastLine = lines[lines.length - 1];
+						if(lastLine.contains("Changes to package " + currentPackage)) {
+							lines[lines.length - 1] = "\n\n";
+							desc = new StringBuilder(StringUtils.join(lines, "\n"));
+						}
 					}
+					
+					getChangedListDialog().getEditor().getText().setText(desc.toString());
+					getChangedListDialog().updateSignatureCanvas();
+					getChangedListDialog().updateMessage();
+					
+					removeCreatedPackages();
 				}
-				
-				getChangedListDialog().getEditor().getText().setText(desc.toString());
-				getChangedListDialog().updateSignatureCanvas();
-				getChangedListDialog().updateMessage();
-				
-				removeCreatedPackages();
-				//}
-			}
+			//}
 		});
 
 	}
@@ -331,8 +334,6 @@ public class SummarizeChanges {
 			}
 		}
 	}
-	
-
 
 	protected void removeCreatedPackages() {
 		IFolder folder = ((IJavaProject)changedListDialog.getSelection()).getProject().getFolder("src/commsummtmp");
@@ -348,7 +349,11 @@ public class SummarizeChanges {
 		File currentType = null;
 		
 		try {
-			previousType = Utils.getFileContentOfLastCommit(file.getPath(), getGit().getRepository());
+			if(changedListDialog.getAuthorText().getText() != null && !changedListDialog.getAuthorText().getText().equals("")) { 
+				previousType = Utils.getFileContentOfCommitID(file.getPath(), getGit().getRepository(), changedListDialog.getAuthorText().getText());
+			} else {
+				previousType = Utils.getFileContentOfLastCommit(file.getPath(), getGit().getRepository());
+			}
 			currentType = new File(file.getAbsolutePath());
 			distiller.extractClassifiedSourceCodeChanges(previousType, currentType);
 			
@@ -368,7 +373,7 @@ public class SummarizeChanges {
 		
 	}
 
-	public void summarizeType(StereotypeIdentifier identifier) {
+	public void summarizeType(StereotypeIdentifier identifier) throws JavaModelException {
 		if(identifier.getStereotypedElements().size() == 0) {
 			typesProblem.add(identifier);
 		}
@@ -385,8 +390,11 @@ public class SummarizeChanges {
 					identifier.getBuilder().append(summarizeType.getBuilder().toString());
 				}
 				
-				if(!summarized.containsKey(element.getQualifiedName()) && !summarized.containsValue(identifier)) {
-					summarized.put(element.getQualifiedName(), identifier);
+				String packageName = element.getFullyQualifiedName();
+				
+				if(!summarized.containsKey(packageName) && !summarized.containsValue(identifier)) {
+					
+					summarized.put(packageName, identifier);
 				}
 				i++;
 				
@@ -398,14 +406,8 @@ public class SummarizeChanges {
 		List<StereotypedMethod> methods = new ArrayList<StereotypedMethod>();
 		String result = "";
 		
-		//IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		//boolean filtering = store.getBoolean(PreferenceConstants.P_FILTER_COMMIT_MESSAGE);
-		//double factor = store.getDouble(PreferenceConstants.P_FILTER_FACTOR);
-		
 		for(StereotypeIdentifier identifier : identifiers) {
-			/*if(filtering && identifier != null && identifier.getImpactPercentaje() <= (factor) ) {
-				continue;
-			}*/
+
 			for(StereotypedElement element : identifier.getStereotypedElements()) {
 				if(!identifier.getScmOperation().equals(TypeChange.MODIFIED.name())) {
 					methods.addAll((Collection<? extends StereotypedMethod>) element.getStereoSubElements());
@@ -615,7 +617,7 @@ public class SummarizeChanges {
 	public StereotypeIdentifier identifyStereotypes(ChangedFile file, String scmOperation) {
 		
 		if(scmOperation.equals(TypeChange.ADDED.toString()) ||scmOperation.equals(TypeChange.UNTRACKED.toString()) || scmOperation.equals(TypeChange.MODIFIED.toString())) {
-			getAddedStereotypeIdentifier(file);
+			stereotypeIdentifier = getAddedStereotypeIdentifier(file);
 		} else if(scmOperation.equals(TypeChange.REMOVED.toString())) {
 			stereotypeIdentifier = getRemovedStereotypeIdentifier(file);
 		} 
@@ -630,38 +632,46 @@ public class SummarizeChanges {
 	}
 	
 	public StereotypeIdentifier getAddedStereotypeIdentifier(ChangedFile file) {
-		
-		String projectName;
-		IResource res;
-		
-		if(changedListDialog.getSelection() != null) {
-			projectName = changedListDialog.getSelection().getElementName();
-			
-			if(file.getPath().startsWith(projectName)) {
-				res = changedListDialog.getSelection().getProject().findMember(file.getPath().replaceFirst(projectName, ""));
+		try {
+			String projectName;
+			IResource res;
+			if(changedListDialog.getSelection() != null) {
+				projectName = changedListDialog.getSelection().getElementName();
+				
+				if(file.getPath().startsWith(projectName)) {
+					res = changedListDialog.getSelection().getProject().findMember(file.getPath().replaceFirst(projectName, ""));
+				} else {
+					res = changedListDialog.getSelection().getProject().findMember(file.getPath());
+				}
+				stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(res, changedListDialog.getSelection()), 0, 0);
 			} else {
-				res = changedListDialog.getSelection().getProject().findMember(file.getPath());
+				projectName = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).getName();
+				res = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).findMember(file.getPath().replaceFirst(projectName, ""));
+				IFile ifile = ProjectInformation.getSelectedProject().getWorkspace().getRoot().getFile(res.getFullPath());
+				stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(ifile), 0, 0);
 			}
-			stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(res, changedListDialog.getSelection()), 0, 0);
-		} else {
-			projectName = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).getName();
-			res = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).findMember(file.getPath().replaceFirst(projectName, ""));
-			IFile ifile = ProjectInformation.getSelectedProject().getWorkspace().getRoot().getFile(res.getFullPath());
-			stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(ifile), 0, 0);
-		}
-		
+		} catch (RevisionSyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 		return stereotypeIdentifier;
 	}
 
 	public StereotypeIdentifier getRemovedStereotypeIdentifier(ChangedFile file) {
 		try {
-			String removedFile = Utils.getStringContentOfLastCommit(file.getPath(), getGit().getRepository());
+			String removedFile = ""; //Utils.getStringContentOfLastCommit(file.getPath(), getGit().getRepository());
+			if(older != null && !older.equals("")) { 
+				removedFile = Utils.getStringContentOfCommitID(file.getPath(), getGit().getRepository(), older);
+			} else {
+				removedFile = Utils.getStringContentOfLastCommit(file.getPath(), getGit().getRepository());
+			}
 			IPackageFragment pack = null;
 			String packageName = "";
 			packageName = "commsummtmp." + CompilationUtils.getPackageNameFromStringClass(removedFile);
 			IFolder folder = ((IJavaProject)changedListDialog.getSelection()).getProject().getFolder("src");
 			pack = changedListDialog.getSelection().getPackageFragmentRoot(folder).createPackageFragment(packageName, true, null);
-			ICompilationUnit cu = pack.createCompilationUnit(file.getName(), removedFile,true, null);
+			String fileName = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf("/") + 1);
+			ICompilationUnit cu = pack.createCompilationUnit(fileName, removedFile,true, null);
 			stereotypeIdentifier = new StereotypeIdentifier(cu, 0, 0);
 		} catch (RevisionSyntaxException e) {
 			// TODO Auto-generated catch block
@@ -684,7 +694,13 @@ public class SummarizeChanges {
 	
 	public StereotypeIdentifier getModifiedStereotypeIdentifier(ChangedFile file) {
 		try {
-			String removedFile = Utils.getStringContentOfLastCommit(file.getPath(), getGit().getRepository());
+			String removedFile = "";//Utils.getStringContentOfLastCommit(file.getPath(), getGit().getRepository());
+			if(changedListDialog.getAuthorText().getText() != null && !changedListDialog.getAuthorText().getText().equals("")) { 
+				removedFile = Utils.getStringContentOfCommitID(file.getPath(), getGit().getRepository(), changedListDialog.getAuthorText().getText());
+			} else {
+				removedFile = Utils.getStringContentOfLastCommit(file.getPath(), getGit().getRepository());
+			}
+			
 			IPackageFragment pack = null;
 			String packageName = "";
 			packageName = "commsummtmp." + CompilationUtils.getPackageNameFromStringClass(removedFile);
@@ -735,11 +751,11 @@ public class SummarizeChanges {
 		this.identifiers = identifiers;
 	}
 
-	public FilesChangedListDialog getChangedListDialog() {
+	public DescribeVersionsDialog getChangedListDialog() {
 		return changedListDialog;
 	}
 
-	public void setChangedListDialog(FilesChangedListDialog changedListDialog) {
+	public void setChangedListDialog(DescribeVersionsDialog changedListDialog) {
 		this.changedListDialog = changedListDialog;
 	}
 
@@ -757,6 +773,14 @@ public class SummarizeChanges {
 
 	public void setModules(List<Module> modules) {
 		this.modules = modules;
+	}
+
+	public String getCurrent() {
+		return current;
+	}
+
+	public void setCurrent(String current) {
+		this.current = current;
 	}
 
 }

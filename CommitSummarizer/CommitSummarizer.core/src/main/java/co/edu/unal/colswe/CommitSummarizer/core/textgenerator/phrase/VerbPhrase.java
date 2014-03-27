@@ -3,6 +3,7 @@ package co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase;
 import java.util.LinkedList;
 import java.util.List;
 
+import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.util.PhraseUtils;
 import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.pos.Tag;
 import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.pos.TaggedTerm;
 import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.tokenizer.Tokenizer;
@@ -65,6 +66,10 @@ public class VerbPhrase extends Phrase {
 			return;
 		}
 		this.verb = this.taggedPhrase.getFirst().getTerm();
+		
+		if(this.taggedPhrase.size() == 2 && PhraseUtils.isVerb(this.taggedPhrase.get(1))) {
+			this.verb = this.taggedPhrase.get(1).getTerm();
+		}
 		if (this.taggedPhrase.size() > 0) {
 			final StringBuilder dirObj = new StringBuilder();
 			if (hasNounOrAdjective(this.taggedPhrase) || hasPrepositionOrAdverb(this.taggedPhrase)) {

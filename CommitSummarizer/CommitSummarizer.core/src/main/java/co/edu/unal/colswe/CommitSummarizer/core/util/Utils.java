@@ -91,6 +91,68 @@ public class Utils {
 		
 		return IOUtils.stringFromFile(Utils.inputStreamToFile(loader.openStream()).getAbsolutePath(), "utf-8");
 	}
+	
+	public static String getStringContentOfCommitID(String filePath,Repository repository, String commitID) throws RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException, IOException {
+		// find the HEAD
+		ObjectId lastCommitId = repository.resolve(commitID);
+
+		// a RevWalk allows to walk over commits based on some filtering that is
+		// defined
+		RevWalk revWalk = new RevWalk(repository);
+		RevCommit commit = revWalk.parseCommit(lastCommitId);
+		// and using commit's tree find the path
+		RevTree tree = commit.getTree();
+		System.out.println("Having tree: " + tree);
+
+		// now try to find a specific file
+		TreeWalk treeWalk = new TreeWalk(repository);
+		treeWalk.addTree(tree);
+		treeWalk.setRecursive(true);
+		treeWalk.setFilter(PathFilter.create(filePath.substring(filePath.indexOf("/") + 1)));
+		if (!treeWalk.next()) {
+			
+			//TODO the file is added to project
+			throw new IllegalStateException(
+					"CHANGECOMMIT -- Did not find expected file '" + filePath + "'");
+		}
+
+		ObjectId objectId = treeWalk.getObjectId(0);
+		ObjectLoader loader = repository.open(objectId);
+		
+		return IOUtils.stringFromFile(Utils.inputStreamToFile(loader.openStream()).getAbsolutePath(), "utf-8");
+	}
+	
+	public static File getFileContentOfCommitID(String filePath,Repository repository, String commitID) throws RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException, IOException {
+		// find the HEAD
+		ObjectId lastCommitId = repository.resolve(commitID);
+		
+
+		// a RevWalk allows to walk over commits based on some filtering that is
+		// defined
+		RevWalk revWalk = new RevWalk(repository);
+		RevCommit commit = revWalk.parseCommit(lastCommitId);
+		// and using commit's tree find the path
+		RevTree tree = commit.getTree();
+		System.out.println("Having tree: " + tree); 
+
+		// now try to find a specific file
+		TreeWalk treeWalk = new TreeWalk(repository);
+		treeWalk.addTree(tree);
+		treeWalk.setRecursive(true);
+		treeWalk.setFilter(PathFilter.create(filePath.substring(filePath.indexOf("/") + 1)));
+
+		if (!treeWalk.next()) { 
+			
+			//TODO the file is added to project
+			throw new IllegalStateException(
+					"CHANGECOMMIT -- Did not find expected file '" + filePath + "'");
+		}
+
+		ObjectId objectId = treeWalk.getObjectId(0);
+		ObjectLoader loader = repository.open(objectId);
+		
+		return Utils.inputStreamToFile(loader.openStream());
+	}
 
 	public static File inputStreamToFile(InputStream is) throws IOException {
 		File contentFile = File.createTempFile("tmpCont", ".txt");

@@ -10,6 +10,7 @@ public class SummarizeType {
 	private StereotypedElement element;
 	private ChangedFile[] differences;
 	private StereotypeIdentifier identifier;
+	private boolean isLocal;
 	
 	public SummarizeType(StereotypedElement element, StereotypeIdentifier identifier, ChangedFile[] differences) {
 		super();
@@ -19,15 +20,26 @@ public class SummarizeType {
 	}
 	
 	public void generate() {
+		StringBuilder localBuilder = new StringBuilder("");
 		builder = new StringBuilder();
-		builder.append(GeneralDescriptor.describe(element, identifier.getParser().getCompilationUnit(), identifier.getScmOperation()));
 		
-		if(getElement().getStereoSubElements() != null && getElement().getStereoSubElements().size() > 0) {
-			builder.append(". It allows: \n\n");
+		builder.append(GeneralDescriptor.describe(element, identifier.getParser().getCompilationUnit(), identifier.getScmOperation(), isLocal()));
+		
+		
+		
+		localBuilder.append(StereotypeMethodDescriptor.describe(getElement().getStereoSubElements()));
+		localBuilder.append(ImpactSetDescriptor.describe(identifier.getCompilationUnit(), getDifferences(), identifier.getScmOperation()) + "\n");
+		
+		if(!localBuilder.toString().trim().equals("")) {
+			if(getElement().getStereoSubElements() != null && getElement().getStereoSubElements().size() > 0) {
+				builder.append(". It allows to: \n\n");
+			} else {
+				builder.append("\n\n");
+			}
+			builder.append(localBuilder.toString());
+		} else {
+			builder.append("\n\n");
 		}
-		
-		builder.append(StereotypeMethodDescriptor.describe(getElement().getStereoSubElements()));
-		builder.append(ImpactSetDescriptor.describe(identifier.getCompilationUnit(), getDifferences(), identifier.getScmOperation()) + "\n");
 	}
 	
 	public StringBuilder getBuilder() {
@@ -60,5 +72,13 @@ public class SummarizeType {
 
 	public void setIdentifier(StereotypeIdentifier identifier) {
 		this.identifier = identifier;
+	}
+
+	public boolean isLocal() {
+		return isLocal;
+	}
+
+	public void setLocal(boolean isLocal) {
+		this.isLocal = isLocal;
 	}
 }
