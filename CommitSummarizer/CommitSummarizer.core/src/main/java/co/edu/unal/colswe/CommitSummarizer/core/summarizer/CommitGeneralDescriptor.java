@@ -117,21 +117,33 @@ public class CommitGeneralDescriptor {
 		if(newProperties == null && newProperties.size() == 0) {
 			return;
 		}
-		/*StringBuilder propsBuilder = new StringBuilder();
+		StringBuilder propsBuilder = new StringBuilder();
 		
 		int i = 0;
 		for(ChangedFile file : newProperties) {
-			if(!propsBuilder.toString().contains(file.getChangeTypeToShow(true).toLowerCase())) {
-				if(i > 0) {
-					propsBuilder.append(", ");
-				}
-				propsBuilder.append(file.getChangeTypeToShow(true).toLowerCase());
-				i++;
+			if (i < 3) {
+				String fileName = file.getName();
+				if (!propsBuilder.toString().contains(fileName)) {
+					if (i == 0) {
+						propsBuilder.append("(");
+					} else if (i > 0) {
+						propsBuilder.append(", ");
+					}
+					propsBuilder.append(fileName);
+					i++;
+				} 
+			} else {
+				propsBuilder.append(", ... ");
+				break;
 			}
 		}
-		descriptionBuilder.append(" " + propsBuilder.toString());*/
+		if(propsBuilder.toString().length() > 0) {
+			propsBuilder.append(")");
+		}
+		
 		descriptionBuilder.append(" includes changes to");
 		descriptionBuilder.append(" internationalization, properties or configuration files");
+		descriptionBuilder.append(" " + propsBuilder.toString());
 		descriptionBuilder.append(". ");
 		
 	}

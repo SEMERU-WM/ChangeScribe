@@ -198,7 +198,6 @@ public class SummarizeChangesTMP {
 					int j = 1;
 					
 					boolean isInitialCommit = Utils.isInitialCommit(git); 
-					//General description
 					if(isInitialCommit) {
 						getNewModules();
 						describeNewModules(desc);
@@ -267,8 +266,6 @@ public class SummarizeChangesTMP {
 					
 					if(isInitialCommit) {
 						desc.insert(0, "Initial commit. "); 
-						getNewModules();
-						describeNewModules(desc);
 					} else { 
 						desc.insert(0, "BUG - FEATURE: <type-ID> \n\n");
 					}

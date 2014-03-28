@@ -50,9 +50,7 @@ public class CommitStereotypeDescriptor {
 			description.append("this change set is composed of empty, incidental, and abstract methods. " );
 			description.append("These methods indicate that a new feature is planned. " );
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.SMALL_MODIFIER) {
-			description.append("This is a small modifier commit: ");
-			description.append("this change set is composed only of " + stereotypedCommit.getMethods().size() + " method" + ((stereotypedCommit.getMethods().size()>1)?"s,":","));
-			description.append(" and does not change the system significantly. " );
+			description.append("This is a small modifier commit that does not change the system significantly.");
 		}
 		
 		return description.toString();

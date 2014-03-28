@@ -228,7 +228,7 @@ public class ModificationDescriptor {
 			phrase.generate();
 			desc.append("Remove funtionality to " + phrase.toString());
 		} else if(delete.getChangeType() == ChangeType.REMOVED_OBJECT_STATE) {
-			desc.append("Remove object state " + delete.getChangedEntity().getName().substring(0, delete.getChangedEntity().getName().indexOf(":")));
+			desc.append("Remove " + delete.getChangedEntity().getName().substring(0, delete.getChangedEntity().getName().indexOf(":")) + " attribute");
 		} else if(delete.getChangeType() == ChangeType.PARAMETER_DELETE) {
 			if(delete.getChangedEntity().getAstNode() instanceof Argument) { 
 				Argument arg = (Argument) delete.getChangedEntity().getAstNode(); 
@@ -254,12 +254,12 @@ public class ModificationDescriptor {
 			VerbPhrase phrase = new VerbPhrase(POSTagger.tag(Tokenizer.split(functionality)), className, null, false);
 			phrase.generate();
 			if(insert.getChangedEntity().getAstNode() != null && !(insert.getChangedEntity().getAstNode() instanceof ConstructorDeclaration)) {
-				desc.append("Add an additional functionality to " + phrase.toString());
+				desc.append("Add a functionality to " + phrase.toString());
 			} else {
 				desc.append("Add a constructor method");
 			}
 		} else if(insert.getChangeType() == ChangeType.ADDITIONAL_OBJECT_STATE) {
-			desc.append("Add object state " + insert.getChangedEntity().getName().substring(0, insert.getChangedEntity().getName().indexOf(":")) + "");
+			desc.append("Add " + insert.getChangedEntity().getName().substring(0, insert.getChangedEntity().getName().indexOf(":")) + " attribute");
 		} else if(insert.getChangeType() == ChangeType.INCREASING_ACCESSIBILITY_CHANGE) {
 			desc.append("Increasing accessibility change " + insert.getChangedEntity().toString().substring(insert.getChangedEntity().toString().indexOf(":") + 1) + "");
 		} else if(insert.getChangeType() == ChangeType.COMMENT_INSERT || insert.getChangeType() == ChangeType.DOC_INSERT) {
