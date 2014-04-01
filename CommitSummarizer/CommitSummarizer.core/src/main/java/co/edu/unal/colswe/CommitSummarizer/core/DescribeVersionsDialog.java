@@ -20,7 +20,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -65,7 +64,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -113,23 +111,16 @@ public class DescribeVersionsDialog extends TitleAreaDialog {
 	private Section filesSection;
 	private CachedCheckboxTreeViewer filesViewer;
 	private Set<ChangedFile> items;
-	private Button commitButton;
-	private Button commitAndPushButton;
-	public static final int COMMIT_AND_PUSH_ID = 30;
 	private TreeMap<MethodStereotype, Integer> signatureMap;
 	private SignatureCanvas signatureCanvas;
-	private boolean isPushRequested;
 	private Text previousVersionText;
 	private Text currentVersionText;
-	private String committer = null;
-	private String author = null;
 	private static final String DIALOG_SETTINGS_SECTION_NAME = Activator.getDefault() + ".COMMIT_DIALOG_SECTION"; //$NON-NLS-1$
 	private SashForm sashForm;
 	private Composite messageAndPersonArea;
-	private String commitCurrentID = "66b589d58e8da7936c34644abfe4320abe1b8f8b";//"9c7032c42726b6c887ee119f1682ab6ff8b8a856";
-	private String commitPreviousID = "0e579155369a6966b9ff81ab1e959367628f005d";//"5ae12368574b33a8fad215ef104108fbf5435eb3";
+	private String commitCurrentID = "";
+	private String commitPreviousID = "";
 	private Shell shellTmp;
-	//private static final String SHOW_UNTRACKED_PREF = "CommitDialog.showUntracked"; //$NON-NLS-1$
 
 	public DescribeVersionsDialog(Shell shell, Git git, IJavaProject selection) {
 		super(shell);
@@ -138,8 +129,6 @@ public class DescribeVersionsDialog extends TitleAreaDialog {
 		this.git = git;
 		this.setSelection(selection);
 		this.setHelpAvailable(false);
-		setAuthor("anonymous");
-		setCommitter("anonymous");
 		
 		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(new IPropertyChangeListener() {
 		    @Override
@@ -300,12 +289,7 @@ public class DescribeVersionsDialog extends TitleAreaDialog {
 	}
 	
 	protected void buttonPressed(int buttonId) {
-		if (IDialogConstants.OK_ID == buttonId)
-			okPressed();
-		else if (COMMIT_AND_PUSH_ID == buttonId) {
-			setPushRequested(true);
-			okPressed();
-		} else if (IDialogConstants.CANCEL_ID == buttonId)
+		if (IDialogConstants.CANCEL_ID == buttonId)
 			cancelPressed();
 	}
 	
@@ -780,10 +764,6 @@ public class DescribeVersionsDialog extends TitleAreaDialog {
 		return absolutePath.substring(absolutePath.lastIndexOf("/") + 1, absolutePath.length());
 	}
 	
-	private static IPreferenceStore getPreferenceStore() {
-		return Activator.getDefault().getPreferenceStore();
-	}
-	
 	private void updateFileSectionText() {
 		filesSection.setText(MessageFormat.format("Modified files (selected {0} of {1})",
 				Integer.valueOf(filesViewer.getCheckedElements().length),
@@ -802,9 +782,6 @@ public class DescribeVersionsDialog extends TitleAreaDialog {
 	}
 	
 	public void updateMessage() {
-		if (commitButton == null)
-			// Not yet fully initialized.
-			return;
 
 		String message = null;
 		int type = IMessageProvider.NONE;
@@ -823,10 +800,6 @@ public class DescribeVersionsDialog extends TitleAreaDialog {
 		}
 
 		setMessage(message, type);
-		boolean commitEnabled = type == IMessageProvider.WARNING
-				|| type == IMessageProvider.NONE;
-		commitButton.setEnabled(commitEnabled);
-		commitAndPushButton.setEnabled(commitEnabled);
 	}
 	
 	private boolean isCommitWithoutFilesAllowed() {
@@ -914,14 +887,6 @@ public class DescribeVersionsDialog extends TitleAreaDialog {
 		this.signatureMap = signatureMap;
 	}
 
-	public boolean isPushRequested() {
-		return isPushRequested;
-	}
-
-	public void setPushRequested(boolean isPushRequested) {
-		this.isPushRequested = isPushRequested;
-	}
-
 	public Text getAuthorText() {
 		return previousVersionText;
 	}
@@ -937,31 +902,4 @@ public class DescribeVersionsDialog extends TitleAreaDialog {
 	public void setCommitterText(Text committerText) {
 		this.currentVersionText = committerText;
 	}
-
-	public String getCommitter() {
-		return committer;
-	}
-
-	public void setCommitter(String committer) {
-		IDialogSettings settings = Activator.getDefault().getDialogSettings();
-		if (settings != null) {
-			this.committer = getPreferenceStore().getString(PreferenceConstants.P_COMMITER);
-		} else {
-			this.committer = committer;
-		}
-	}
-
-	public String getAuthor() {
-		return author;
-	}
-
-	public void setAuthor(String author) {
-		IDialogSettings settings = Activator.getDefault().getDialogSettings();
-		if (settings != null) {
-			this.author = getPreferenceStore().getString(PreferenceConstants.P_AUTHOR);
-		} else {
-			this.author = author;
-		}
-	}
-
 }
