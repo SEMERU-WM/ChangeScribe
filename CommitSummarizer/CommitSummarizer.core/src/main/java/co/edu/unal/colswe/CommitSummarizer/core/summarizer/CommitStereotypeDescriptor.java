@@ -37,7 +37,7 @@ public class CommitStereotypeDescriptor {
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.CONTROL_MODIFIER) {
 			description.append("This is a control modifier commit: ");
 			description.append("this change set is composed mainly of controller, factory, constructor, copy-constructor and destructor methods, and " );
-			description.append("these methods modify the external behavior of the participating classes  ");
+			description.append("these methods modify the external behavior of the participating classes.  ");
 		} else if (stereotypedCommit.getStereotypes().get(0) == CommitStereotype.LARGE_MODIFIER) {
 			description.append("This is a large modifier commit: ");
 			description.append("this is a commit with many methods and combines multiple roles. " );

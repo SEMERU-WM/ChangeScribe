@@ -3,10 +3,14 @@ package co.edu.unal.colswe.CommitSummarizer.core.summarizer;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.internal.compiler.ast.AllocationExpression;
+import org.eclipse.jdt.internal.compiler.ast.Annotation;
 import org.eclipse.jdt.internal.compiler.ast.Argument;
 import org.eclipse.jdt.internal.compiler.ast.Assignment;
 import org.eclipse.jdt.internal.compiler.ast.CompoundAssignment;
@@ -17,12 +21,17 @@ import org.eclipse.jdt.internal.compiler.ast.ForeachStatement;
 import org.eclipse.jdt.internal.compiler.ast.IfStatement;
 import org.eclipse.jdt.internal.compiler.ast.LocalDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.MessageSend;
+import org.eclipse.jdt.internal.compiler.ast.MethodDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.OperatorIds;
 import org.eclipse.jdt.internal.compiler.ast.PrefixExpression;
 import org.eclipse.jdt.internal.compiler.ast.ReturnStatement;
 import org.eclipse.jdt.internal.compiler.ast.SingleNameReference;
 import org.eclipse.jdt.internal.compiler.ast.ThrowStatement;
 import org.eclipse.jdt.internal.compiler.ast.TrueLiteral;
+import org.eclipse.jdt.internal.core.NamedMember;
+import org.eclipse.jdt.internal.core.ResolvedSourceField;
+import org.eclipse.jdt.internal.core.ResolvedSourceMethod;
+import org.eclipse.jdt.internal.core.ResolvedSourceType;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
@@ -39,12 +48,16 @@ import ch.uzh.ifi.seal.changedistiller.model.entities.Move;
 import ch.uzh.ifi.seal.changedistiller.model.entities.SourceCodeChange;
 import ch.uzh.ifi.seal.changedistiller.model.entities.StructureEntityVersion;
 import ch.uzh.ifi.seal.changedistiller.model.entities.Update;
+import ch.uzh.ifi.seal.changedistiller.structuredifferencing.java.JavaStructureNode.Type;
+import co.edu.unal.colswe.CommitSummarizer.core.dependencies.MethodDependencySummary;
 import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
 import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.NounPhrase;
 import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.Parameter;
 import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.ParameterPhrase;
 import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.VerbPhrase;
+import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.phrase.util.PhraseUtils;
 import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.pos.POSTagger;
+import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.pos.TaggedTerm;
 import co.edu.unal.colswe.CommitSummarizer.core.textgenerator.tokenizer.Tokenizer;
 import co.edu.unal.colswe.CommitSummarizer.core.util.Utils;
 
@@ -54,6 +67,8 @@ public class ModificationDescriptor {
 	private List<SourceCodeChange> changes;
 	private ChangedFile file;
 	private Git git;
+	private ChangedFile[] differences;
+	private List<SourceCodeChange> addedRemovedFunctionalities;
 	
 	public void extractDifferences(ChangedFile file, Git git) {
 		FileDistiller distiller = ChangeDistiller.createFileDistiller(Language.JAVA); 
@@ -97,6 +112,7 @@ public class ModificationDescriptor {
 
 	public void describe(int i, int j, StringBuilder desc) {
 		StringBuilder localDescription = new StringBuilder("");
+		addedRemovedFunctionalities = new ArrayList<SourceCodeChange>();
 		if(changes != null) {
 			if(changes != null && changes.size() > 0) {
 				desc.append((i - 1) + "." + j + ". " + " Modifications to " + file.getName() + ":  \n\n");
@@ -133,13 +149,16 @@ public class ModificationDescriptor {
 			    	}
 		    	}
 		    }
+		    if(addedRemovedFunctionalities != null && addedRemovedFunctionalities.size() > 0) {
+		    	describeCollateralChanges(desc);
+		    }
 		    if(!localDescription.toString().equals("")) {
 		    	desc.append("\n");
 		    }
 		}
 	}
 
-	public static void describeDelete(StringBuilder desc, Delete delete) {
+	public void describeDelete(StringBuilder desc, Delete delete) {
 		if(delete.getChangeType() == ChangeType.STATEMENT_DELETE) {
 			String statementType = delete.getChangedEntity().getType().name().toLowerCase().replace("statement", "").replace("_", " ");
 			desc.append("Remove ");
@@ -222,13 +241,9 @@ public class ModificationDescriptor {
 			String entityType = delete.getRootEntity().getJavaStructureNode().getType().name().toLowerCase();
 			desc.append("Remove " + type +" at " + delete.getRootEntity().getJavaStructureNode().getName() + " " + entityType);
 		} else if(delete.getChangeType() == ChangeType.REMOVED_FUNCTIONALITY) {
-			String className = delete.getParentEntity().getName();
-			String functionality = delete.getChangedEntity().getName().substring(0, delete.getChangedEntity().getName().indexOf("("));
-			VerbPhrase phrase = new VerbPhrase(POSTagger.tag(Tokenizer.split(functionality)), className, null, false);
-			phrase.generate();
-			desc.append("Remove funtionality to " + phrase.toString());
+			describeAdditionalRemovedFunctionality(desc, delete, "Remove");
 		} else if(delete.getChangeType() == ChangeType.REMOVED_OBJECT_STATE) {
-			desc.append("Remove " + delete.getChangedEntity().getName().substring(0, delete.getChangedEntity().getName().indexOf(":")) + " attribute");
+			desc.append("Remove (Object state) " + delete.getChangedEntity().getName().substring(0, delete.getChangedEntity().getName().indexOf(":")) + " attribute");
 		} else if(delete.getChangeType() == ChangeType.PARAMETER_DELETE) {
 			if(delete.getChangedEntity().getAstNode() instanceof Argument) { 
 				Argument arg = (Argument) delete.getChangedEntity().getAstNode(); 
@@ -241,25 +256,16 @@ public class ModificationDescriptor {
 	}
 
 	@SuppressWarnings("static-access")
-	public static void describeInsert(StringBuilder desc, Insert insert) {
+	public void describeInsert(StringBuilder desc, Insert insert) {
 		
 		String fType = insert.getChangedEntity().getType().name().toLowerCase().replace("_", " ");
-		//String article = PhraseUtils.getIndefiniteArticle(fType).concat(" ");
 		
 		fType = "Add " + fType;
 		
 		if(insert.getChangeType() == ChangeType.ADDITIONAL_FUNCTIONALITY) {
-			String className = insert.getParentEntity().getName();
-			String functionality = insert.getChangedEntity().getName().substring(0, insert.getChangedEntity().getName().indexOf("("));
-			VerbPhrase phrase = new VerbPhrase(POSTagger.tag(Tokenizer.split(functionality)), className, null, false);
-			phrase.generate();
-			if(insert.getChangedEntity().getAstNode() != null && !(insert.getChangedEntity().getAstNode() instanceof ConstructorDeclaration)) {
-				desc.append("Add a functionality to " + phrase.toString());
-			} else {
-				desc.append("Add a constructor method");
-			}
+			describeAdditionalRemovedFunctionality(desc, insert, "Add");
 		} else if(insert.getChangeType() == ChangeType.ADDITIONAL_OBJECT_STATE) {
-			desc.append("Add " + insert.getChangedEntity().getName().substring(0, insert.getChangedEntity().getName().indexOf(":")) + " attribute");
+			desc.append("Add (Object state) " + insert.getChangedEntity().getName().substring(0, insert.getChangedEntity().getName().indexOf(":")) + " attribute");
 		} else if(insert.getChangeType() == ChangeType.INCREASING_ACCESSIBILITY_CHANGE) {
 			desc.append("Increasing accessibility change " + insert.getChangedEntity().toString().substring(insert.getChangedEntity().toString().indexOf(":") + 1) + "");
 		} else if(insert.getChangeType() == ChangeType.COMMENT_INSERT || insert.getChangeType() == ChangeType.DOC_INSERT) {
@@ -320,7 +326,63 @@ public class ModificationDescriptor {
 		}
 	}
 
-	public static void describeUpdate(StringBuilder desc,
+	public void describeAdditionalRemovedFunctionality(StringBuilder desc, SourceCodeChange change, String operation) {
+		String className = change.getParentEntity().getName();
+		MethodDeclaration method = null;
+		if (change.getChangedEntity().getAstNode() instanceof MethodDeclaration) {
+			method = (MethodDeclaration) change.getChangedEntity().getAstNode();
+		}
+		String verb = "";
+		boolean hasLeadingVerb = true;
+		StringBuilder localDescriptor = new StringBuilder();
+		
+		String functionality = change.getChangedEntity().getName().substring(0, change.getChangedEntity().getName().indexOf("("));
+		VerbPhrase phrase = null;
+		LinkedList<TaggedTerm> tags = POSTagger.tag(Tokenizer.split(functionality));
+		if(tags != null && tags.size() > 0) {
+			hasLeadingVerb = PhraseUtils.hasLeadingVerb(tags.get(0));
+		}
+		
+		if(method != null && method.returnType != null && !method.returnType.toString().equals("") && !method.returnType.toString().equals("void") && !hasLeadingVerb) {
+			verb = "get";
+			NounPhrase nounPhrase = new NounPhrase(Tokenizer.split(functionality));
+			phrase = new VerbPhrase(verb, nounPhrase);
+					
+		} else {
+			phrase = new VerbPhrase(POSTagger.tag(Tokenizer.split(functionality)), className, null, false);
+		}
+		phrase.generate();
+		if(change.getChangedEntity().getAstNode() != null && !(change.getChangedEntity().getAstNode() instanceof ConstructorDeclaration)) {
+			
+			if(change.getChangedEntity() != null && change.getChangedEntity().isPrivate()) {
+				localDescriptor.append(" private ");
+			}
+			if(change.getChangedEntity() != null && change.getChangedEntity().isPrivate() &&
+					operation.equals("Remove") && isUnUsedMethod(change)) {
+				localDescriptor.append("and ");
+			}
+			if(operation.equals("Remove") && isUnUsedMethod(change)) {
+				localDescriptor.append(" unused ");
+			}
+			localDescriptor.insert(0, " " + PhraseUtils.getIndefiniteArticle(localDescriptor.toString().trim()));
+			localDescriptor.insert(0, operation);
+			localDescriptor.append(" functionality to " + phrase.toString());
+			if(method.returnType != null && !method.returnType.toString().equals("") && !method.returnType.toString().equals("void") && !hasLeadingVerb) {
+				localDescriptor.append(" (");
+				localDescriptor.append("" + method.returnType.toString());
+				localDescriptor.append(")");
+						
+			}
+		} else {
+			localDescriptor.append(operation + " a ");
+			describeDeprecatedMethod(localDescriptor, change);
+			localDescriptor.append("constructor method");
+		}
+		desc.append(localDescriptor.toString());
+		addedRemovedFunctionalities.add(change);
+	}
+	
+	public void describeUpdate(StringBuilder desc,
 			SourceCodeChange change, Update update) {
 		String fType = "Modify " + update.getChangedEntity().getType().name().toLowerCase().replace("_", " ");
 		if(fType.equals("Modify variable declaration statement")) {
@@ -343,7 +405,7 @@ public class ModificationDescriptor {
 					String name = !(new String(methodC.selector)).equals("") ? (new String(methodC.selector)) : methodC.receiver.toString();
 					String methodName = update.getRootEntity().getUniqueName().substring(update.getRootEntity().getUniqueName().lastIndexOf(".") + 1, update.getRootEntity().getUniqueName().length());
 					desc.replace(desc.lastIndexOf(fType), desc.lastIndexOf(fType) + fType.length(), "");
-					desc.insert(0, "Modify parameters calling " + name + " method at " + methodName + " method");
+					desc.insert(0, "Modify arguments list when calling " + name + " method at " + methodName + " method");
 				}
 			} else if(update.getChangedEntity().getType() == JavaEntityType.ASSIGNMENT) {
 				desc.append(StringUtils.capitalize(fType) + " ");
@@ -371,7 +433,6 @@ public class ModificationDescriptor {
 					desc.append(" decrement ");
 				}
 				desc.append(" " + prefixExpression.lhs.toString());
-				//desc.append(" was added ");
 			} else if(update.getChangedEntity().getAstNode() != null && update.getChangedEntity().getAstNode() instanceof ReturnStatement) {
 				String beforeName = update.getChangedEntity().getName().replace(";", "");
 				String afterName = update.getNewEntity().getUniqueName().replace(";", "");
@@ -449,7 +510,7 @@ public class ModificationDescriptor {
 		
 	}
 	
-	private static void compareModifiedVersions(ChangedFile file, FileDistiller distiller, Git git, String olderID, String currentID) {
+	private void compareModifiedVersions(ChangedFile file, FileDistiller distiller, Git git, String olderID, String currentID) {
 		File previousType = null;
 		File currentType = null;
 		
@@ -468,6 +529,77 @@ public class ModificationDescriptor {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public static void describeDeprecatedMethod(StringBuilder desc, SourceCodeChange insert) {
+		if(insert.getChangedEntity() != null && insert.getChangedEntity().getAstNode() != null) {
+			Annotation[] annotations = ((ConstructorDeclaration)insert.getChangedEntity().getAstNode()).annotations;
+			if(annotations != null && annotations.length > 0) {
+				for (Annotation annotation : annotations) {
+					if(annotation.type.toString().equals("Deprecated")) {
+						desc.append("deprecated ");
+						break;
+					}
+				}
+			}
+			
+		}
+	}
+	
+	private boolean isUnUsedMethod(SourceCodeChange change) {
+		boolean isUnUsed = true;
+		MethodDependencySummary methodDependencySummary = new MethodDependencySummary(change.getChangedEntity().getName());
+		methodDependencySummary.setConstructor(change.getChangedEntity().getJavaStructureNode().getType() == Type.CONSTRUCTOR);
+		methodDependencySummary.setDifferences(getDifferences());
+		methodDependencySummary.find();
+		
+		if(methodDependencySummary.getDependencies() != null && methodDependencySummary.getDependencies().size() > 0) {
+			isUnUsed = false;
+		}
+		
+		return isUnUsed;
+	}
+	
+	private void describeCollateralChanges(StringBuilder descriptor) {
+		List<NamedMember> impactedElements = new ArrayList<NamedMember>();
+		StringBuilder localDescriptor = new StringBuilder(""); 
+		//search collateral changes
+		for (SourceCodeChange change : addedRemovedFunctionalities) {
+			MethodDependencySummary methodDependencySummary = new MethodDependencySummary(change.getChangedEntity().getUniqueName());
+			methodDependencySummary.setConstructor(change.getChangedEntity().getJavaStructureNode().getType() == Type.CONSTRUCTOR);
+			methodDependencySummary.setDifferences(getDifferences());
+			methodDependencySummary.find();
+			if(methodDependencySummary.getDependencies() != null && methodDependencySummary.getDependencies().size() > 0) {
+				List<SearchMatch> dependencies = methodDependencySummary.getDependencies();
+				for (SearchMatch searchMatch : dependencies) {
+					NamedMember type = null;
+		        	if(searchMatch.getElement() instanceof ResolvedSourceMethod) {
+		        		type = ((ResolvedSourceMethod ) searchMatch.getElement());
+		        	} else if(searchMatch.getElement() instanceof ResolvedSourceType) {
+		        		type = ((ResolvedSourceType ) searchMatch.getElement());
+		        	} else if(searchMatch.getElement() instanceof ResolvedSourceField) {
+		        		type = ((ResolvedSourceField) searchMatch.getElement());
+		        	}
+		        	impactedElements.add(type);
+				}
+			}
+		}
+		if(impactedElements.size() > 0) {
+			localDescriptor.append("\n\t\tThe added/removed methods triggered changes to ");
+			for (NamedMember type : impactedElements) {
+				IJavaElement iJavaElement = type.getParent(); 
+				String name = iJavaElement.getElementName();
+				if(!localDescriptor.toString().contains(name)) {
+					localDescriptor.append(name + " " + PhraseUtils.getStringType(type.getDeclaringType()) + ", ");
+				}
+			}
+			
+			if(localDescriptor.toString().trim().length() > 0) {
+				localDescriptor = new StringBuilder(localDescriptor.substring(0, localDescriptor.length() - 2));
+				localDescriptor.append("\n");
+			}
+			descriptor.append(localDescriptor.toString());
+		}
 	}
 	
 	public List<SourceCodeChange> getChanges() {
@@ -492,6 +624,23 @@ public class ModificationDescriptor {
 
 	public void setGit(Git git) {
 		this.git = git;
+	}
+
+	public ChangedFile[] getDifferences() {
+		return differences;
+	}
+
+	public void setDifferences(ChangedFile[] differences) {
+		this.differences = differences;
+	}
+
+	public List<SourceCodeChange> getAddedRemovedFunctionalities() {
+		return addedRemovedFunctionalities;
+	}
+
+	public void setAddedRemovedFunctionalities(
+			List<SourceCodeChange> addedRemovedFunctionalities) {
+		this.addedRemovedFunctionalities = addedRemovedFunctionalities;
 	}
 
 }

@@ -49,7 +49,8 @@ public class Impact {
 	public void searchImpactSet() {
 		for (final StereotypeIdentifier identifier : identifiers) {
 			SearchRequestor findMethod = new SearchRequestor() {
-	            @Override
+	            @SuppressWarnings("unused")
+				@Override
 	            public void acceptSearchMatch(SearchMatch match) throws CoreException {
 	            	IJavaElement type = null;
 	            	if(match.getElement() instanceof SourceType) {
@@ -136,6 +137,7 @@ public class Impact {
 						}
 						for (IType iType : types) {
 							IType type = null;
+							@SuppressWarnings("unused")
 							String typeName = "";
 							if(identifier.getCompilationUnit().getAllTypes() != null && identifier.getCompilationUnit().getAllTypes().length > 0) {
 								type = identifier.getCompilationUnit().getAllTypes()[0];

@@ -42,16 +42,8 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jgit.api.AddCommand;
-import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.PushCommand;
-import org.eclipse.jgit.api.errors.ConcurrentRefUpdateException;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.NoHeadException;
-import org.eclipse.jgit.api.errors.NoMessageException;
-import org.eclipse.jgit.api.errors.UnmergedPathsException;
-import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.RenameDetector;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
@@ -142,9 +134,7 @@ public class DescribeVersionsDialog extends TitleAreaDialog {
 	public DescribeVersionsDialog(Shell shell, Git git, IJavaProject selection) {
 		super(shell);
 		shellTmp = shell;
-		/*listSelectionDialog = new ListSelectionDialog(shell, differences,
-				new ArrayContentProvider(),
-				new LabelProvider(), "Changes");*/
+
 		this.git = git;
 		this.setSelection(selection);
 		this.setHelpAvailable(false);
@@ -294,12 +284,9 @@ public class DescribeVersionsDialog extends TitleAreaDialog {
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		toolkit.adapt(parent, false, false);
-		commitAndPushButton = createButton(parent, COMMIT_AND_PUSH_ID,
-				"Commit and push", false);
-		commitButton = createButton(parent, IDialogConstants.OK_ID,
-				"Commit", true);
+		
 		createButton(parent, IDialogConstants.CANCEL_ID,
-				IDialogConstants.CANCEL_LABEL, false);
+				IDialogConstants.OK_LABEL, false);
 		updateMessage();
 	}
 	
@@ -366,70 +353,13 @@ public class DescribeVersionsDialog extends TitleAreaDialog {
 		return dropDownBar;
 	}
 	
-	@Override
-	protected void okPressed() {
-		if (!isCommitWithoutFilesAllowed()) {
-			MessageDialog.openWarning(getShell(), "No files selected", "You do not selected files to be commited");
-			return;
-		} else if(!validateCommit().equals("")) {
-			MessageDialog.openWarning(getShell(), "Error", validateCommit());
-			return;
-		}
-
-		ArrayList<String> selectedFiles = new ArrayList<String>(); 
-		Object[] checkedElements = filesViewer.getCheckedElements(); 
-		selectedFiles.clear(); 
-		for (Object obj : checkedElements)
-			selectedFiles.add(((ChangedFile) obj).getPath());
-
-		try {
-			for(String fileTmp : selectedFiles) {
-				AddCommand add = git.add();
-				add.addFilepattern(fileTmp).call();
-			}
-			
-			CommitCommand commit = git.commit();
-			commit.setAuthor(getAuthor(), getAuthor());
-			commit.setCommitter(getCommitter(), "");
-			commit.setMessage(editor.getText().getText());
-			commit.call();
-			
-			if(isPushRequested) {
-				PushCommand push = git.push();
-				push.call();
-			}
-		} catch (NoHeadException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoMessageException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnmergedPathsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ConcurrentRefUpdateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (WrongRepositoryStateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (GitAPIException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		super.okPressed();
-	}
-	
 	protected String validateCommit() {
-		String authorValue = author;
-		if (authorValue.length() == 0 /*|| RawParseUtils.parsePersonIdent(authorValue) == null*/) {
-			return "Empty or Invalid author";
+		if (previousVersionText.getText().length() == 0 ) {
+			return "Empty or invalid older commit id"; 
 		}
 
-		String committerValue = committer;
-		if (committerValue.length() == 0 /*|| RawParseUtils.parsePersonIdent(committerValue) == null*/) {
-			return "Empty or Invalid committer";
+		if (currentVersionText.getText().length() == 0 ) {
+			return "Empty or invalid newer commit id";
 		}
 		
 		return "";
@@ -501,13 +431,13 @@ public class DescribeVersionsDialog extends TitleAreaDialog {
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(personArea);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(personArea);
 
-		toolkit.createLabel(personArea, "Old: ").setForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
+		toolkit.createLabel(personArea, "Older Commit ID: ").setForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
 		setAuthorText(toolkit.createText(personArea, null));
 		getAuthorText().setText(commitPreviousID);
 		getAuthorText().setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
 		getAuthorText().setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 		
-		toolkit.createLabel(personArea, "Current: ").setForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
+		toolkit.createLabel(personArea, "Newer Commit ID: ").setForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
 		setCommitterText(toolkit.createText(personArea, null));
 		getCommitterText().setText(commitCurrentID);
 		getCommitterText().setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
@@ -644,13 +574,16 @@ public class DescribeVersionsDialog extends TitleAreaDialog {
 			
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				
-				computeModifications();
+				if(!validateCommit().equals("")) {
+					MessageDialog.openWarning(getShell(), "Error", validateCommit());
+				} else {
+					computeModifications();
+				}
 			}
-			
+
 			@Override
 			public void widgetDefaultSelected(SelectionEvent arg0) {
-				// TODO Auto-generated method stub
+				
 				
 			}
 		});
@@ -706,90 +639,95 @@ public class DescribeVersionsDialog extends TitleAreaDialog {
 			ObjectReader reader = git.getRepository().newObjectReader(); 
 
 			CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
-			oldTreeIter.reset(reader, oldId);
-			CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
-			newTreeIter.reset(reader, currentId);
-
-			List<DiffEntry> diffs = git.diff().setNewTree(newTreeIter).setOldTree(oldTreeIter).call();
-			Set<ChangedFile> differences = new TreeSet<ChangedFile>();
-			String projectName = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).getName();
 			
-
-			//rename detector
-			TreeWalk tw = new TreeWalk(git.getRepository());
-			tw.setRecursive(true);
-			tw.addTree(oldTreeIter);
-			tw.addTree(newTreeIter);
-
-			RenameDetector rd = new RenameDetector(git.getRepository());
-			rd.addAll(diffs);
-
-			List<DiffEntry> lde = rd.compute(tw.getObjectReader(), null);
-			
-			List<DiffEntry> finalChanges = cleanRenamed(diffs, lde);
-			
-			for (DiffEntry diffEntry : finalChanges) {
+			if(oldId != null || currentId != null) {
+				oldTreeIter.reset(reader, oldId);
+				CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
+				newTreeIter.reset(reader, currentId);
+	
+				List<DiffEntry> diffs = git.diff().setNewTree(newTreeIter).setOldTree(oldTreeIter).call();
+				Set<ChangedFile> differences = new TreeSet<ChangedFile>();
+				String projectName = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).getName();
 				
-				ChangedFile changedFile = new ChangedFile();
+	
+				//rename detector
+				TreeWalk tw = new TreeWalk(git.getRepository());
+				tw.setRecursive(true);
+				tw.addTree(oldTreeIter);
+				tw.addTree(newTreeIter);
+	
+				RenameDetector rd = new RenameDetector(git.getRepository());
+				rd.addAll(diffs);
+	
+				List<DiffEntry> lde = rd.compute(tw.getObjectReader(), null);
 				
-				String name = (diffEntry.getNewPath() != null) ? getFileName(diffEntry.getNewPath()) : getFileName(diffEntry.getOldPath());
+				List<DiffEntry> finalChanges = cleanRenamed(diffs, lde);
 				
-				
-				changedFile.setName(name);
-				changedFile.setAbsolutePath(diffEntry.getNewPath() != null ? projectName + "/" + diffEntry.getNewPath() : projectName + "/" + diffEntry.getOldPath());
-				changedFile.setPath(changedFile.getAbsolutePath());
-				if(diffEntry.getChangeType().name().equals("RENAME")) {
-					changedFile.setRenamedPath(diffEntry.getOldPath());
-					changedFile.setRenamed(true);
-					changedFile.setChangeType(TypeChange.ADDED.name());
-					changedFile.setTypeChange(TypeChange.ADDED);
-				} else	if(diffEntry.getChangeType().name().equals("MODIFY")) {
-					changedFile.setRenamed(false);
-					changedFile.setChangeType(TypeChange.MODIFIED.name());
-					changedFile.setTypeChange(TypeChange.MODIFIED);
-				} else if(diffEntry.getChangeType().name().equals("ADD")) {
-					changedFile.setRenamed(false);
-					changedFile.setChangeType(TypeChange.ADDED.name());
-					changedFile.setTypeChange(TypeChange.ADDED);
-				} else if(diffEntry.getChangeType().name().equals("REMOVE") || diffEntry.getChangeType().name().equals("DELETE")) {
-					changedFile.setRenamed(false);
-					changedFile.setChangeType(TypeChange.REMOVED.name());
-					changedFile.setTypeChange(TypeChange.REMOVED);
+				for (DiffEntry diffEntry : finalChanges) {
 					
-					changedFile.setAbsolutePath(projectName + "/" + diffEntry.getOldPath());
+					ChangedFile changedFile = new ChangedFile();
+					
+					String name = (diffEntry.getNewPath() != null) ? getFileName(diffEntry.getNewPath()) : getFileName(diffEntry.getOldPath());
+					
+					
+					changedFile.setName(name);
+					changedFile.setAbsolutePath(diffEntry.getNewPath() != null ? projectName + "/" + diffEntry.getNewPath() : projectName + "/" + diffEntry.getOldPath());
 					changedFile.setPath(changedFile.getAbsolutePath());
-				} 
-				
-				if(changedFile.getTypeChange() != null) {
-					differences.add(changedFile);
+					if(diffEntry.getChangeType().name().equals("RENAME")) {
+						changedFile.setRenamedPath(diffEntry.getOldPath());
+						changedFile.setRenamed(true);
+						changedFile.setChangeType(TypeChange.ADDED.name());
+						changedFile.setTypeChange(TypeChange.ADDED);
+					} else	if(diffEntry.getChangeType().name().equals("MODIFY")) {
+						changedFile.setRenamed(false);
+						changedFile.setChangeType(TypeChange.MODIFIED.name());
+						changedFile.setTypeChange(TypeChange.MODIFIED);
+					} else if(diffEntry.getChangeType().name().equals("ADD")) {
+						changedFile.setRenamed(false);
+						changedFile.setChangeType(TypeChange.ADDED.name());
+						changedFile.setTypeChange(TypeChange.ADDED);
+					} else if(diffEntry.getChangeType().name().equals("REMOVE") || diffEntry.getChangeType().name().equals("DELETE")) {
+						changedFile.setRenamed(false);
+						changedFile.setChangeType(TypeChange.REMOVED.name());
+						changedFile.setTypeChange(TypeChange.REMOVED);
+						
+						changedFile.setAbsolutePath(projectName + "/" + diffEntry.getOldPath());
+						changedFile.setPath(changedFile.getAbsolutePath());
+					} 
+					
+					if(changedFile.getTypeChange() != null) {
+						differences.add(changedFile);
+					}
+					
+					System.out.println(changedFile.toString());
 				}
 				
-				System.out.println(changedFile.toString());
+				
+				for (DiffEntry de : lde) {
+				    if (de.getScore() >= rd.getRenameScore()) {
+				        System.out.println("file: " + de.getOldPath() + " copied/moved to: " + de.getNewPath());
+				    }
+				}
+				Sets.intersection(new HashSet<DiffEntry>(diffs), new HashSet<DiffEntry>(lde));
+				
+				listSelectionDialog = new ListSelectionDialog(this.shellTmp.getShell(), differences,
+						new ArrayContentProvider(),
+						new LabelProvider(), "Changes");
+				
+				items = differences;
+				
+				if(items != null) {
+					filesViewer.setInput(items.toArray());
+				}
+			} else {
+				MessageDialog.openWarning(getShell(), "Error", "The older or newer commit id is not valid!");
 			}
-			
-			
-			for (DiffEntry de : lde) {
-			    if (de.getScore() >= rd.getRenameScore()) {
-			        System.out.println("file: " + de.getOldPath() + " copied/moved to: " + de.getNewPath());
-			    }
+				
+			} catch (RevisionSyntaxException | IOException | GitAPIException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			Sets.intersection(new HashSet<DiffEntry>(diffs), new HashSet<DiffEntry>(lde));
-			
-			listSelectionDialog = new ListSelectionDialog(this.shellTmp.getShell(), differences,
-					new ArrayContentProvider(),
-					new LabelProvider(), "Changes");
-			
-			items = differences;
-			
-			if(items != null) {
-				filesViewer.setInput(items.toArray());
-			}
-			
-			
-		} catch (RevisionSyntaxException | IOException | GitAPIException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 	}
 	
 	private List<DiffEntry> cleanRenamed(List<DiffEntry> diffs, List<DiffEntry> lde) {

@@ -142,11 +142,11 @@ public class SummarizeChangesTMP {
 								return Status.OK_STATUS;
 							}
 						};
-						internalJob.addJobChangeListener(new JobChangeAdapter() {
+						/*internalJob.addJobChangeListener(new JobChangeAdapter() {
 									public void done(IJobChangeEvent event) {
-										//updateTextInputDescription();
+										updateTextInputDescription();
 									}
-								});
+								});*/
 						internalJob.schedule();
 						try {
 							internalJob.join();
@@ -192,8 +192,7 @@ public class SummarizeChangesTMP {
 					
 					String currentPackage = "";
 					StringBuilder desc = new StringBuilder(); 
-					//Commit stereotype description
-					desc.append(summarizeCommitStereotype());
+					
 					int i = 1;
 					int j = 1;
 					
@@ -240,6 +239,7 @@ public class SummarizeChangesTMP {
 						}
 						if(identifier.getValue().getScmOperation().equals(TypeChange.MODIFIED.toString())) {
 							ModificationDescriptor modificationDescriptor = new ModificationDescriptor();
+							modificationDescriptor.setDifferences(differences);
 							modificationDescriptor.setFile(identifier.getValue().getChangedFile());
 							modificationDescriptor.setGit(getGit());
 							modificationDescriptor.extractDifferencesBetweenVersions(identifier.getValue().getChangedFile(), git, changedListDialog.getAuthorText().getText(), changedListDialog.getCommitterText().getText());
@@ -263,6 +263,9 @@ public class SummarizeChangesTMP {
 					generalDescriptor.setInitialCommit(isInitialCommit);
 					generalDescriptor.setGit(git);
 					desc.insert(0, generalDescriptor.describe());
+					
+					//Commit stereotype description
+					desc.insert(0, summarizeCommitStereotype());
 					
 					if(isInitialCommit) {
 						desc.insert(0, "Initial commit. "); 
@@ -406,7 +409,7 @@ public class SummarizeChangesTMP {
 		for(StereotypeIdentifier identifier : identifiers) {
 
 			for(StereotypedElement element : identifier.getStereotypedElements()) {
-				if(!identifier.getScmOperation().equals(TypeChange.MODIFIED.name())) {
+				if(!identifier.getScmOperation().equals(TypeChange.MODIFIED.name()) && !identifier.getChangedFile().isRenamed()) {
 					methods.addAll((Collection<? extends StereotypedMethod>) element.getStereoSubElements());
 				} else {
 					List<StructureEntityVersion> modifiedMethods = identifier.getChangedFile().getModifiedMethods();
