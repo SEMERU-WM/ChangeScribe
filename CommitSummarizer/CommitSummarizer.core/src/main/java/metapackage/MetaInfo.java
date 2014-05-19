@@ -3,7 +3,7 @@ package metapackage;
 
 import java.io.File;
 
-import co.edu.unal.colswe.CommitSummarizer.core.Activator;
+import co.edu.unal.colswe.changescribe.core.Activator;
 
 public class MetaInfo {
 	public static final int k=1; 

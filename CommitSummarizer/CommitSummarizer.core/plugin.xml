@@ -4,32 +4,32 @@
    <extension
          point="org.eclipse.ui.commands">
       <category
-            id="CommitSummarizer.core.commands.category"
+            id="changescribe.core.commands.category"
             name="Git Actions Category">
       </category>
       <command
-            categoryId="CommitSummarizer.core.commands.category"
-            id="CommitSummarizer.core.commands.commitCommand"
+            categoryId="changescribe.core.commands.category"
+            id="changescribe.core.commands.commitCommand"
             name="Commit">
       </command>
       <command
-            categoryId="CommitSummarizer.core.commands.category"
-            id="CommitSummarizer.core.commands.describeVersionsCommand"
+            categoryId="changescribe.core.commands.category"
+            id="changescribe.core.commands.describeVersionsCommand"
             name="Describe versions">
       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="commitsummarizer.core.handlers.CommitCommandHandler"
-            commandId="CommitSummarizer.core.commands.commitCommand">
+            class="changescribe.core.handlers.CommitCommandHandler"
+            commandId="changescribe.core.commands.commitCommand">
       </handler>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="commitsummarizer.core.handlers.CompareVersionsHandler"
-            commandId="CommitSummarizer.core.commands.describeVersionsCommand">
+            class="changescribe.core.handlers.CompareVersionsHandler"
+            commandId="changescribe.core.commands.describeVersionsCommand">
       </handler>
    </extension>
    <extension
@@ -40,11 +40,11 @@
       <menuContribution
             locationURI="popup:org.eclipse.ui.popup.any?after=additions">
          <menu
-               id="CommitSummarizer.core.menus.commitMenu"
-               label="JComment">
+               id="changescribe.core.menus.commitMenu"
+               label="ChangeScribe">
             <command
-                  commandId="CommitSummarizer.core.commands.commitCommand"
-                  id="CommitSummarizer.core.menus.commitCommand"
+                  commandId="changescribe.core.commands.commitCommand"
+                  id="changescribe.core.menus.commitCommand"
                   style="push">
                   <visibleWhen
                   checkEnabled="false">
@@ -76,8 +76,8 @@
             </visibleWhen>
             </command>
             <command
-                  commandId="CommitSummarizer.core.commands.describeVersionsCommand"
-                  id="CommitSummarizer.core.menus.describeVersionsCommand"
+                  commandId="changescribe.core.commands.describeVersionsCommand"
+                  id="changescribe.core.menus.describeVersionsCommand"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -115,15 +115,15 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="commitsummarizer.core.preferences.PreferencePage"
-            id="commitsummarizer.core.preferences.PreferencePage"
-            name="JComment Preferences">
+            class="changescribe.core.preferences.PreferencePage"
+            id="changescribe.core.preferences.PreferencePage"
+            name="ChangeScribe Preferences">
       </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="commitsummarizer.core.preferences.PreferenceInitializer">
+            class="changescribe.core.preferences.PreferenceInitializer">
       </initializer>
    </extension>
 </plugin>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="CommitSummarizer.feature"
-      label="CommitSummarizer plugin"
+      id="ChangeScribe.feature"
+      label="ChangeScribe plugin"
       version="0.0.1.qualifier">
 
-   <description url="http://blobsolutions.com/commitsummarizer/">
-      JComment is an Eclipse plug-in to generate commit messages for Java applications and Git SCM. 
+   <description url="http://blobsolutions.com/changescribe/">
+      ChangeScribe is an Eclipse plug-in to generate commit messages for Java applications and Git SCM. 
    </description>
 
    <license url="http://www.eclipse.org/legal/epl-v10.html">
@@ -92,7 +92,7 @@ This Agreement is governed by the laws of the State of New York and the intellec
    </requires>
 
    <plugin
-         id="CommitSummarizer.core"
+         id="ChangeScribe.core"
          download-size="0"
          install-size="0"
          version="0.0.1.qualifier"

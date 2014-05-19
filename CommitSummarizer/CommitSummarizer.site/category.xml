@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/CommitSummarizer.feature_0.0.1.qualifier.jar" id="CommitSummarizer.feature" version="0.0.1.qualifier">
+   <feature url="features/ChangeScribe.feature_0.0.1.qualifier.jar" id="ChangeScribe.feature" version="0.0.1.qualifier">
       <category name="summarizer"/>
    </feature>
    <category-def name="summarizer" label="summarizer"/>

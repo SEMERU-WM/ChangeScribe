@@ -2,12 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>co.edu.unal.colswe</groupId>
-  <artifactId>CommitSummarizer</artifactId>
+  <artifactId>ChangeScribe</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>CommitSummarizer :: parent</name>
   <description>CommitSummarizer parent</description>
-  
+
   <dependencies>
   	<dependency>
 		<groupId>ch.uzh.ifi.seal</groupId>
@@ -28,7 +28,7 @@
   <properties>
     <java.version>1.5</java.version>
   	<maven.version>3.0</maven.version>
-  	<tycho.version>0.16.0</tycho.version>
+  	<tycho.version>0.18.1</tycho.version>
   	<tycho.test.jvmArgs>-Xmx512m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
   </properties>
 
@@ -138,7 +138,7 @@
         						<artifactId>
         							tycho-compiler-plugin
         						</artifactId>
-        						<versionRange>[0.16.0,)</versionRange>
+        						<versionRange>[0.18.1,)</versionRange>
         						<goals>
         							<goal>compile</goal>
         							<goal>testCompile</goal>
@@ -154,7 +154,7 @@
         						<artifactId>
         							tycho-packaging-plugin
         						</artifactId>
-        						<versionRange>[0.16.0,)</versionRange>
+        						<versionRange>[0.18.1,)</versionRange>
         						<goals>
         							<goal>build-qualifier</goal>
         							<goal>validate-id</goal>

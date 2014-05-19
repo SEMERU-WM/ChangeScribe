@@ -52,7 +52,7 @@ import changetypes.AtomicChange.ChangeTypes;
 import changetypes.ChangeSet;
 import changetypes.Fact;
 import changetypes.FactBase;
-import co.edu.unal.colswe.CommitSummarizer.core.Activator;
+import co.edu.unal.colswe.changescribe.core.Activator;
 
 public class LSDiffExecutor {
 	private static final int NUM_THREADS = 4;
