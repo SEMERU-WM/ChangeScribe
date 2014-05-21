@@ -6,7 +6,7 @@ This repository contains the source code of ChangeScribe Eclipse plug-in. This p
 Content
 -------
 
-Repository contains below directories:
+Repository contains the following directories:
 
 - CommitSummarizer.core - Includes source files of the plug-in.
 - CommitSummarizer.test - Includes JUnit test.
