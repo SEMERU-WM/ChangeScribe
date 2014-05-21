@@ -1,0 +1,29 @@
+About
+-----
+
+This repository contains the source code of ChangeScribe Eclipse plug-in. This plug-in allows generate commit messages for Java Projects.
+
+Content
+-------
+
+Repository contains below directories:
+
+- CommitSummarizer.core - Includes source files of the plug-in.
+- CommitSummarizer.test - Includes JUnit test.
+- CommitSummarizer.feature - Includes Eclipse plug-in description.
+- CommitSummarizer.site - Includes Eclipse update site configuration.
+
+Getting Started
+----------------
+
+1. git clone https://github.com/SEMERU-WM/ChangeScribe.git
+2. For each module (core, site, features, test) import in Eclipse IDE selecting *Import ...* > *Import as Existing Maven Projects ...*
+3. Run in Eclipse IDE doing right click on ChangeScribe.core project, select Run as ... > Eclipse Application 
+
+Package
+-------
+
+1. Compile and package using mvn clean package
+2. In the following directory *CommitSummarizer.site -> target -> repository* find the binary files of the plug-in
+
+For other commands, review Eclipse Tycho Documentation here http://www.eclipse.org/tycho/sitedocs/index.html
