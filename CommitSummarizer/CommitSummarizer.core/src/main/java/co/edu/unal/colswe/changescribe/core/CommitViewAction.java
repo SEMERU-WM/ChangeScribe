@@ -56,7 +56,7 @@ public class CommitViewAction implements IViewActionDelegate {
 	}
 	
 	private void initMonitorDialog(IAction event) {
-            final Job job = new Job("JSummarizer - Summarizing types") {
+            final Job job = new Job("ChangeScribe - Summarizing types") {
                 protected IStatus run(final IProgressMonitor monitor) {
                 	IStatus status = gettingRepositoryStatus(monitor);
                 	createDialog();

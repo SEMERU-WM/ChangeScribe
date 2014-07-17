@@ -58,7 +58,7 @@ public class CompareVersionsHandler extends AbstractHandler {
 	}
 	
 	private void initMonitorDialog(final IStructuredSelection selection) {
-        final Job job = new Job("JSummarizer - Summarizing types") {
+        final Job job = new Job("ChangeScribe - Summarizing types") {
             protected IStatus run(final IProgressMonitor monitor) {
             	IStatus status = gettingRepositoryStatus(monitor);
             	if(status.equals(org.eclipse.core.runtime.Status.OK_STATUS)) {
