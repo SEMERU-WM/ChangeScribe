@@ -210,7 +210,7 @@ public class SummarizeChanges {
 				for(Entry<String, StereotypeIdentifier> identifier : summarized.entrySet()) {
 					StringBuilder descTmp = new StringBuilder("");
 					StereotypeIdentifier calculated = identifiers.get(identifiers.indexOf(identifier.getValue()));
-					if(filtering && calculated != null && calculated.getImpactPercentaje() <= (factor /* 100*/) ) {
+					if(filtering && calculated != null && calculated.getImpactPercentaje() <= (factor) ) {
 						continue;
 					}
 					if(i == 1) {

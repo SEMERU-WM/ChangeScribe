@@ -115,7 +115,7 @@ public class ModificationDescriptor {
 		addedRemovedFunctionalities = new ArrayList<SourceCodeChange>();
 		if(changes != null) {
 			if(changes != null && changes.size() > 0) {
-				desc.append((i - 1) + "." + j + ". " + " Modifications to " + file.getName() + ":  \n\n");
+				desc.append(/*(i - 1) + "." + j + ". " + */"Modifications to " + file.getName() + ":  \n\n");
 			} 
 			int k = 1;
 		    for(SourceCodeChange change : changes) {
@@ -137,8 +137,8 @@ public class ModificationDescriptor {
 		    	if(!descTmp.toString().equals("") && (change instanceof Update || change instanceof Insert || change instanceof Delete)) {
 			    	
 			    	if(!localDescription.toString().toLowerCase().contains(descTmp.toString().toLowerCase())) {
-			    		desc.append("\t\t");
-				    	desc.append((i - 1) + "." + j + "." + k + ". ");
+			    		desc.append("\t");
+				    	//desc.append((i - 1) + "." + j + "." + k + ". ");
 			    		desc.append(descTmp.toString());
 			    		localDescription.append(descTmp.toString());
 			    		
@@ -465,7 +465,7 @@ public class ModificationDescriptor {
 				}
 			} else {
 				String name = (!update.getChangedEntity().getName().equals("")) ? update.getChangedEntity().getName() : update.getChangedEntity().getAstNode().toString();
-				desc.append("Change attribute type " + name + " with " + update.getNewEntity().getAstNode().toString());
+				desc.append("Change attribute type " + name + " with " + update.getNewEntity().getUniqueName().toString());
 			}
 		} else if(update.getChangeType() == ChangeType.CONDITION_EXPRESSION_CHANGE) {
 			desc.append("Modify conditional expression " + update.getChangedEntity().getName().substring(1, update.getChangedEntity().getName().length() - 1) + " with " + update.getNewEntity().getUniqueName() + " at " + update.getParentEntity().getName() + " method");

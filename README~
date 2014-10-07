@@ -27,15 +27,3 @@ Package
 2. In the following directory *CommitSummarizer.site -> target -> repository* find the binary files of the plug-in
 
 For other commands, review Eclipse Tycho Documentation here http://www.eclipse.org/tycho/sitedocs/index.html
-
-Obtaining ChangeScribe
--------
-
-ChangeScribe is open source, available under Eclipse Public Licence, EPL (http://www.eclipse.org/legal/epl-v10.html). Please cite [1] if you want
-reference ChangeScribe in your scientific work.
-
-References
--------
-
-[1] Cortés-Coy, L. F., Linares-Vásquez, M., Aponte, J., and Poshyvanyk, D., "On Automatically Generating Commit Messages via Summarization of Source Code Changes", 
-in Proceedings of 14th IEEE International Working Conference on Software Code Analysis and Manipulation (SCAM’14), Victoria, Canada, September 28-29, 2014, to appear 10 pages.

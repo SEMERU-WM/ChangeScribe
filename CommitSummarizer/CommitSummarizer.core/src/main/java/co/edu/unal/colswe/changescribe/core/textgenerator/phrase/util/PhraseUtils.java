@@ -210,5 +210,15 @@ public class PhraseUtils {
         }
         return -1;
     }
+    
+    public static String getIsAre(int size) {
+    	String value = "";
+    	if(size == 1) {
+    		value = " is ";
+    	} else if(size > 1) {
+    		value = " are ";
+    	}
+    	return value;
+    }
 
 }

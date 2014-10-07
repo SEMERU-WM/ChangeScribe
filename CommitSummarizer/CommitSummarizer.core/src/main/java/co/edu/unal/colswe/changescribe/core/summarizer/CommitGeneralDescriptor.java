@@ -46,15 +46,14 @@ public class CommitGeneralDescriptor {
 			if(renames != null && renames.size() > 0) {
 				describeRenamed(descriptionBuilder);
 			}
-			
 			if(descriptionBuilder.length() > 0) {
 				descriptionBuilder.insert(0, "This commit ");
 			}
 		} else  {
-			return "";
+			descriptionBuilder.append("");
 		}
 		
-		
+		descriptionBuilder.append("\n");
 		return descriptionBuilder.toString();
 	}
 	
