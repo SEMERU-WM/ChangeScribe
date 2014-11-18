@@ -145,38 +145,10 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 	}
 	
 	public void refreshView() {
-		//boolean visible = Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.P_COMMIT_SIGNATURE_ACTIVE);
-		
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
 				MessageDialog.openInformation(getShell(), "Information", "You must close the window for the changes to take effect");
 			}});
-		/*if(signatureCanvas != null) {
-			
-			signatureCanvas.setSignatureMap(signatureMap);
-			
-			signatureCanvas.getCanvas().setVisible(visible);
-			Point size = this.getContents().getSize();
-			if(visible) {
-				signatureCanvas.getCanvas().setLayoutData(GridDataFactory.fillDefaults()
-						.grab(true, true).hint(size).minSize(size.x, 90)
-						.align(SWT.FILL, SWT.FILL).create());
-			} else {
-				signatureCanvas.getCanvas().setLayoutData(GridDataFactory.fillDefaults()
-						.grab(true, true).hint(size).minSize(size.x, 0)
-						.align(SWT.FILL, SWT.FILL).create());
-			}
-			
-			getShell().redraw();
-			getShell().update();
-			signatureCanvas.redraw();
-			messageAndPersonArea.redraw();
-			messageAndPersonArea.update();
-			messageAndPersonArea.layout();
-			sashForm.redraw();
-			
-			
-		}*/
 	}
 	
 	static class CommitFileContentProvider extends BaseWorkbenchContentProvider {
@@ -573,6 +545,7 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 	 */
 	private ToolItem createHelpButton(ToolBar filesToolbar) {
 		ToolItem help = new ToolItem(filesToolbar,SWT.PUSH);
+		help.setWidth(20);
 	    Image img = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_LCL_LINKTO_HELP);
 	    help.setImage(img);
 	    help.setToolTipText("Help");
@@ -589,7 +562,7 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		toolkit.paintBordersFor(filesArea);
 		GridLayoutFactory.fillDefaults().extendedMargins(2, 2, 2, 2).applyTo(filesArea);
 
-		ToolBar filesToolbar = new ToolBar(filesSection, SWT.FLAT);
+		ToolBar filesToolbar = new ToolBar(filesSection, SWT.WRAP);
 
 		filesSection.setTextClient(filesToolbar);
 
@@ -646,12 +619,14 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		});
 		
 		ToolItem describeChangesItem = new ToolItem(filesToolbar, SWT.PUSH);
+		describeChangesItem.setWidth(20);
 		Image describeImage = UIIcons.ANNOTATE.createImage();
 		describeChangesItem.setImage(describeImage);
 		describeChangesItem.setToolTipText("Describe changes");
 		describeChangesItem.addSelectionListener(new SummarizeChangeListener(this));
 
 		ToolItem checkAllItem = new ToolItem(filesToolbar, SWT.PUSH);
+		checkAllItem.setWidth(20);
 		Image checkImage = UIIcons.CHECK_ALL.createImage();
 		checkAllItem.setImage(checkImage);
 		checkAllItem.setToolTipText("Select All");
@@ -666,6 +641,7 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		});
 
 		ToolItem uncheckAllItem = new ToolItem(filesToolbar, SWT.PUSH);
+		uncheckAllItem.setWidth(20);
 		Image uncheckImage = UIIcons.UNCHECK_ALL.createImage();
 		uncheckAllItem.setImage(uncheckImage);
 		uncheckAllItem.setToolTipText("Deselect All");

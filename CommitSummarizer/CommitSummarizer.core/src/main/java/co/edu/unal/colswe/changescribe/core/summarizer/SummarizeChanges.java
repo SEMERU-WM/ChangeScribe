@@ -627,6 +627,15 @@ public class SummarizeChanges {
 		stereotypeIdentifier.setScmOperation(scmOperation);
 		stereotypeIdentifier.setChangedFile(file);
 		
+		for (StereotypedElement stereotypedElement : stereotypeIdentifier.getStereotypedElements()) {
+			if(stereotypedElement.getStereoSubElements() != null && !stereotypedElement.getStereoSubElements().isEmpty()) {
+				for (StereotypedElement stereotypedElement2 : stereotypedElement.getStereoSubElements()) {
+						System.out.println("Method: " + ((StereotypedMethod)stereotypedElement2) + " stereotype: " + stereotypedElement2.getStereotypes().toString());
+					
+				}
+			}
+		}
+		
 		identifiers.add(stereotypeIdentifier);
 		
 		return stereotypeIdentifier;
