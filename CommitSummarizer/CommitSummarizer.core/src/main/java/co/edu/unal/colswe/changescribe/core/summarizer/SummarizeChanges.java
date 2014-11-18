@@ -434,9 +434,9 @@ public class SummarizeChanges {
 			
 			if(stereotype != null) {
 				result = CommitStereotypeDescriptor.describe(stereotypeIdentifier.getCompilationUnit() ,stereotypedCommit);
-			} else {
+			} /*else {
 				result = "Not found commit stereotype. ";
-			}
+			}*/
 			changedListDialog.setSignatureMap(stereotypedCommit.getSignatureMap());
 		} else {
 			changedListDialog.setSignatureMap(new TreeMap<MethodStereotype, Integer>());
