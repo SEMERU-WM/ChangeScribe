@@ -44,12 +44,7 @@ public class JParser {
         
         this.unit = (CompilationUnit)parser.createAST((IProgressMonitor)null);
         this.elements = new ArrayList<ASTNode>();
-        //try {
-            //this.document = new Document(unit.getSource());
-        //}
-        /*catch (JavaModelException ex) {
-            System.err.println("Ooops! An error occurred when printing the report.");
-        }*/
+
     }
     
     public JParser(final File file) throws CoreException {

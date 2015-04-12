@@ -45,18 +45,20 @@ public class MethodDependencySummary extends DependencySummary {
         	constructor = IJavaSearchConstants.CONSTRUCTOR;
         }
         
-        SearchPattern pattern = SearchPattern.createPattern(
-                		getName(),
-                		constructor,
-                        IJavaSearchConstants.REFERENCES,
-                        SearchPattern.R_EXACT_MATCH);
-        SearchParticipant[] participant = new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() };
-        try {
-			engine.search(pattern, participant, workspaceScope, createSearchRequestor(), new NullProgressMonitor());
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        if(null != getName() && !getName().isEmpty()) {
+	        SearchPattern pattern = SearchPattern.createPattern(
+	                		getName(),
+	                		constructor,
+	                        IJavaSearchConstants.REFERENCES,
+	                        SearchPattern.R_EXACT_MATCH);
+	        SearchParticipant[] participant = new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() };
+	        try {
+				engine.search(pattern, participant, workspaceScope, createSearchRequestor(), new NullProgressMonitor());
+			} catch (CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
 	}
 
 	@Override

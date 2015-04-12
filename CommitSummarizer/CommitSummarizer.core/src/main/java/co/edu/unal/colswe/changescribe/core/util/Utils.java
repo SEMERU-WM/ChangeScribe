@@ -48,6 +48,7 @@ public class Utils {
 		TreeWalk treeWalk = new TreeWalk(repository);
 		treeWalk.addTree(tree);
 		treeWalk.setRecursive(true);
+		treeWalk.setPostOrderTraversal(true);
 		treeWalk.setFilter(PathFilter.create(filePath));
 		if (!treeWalk.next()) {
 			
@@ -78,6 +79,7 @@ public class Utils {
 		TreeWalk treeWalk = new TreeWalk(repository);
 		treeWalk.addTree(tree);
 		treeWalk.setRecursive(true);
+		treeWalk.setPostOrderTraversal(true);
 		treeWalk.setFilter(PathFilter.create(filePath));
 		if (!treeWalk.next()) {
 			
@@ -108,6 +110,7 @@ public class Utils {
 		TreeWalk treeWalk = new TreeWalk(repository);
 		treeWalk.addTree(tree);
 		treeWalk.setRecursive(true);
+		treeWalk.setPostOrderTraversal(true);
 		treeWalk.setFilter(PathFilter.create(filePath.substring(filePath.indexOf("/") + 1)));
 		if (!treeWalk.next()) {
 			
@@ -139,13 +142,19 @@ public class Utils {
 		TreeWalk treeWalk = new TreeWalk(repository);
 		treeWalk.addTree(tree);
 		treeWalk.setRecursive(true);
+		//treeWalk.setPostOrderTraversal(true);
 		treeWalk.setFilter(PathFilter.create(filePath.substring(filePath.indexOf("/") + 1)));
-
-		if (!treeWalk.next()) { 
-			
-			//TODO the file is added to project
-			throw new IllegalStateException(
-					"CHANGECOMMIT -- Did not find expected file '" + filePath + "'");
+		
+		if (!treeWalk.next()) {
+			treeWalk = new TreeWalk(repository);
+			treeWalk.addTree(tree);
+			treeWalk.setRecursive(true);
+			treeWalk.setFilter(PathFilter.create(filePath));
+			if(!treeWalk.next()) {
+				//TODO the file is added to project
+				throw new IllegalStateException(
+						"CHANGECOMMIT -- Did not find expected file '" + filePath + "'");
+			}
 		}
 
 		ObjectId objectId = treeWalk.getObjectId(0);

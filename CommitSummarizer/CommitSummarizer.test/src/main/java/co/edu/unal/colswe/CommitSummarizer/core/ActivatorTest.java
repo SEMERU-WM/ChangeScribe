@@ -15,10 +15,9 @@ import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.junit.Before;
 import org.junit.Test;
 
-import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile;
-import co.edu.unal.colswe.CommitSummarizer.core.git.ChangedFile.TypeChange;
-import co.edu.unal.colswe.CommitSummarizer.core.summarizer.SummarizeChanges;
-import co.edu.unal.colswe.CommitSummarizer.core.summarizer.SummarizeChangesEngine;
+import co.edu.unal.colswe.changescribe.core.git.ChangedFile;
+import co.edu.unal.colswe.changescribe.core.git.ChangedFile.TypeChange;
+import co.edu.unal.colswe.changescribe.core.summarizer.SummarizeChangesEngine;
 
 /**
  * Sample integration test. In Eclipse, right-click > Run As > JUnit-Plugin. <br/>
@@ -38,7 +37,7 @@ public class ActivatorTest {
 	@Before
 	public void configureEnvironment() {
 		String repositoryProject = "/home/fernandocortes/git/elasticsearch/";
-		differences = new ArrayList<>();
+		differences = new ArrayList<ChangedFile>();
 		File file = new File(repositoryProject);
 		try {
 			git = Git.open(file);

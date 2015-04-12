@@ -30,10 +30,12 @@ public class SCMRepository {
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
-				try {
-					git = Git.open(file.getParentFile());
-				} catch (IOException e) {
-					e.printStackTrace();
+				if(null == git) {
+					try {
+						git = Git.open(file.getParentFile());
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		} else {

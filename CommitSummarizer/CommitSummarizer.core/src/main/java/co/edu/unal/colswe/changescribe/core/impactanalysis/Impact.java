@@ -109,6 +109,8 @@ public class Impact {
 		for(final StereotypeIdentifier cf : identifiers) {
 			if(cf.getChangedFile().getPath().startsWith(projectName)) {
 				scope[i] = JavaCore.create(project.findMember(cf.getChangedFile().getPath().replaceFirst(projectName, "")));
+			} else if(null != cf.getCompilationUnit()) {
+				scope[i] = cf.getCompilationUnit();
 			} else {
 				scope[i] = JavaCore.create(project.findMember(cf.getChangedFile().getPath()));
 			}

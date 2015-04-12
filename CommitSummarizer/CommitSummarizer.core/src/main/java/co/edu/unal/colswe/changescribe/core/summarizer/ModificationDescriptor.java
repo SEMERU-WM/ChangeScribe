@@ -69,6 +69,7 @@ public class ModificationDescriptor {
 	private Git git;
 	private ChangedFile[] differences;
 	private List<SourceCodeChange> addedRemovedFunctionalities;
+	private boolean onlyStructuralChanges = false;
 	
 	public void extractDifferences(ChangedFile file, Git git) {
 		FileDistiller distiller = ChangeDistiller.createFileDistiller(Language.JAVA); 
@@ -87,7 +88,7 @@ public class ModificationDescriptor {
 		} catch(IllegalStateException ex) {
 			ex.printStackTrace();
 		}
-		changes = distiller.getSourceCodeChanges();
+		changes = distiller.getSourceCodeChanges(); 
 	}
 	
 	public void extractModifiedMethods() {
@@ -114,23 +115,26 @@ public class ModificationDescriptor {
 		StringBuilder localDescription = new StringBuilder("");
 		addedRemovedFunctionalities = new ArrayList<SourceCodeChange>();
 		if(changes != null) {
-			if(changes != null && changes.size() > 0) {
-				desc.append(/*(i - 1) + "." + j + ". " + */"Modifications to " + file.getName() + ":  \n\n");
-			} 
-			int k = 1;
+			
+	
 		    for(SourceCodeChange change : changes) {
 		    	StringBuilder descTmp = new StringBuilder("");
 		    	if(change instanceof Update) {
 		    		Update update = (Update) change;
-		    		describeUpdate(descTmp, change, update);
+		    		if(isStructuralChange(update.getChangeType())) {
+		    			describeUpdate(descTmp, change, update);
+		    		}
 		    		
 		    	} else if(change instanceof Insert) {
 		    		Insert insert = (Insert) change;
-		    		describeInsert(descTmp, insert); 
-	    			
+		    		if(isStructuralChange(insert.getChangeType())) {
+		    			describeInsert(descTmp, insert); 
+		    		}
 	    		} else if(change instanceof Delete) {
 	    			Delete delete = (Delete) change;
-	    			describeDelete(descTmp, delete);
+	    			if(isStructuralChange(delete.getChangeType())) {
+	    				describeDelete(descTmp, delete);
+	    			}
 	    		} else if(change instanceof Move) {
 	    		} 
 		    	
@@ -138,13 +142,12 @@ public class ModificationDescriptor {
 			    	
 			    	if(!localDescription.toString().toLowerCase().contains(descTmp.toString().toLowerCase())) {
 			    		desc.append("\t");
-				    	//desc.append((i - 1) + "." + j + "." + k + ". ");
+				    	
 			    		desc.append(descTmp.toString());
 			    		localDescription.append(descTmp.toString());
 			    		
 			    		if(!descTmp.toString().equals("") && (change instanceof Update || change instanceof Insert || change instanceof Delete)) {
 				    		desc.append("\n");
-				    		k++;
 				    	}
 			    	}
 		    	}
@@ -153,9 +156,14 @@ public class ModificationDescriptor {
 		    	describeCollateralChanges(desc);
 		    }
 		    if(!localDescription.toString().equals("")) {
+		    	if(changes != null && changes.size() > 0) {
+					desc.insert(0, "Modifications to " + file.getName() + ":  \n\n");
+				} 
 		    	desc.append("\n");
 		    }
 		}
+		System.out.println("Modification Descriptor: " + desc.toString());
+		
 	}
 
 	public void describeDelete(StringBuilder desc, Delete delete) {
@@ -264,7 +272,7 @@ public class ModificationDescriptor {
 		
 		if(insert.getChangeType() == ChangeType.ADDITIONAL_FUNCTIONALITY) {
 			describeAdditionalRemovedFunctionality(desc, insert, "Add");
-		} else if(insert.getChangeType() == ChangeType.ADDITIONAL_OBJECT_STATE) {
+		} else if(insert.getChangeType() == ChangeType.ADDITIONAL_OBJECT_STATE ) {
 			desc.append("Add (Object state) " + insert.getChangedEntity().getName().substring(0, insert.getChangedEntity().getName().indexOf(":")) + " attribute");
 		} else if(insert.getChangeType() == ChangeType.INCREASING_ACCESSIBILITY_CHANGE) {
 			desc.append("Increasing accessibility change " + insert.getChangedEntity().toString().substring(insert.getChangedEntity().toString().indexOf(":") + 1) + "");
@@ -324,6 +332,17 @@ public class ModificationDescriptor {
 				desc.append(" at " + insert.getRootEntity().getJavaStructureNode().getName() + " method");
 			}
 		}
+	}
+
+	private boolean isStructuralChange(ChangeType changeType) {
+		boolean isStructural = true;
+		if(isOnlyStructuralChanges()) {
+			System.out.println("CHANGE TYPE: " + changeType.toString() + " ISSTRUCTURAL: " + changeType.isBodyChange());
+			if(!changeType.isBodyChange()) {
+				isStructural = false;
+			}
+		}
+		return isStructural;
 	}
 
 	public void describeAdditionalRemovedFunctionality(StringBuilder desc, SourceCodeChange change, String operation) {
@@ -398,7 +417,7 @@ public class ModificationDescriptor {
 				if(!methodC.receiver.toString().equals(methodN.receiver.toString())) {
 					String receiverA = (!methodC.receiver.toString().equals("")) ? new String(methodC.receiver.toString()) : new String(methodC.selector);
 					//String receiverB = (!methodN.receiver.toString().equals("")) ? new String(methodN.receiver.toString()) : new String(methodN.selector);
-					desc.append(" " + receiverA + " at " + update.getParentEntity().getName() + " method");
+					desc.append(" " + receiverA + " at " + update.getRootEntity().getJavaStructureNode().getName() + " method");
 				} else if(!(new String(methodC.selector)).equals((new String(methodN.selector)))) {
 					desc.append(new String(methodC.selector) + " at " + update.getParentEntity().getName() + " method");
 				} else if(!methodC.arguments.equals(methodN.arguments)) {
@@ -436,7 +455,10 @@ public class ModificationDescriptor {
 			} else if(update.getChangedEntity().getAstNode() != null && update.getChangedEntity().getAstNode() instanceof ReturnStatement) {
 				String beforeName = update.getChangedEntity().getName().replace(";", "");
 				String afterName = update.getNewEntity().getUniqueName().replace(";", "");
-				desc.append(StringUtils.capitalize(fType) + " " + beforeName + " with " + afterName);
+				desc.append(StringUtils.capitalize(fType));
+				if(!afterName.contains("\n")) {
+					desc.append(" " + beforeName + " with " + afterName);
+				}
 				desc.append(" at " + update.getRootEntity().getJavaStructureNode().getName() + " " + update.getRootEntity().getJavaStructureNode().getType().name().toLowerCase());
 			} else {
 				String name = "";
@@ -643,6 +665,14 @@ public class ModificationDescriptor {
 	public void setAddedRemovedFunctionalities(
 			List<SourceCodeChange> addedRemovedFunctionalities) {
 		this.addedRemovedFunctionalities = addedRemovedFunctionalities;
+	}
+
+	public boolean isOnlyStructuralChanges() {
+		return onlyStructuralChanges;
+	}
+
+	public void setOnlyStructuralChanges(boolean onlyStructuralChanges) {
+		this.onlyStructuralChanges = onlyStructuralChanges;
 	}
 
 }
