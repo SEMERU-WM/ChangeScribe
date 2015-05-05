@@ -26,12 +26,14 @@ public class CompilationUtils {
 	public static String getCUType(ICompilationUnit type) {
 		String fileType = "";
 		try {
-			if(type.getPrimary().findPrimaryType().isInterface()) {
-				fileType = "interface";
-			} else if(type.getPrimary().findPrimaryType().isClass()) {
-				fileType = "class";
-			} else if(type.getPrimary().findPrimaryType().isEnum()) {
-				fileType = "enum";
+			if(null != type.getPrimary() && null != type.getPrimary().findPrimaryType()) {
+				if(type.getPrimary().findPrimaryType().isInterface()) {
+					fileType = "interface";
+				} else if(type.getPrimary().findPrimaryType().isClass()) {
+					fileType = "class";
+				} else if(type.getPrimary().findPrimaryType().isEnum()) {
+					fileType = "enum";
+				}
 			}
 		} catch (JavaModelException e) {
 			// TODO Auto-generated catch block

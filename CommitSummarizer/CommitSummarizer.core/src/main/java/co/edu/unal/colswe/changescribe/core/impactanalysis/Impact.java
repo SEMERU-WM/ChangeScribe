@@ -117,6 +117,7 @@ public class Impact {
 			
 			i++;
 		}
+		System.out.println("SEARCHING IMPACT INTO A SET OF " + i + " FILES");
 		return scope;
 	}
 	
