@@ -57,6 +57,7 @@ public class StereotypeIdentifier {
 		super();
 		this.parser = new JParser(file);
 		this.stereotypedElements = new LinkedList<StereotypedElement>();
+		this.builder = new StringBuilder();
 	}
 
 	public void setParameters(final ICompilationUnit unit,
@@ -133,6 +134,9 @@ public class StereotypeIdentifier {
 
 	@Override
 	public String toString() {
+		if(null == builder) {
+			builder = new StringBuilder();
+		}
 		return builder.toString();
 	}
 

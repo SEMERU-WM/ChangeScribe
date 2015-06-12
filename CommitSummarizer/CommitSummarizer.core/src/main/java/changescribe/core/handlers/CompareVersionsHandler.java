@@ -46,7 +46,7 @@ public class CompareVersionsHandler extends AbstractHandler {
 		window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 		
 		try {
-			repo = new SCMRepository();
+			repo = new SCMRepository(null);
 			initMonitorDialog(selection);
 		} catch (final RuntimeException e) {
 			Display.getDefault().asyncExec(new Runnable() {

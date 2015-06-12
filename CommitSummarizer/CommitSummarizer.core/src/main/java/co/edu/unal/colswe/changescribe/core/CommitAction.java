@@ -38,7 +38,7 @@ public class CommitAction implements IWorkbenchWindowActionDelegate {
 	 */
 	public void run(IAction action) {
 		
-		SCMRepository repo = new SCMRepository();
+		SCMRepository repo = new SCMRepository(null);
 		Git git = repo.getGit();
 		
 		Status status = null;

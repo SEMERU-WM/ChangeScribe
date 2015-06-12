@@ -383,7 +383,12 @@ public class StereotypedType extends TypeStereotypeRules implements StereotypedE
     }
     
     public String getQualifiedName() {
-        return (this.type != null && this.type.resolveBinding() != null) ? this.type.resolveBinding().getQualifiedName() : "";
+    	String qualifiedName = (this.type.getName() != null && this.type.resolveBinding() != null) ? this.type.resolveBinding().getQualifiedName() : "";
+    	
+    	if(null == qualifiedName || qualifiedName.isEmpty()) {
+    		qualifiedName = type.getName().getFullyQualifiedName();
+    	}
+        return qualifiedName;
     }
     
     public String getFullyQualifiedName() {

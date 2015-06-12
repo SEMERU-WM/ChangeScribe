@@ -1,7 +1,5 @@
 package co.edu.unal.colswe.changescribe.core.summarizer;
 
-import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.Modifier;
@@ -83,20 +81,29 @@ public class GeneralDescriptor {
 	}
 	
 	private static String describeInterface(StereotypedType type) {
-		ITypeBinding[] interfaces = type.getElement().resolveBinding().getInterfaces();
-        
-        final StringBuilder template = new StringBuilder();
-        if (interfaces.length > 0) {
-            final String enumeratedTypes = PhraseUtils.enumeratedTypes(type.getElement().resolveBinding().getInterfaces());
-            template.append(PhraseUtils.getIndefiniteArticle(enumeratedTypes));
-            template.append(" ");
-            template.append(enumeratedTypes);
-            template.append(" ");
-            template.append("interface extension");
-        }
-        else {
-            template.append("an interface declaration");
-        }
+		StringBuilder template = null;
+		try {
+			ITypeBinding[] interfaces = null;
+			if (null != type.getElement().resolveBinding()) {
+				interfaces = type.getElement().resolveBinding().getInterfaces();
+			}
+			
+			template = new StringBuilder();
+			if (null != interfaces && interfaces.length > 0) {
+			    final String enumeratedTypes = PhraseUtils.enumeratedTypes(type.getElement().resolveBinding().getInterfaces());
+			    template.append(PhraseUtils.getIndefiniteArticle(enumeratedTypes));
+			    template.append(" ");
+			    template.append(enumeratedTypes);
+			    template.append(" ");
+			    template.append("interface extension");
+			}
+			else {
+			    template.append("an interface declaration");
+			}
+		} catch (NullPointerException e) {
+			System.out.println("error");
+			template = new StringBuilder();
+		}
         return template.toString();
     }
 	

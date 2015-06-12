@@ -50,7 +50,7 @@ public class CommitViewAction implements IViewActionDelegate {
 	 */
 	public void run(IAction action) {
 		
-		repo = new SCMRepository();
+		repo = new SCMRepository(null);
 		initMonitorDialog(action);
 		
 	}

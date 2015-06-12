@@ -17,6 +17,7 @@ public class SummarizeType {
 		this.element = element;
 		this.differences = differences;
 		this.identifier = identifier;
+		this.builder = new StringBuilder();
 	}
 	
 	public void generate() {
@@ -40,7 +41,7 @@ public class SummarizeType {
 		} else {
 			builder.append("\n\n");
 		}
-	}
+	} 
 	
 	public StringBuilder getBuilder() {
 		return builder;

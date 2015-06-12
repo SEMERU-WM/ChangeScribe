@@ -54,14 +54,22 @@ public class JParser {
         parser.setResolveBindings(true);
         parser.setSource(fileToString(file));
         
-        String projectName = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).getName();
-        if (ProjectInformation.getProject(ProjectInformation.getSelectedProject()).hasNature(JavaCore.NATURE_ID)) {
-			IJavaProject project = JavaCore.create(ProjectInformation.getSelectedProject().getWorkspace().getRoot()).getJavaProject(projectName);
-			project.open((IProgressMonitor) null);
-	        parser.setProject(project);
-	    }
-        
-        this.unit = (CompilationUnit) parser.createAST((IProgressMonitor)null);
+        try {
+			String projectName = ProjectInformation.getProject(
+					ProjectInformation.getSelectedProject()).getName();
+			if (ProjectInformation.getProject(
+					ProjectInformation.getSelectedProject()).hasNature(
+					JavaCore.NATURE_ID)) {
+				IJavaProject project = JavaCore.create(
+						ProjectInformation.getSelectedProject().getWorkspace()
+								.getRoot()).getJavaProject(projectName);
+				project.open((IProgressMonitor) null);
+				parser.setProject(project);
+			}
+		} catch (NoClassDefFoundError e) {
+			// TODO: handle exception
+		}
+		this.unit = (CompilationUnit) parser.createAST((IProgressMonitor)null);
         
         IProblem[] problems = this.unit.getProblems();
 	    if (problems != null && problems.length > 0) {

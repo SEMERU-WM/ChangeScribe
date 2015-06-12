@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -18,28 +19,46 @@ public class SCMRepository {
 	
 	private Git git;
 	private Repository repository;
+	private String projectPath;
 
-	public SCMRepository() throws RuntimeException {
+	public SCMRepository(String projectPath) throws RuntimeException {
 		super();
+		this.projectPath = projectPath;
 		
-		if(ProjectInformation.getSelectedProject() !=  null) {
-			File file = new File(ProjectInformation.getSelectedProject()
+		IResource project = null;
+		try {
+			 project = ProjectInformation.getSelectedProject();
+		} catch(NoClassDefFoundError e) {
+			System.out.println("you did not select a java project");
+		}
+		
+		
+		if(project !=  null) {
+			openRepository(ProjectInformation.getSelectedProject()
 					.getProject().getLocationURI().getPath().toString());
-			try {
-				git = Git.open(file);
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				if(null == git) {
-					try {
-						git = Git.open(file.getParentFile());
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+		} else {
+			if(null != projectPath && !projectPath.isEmpty()) {
+				openRepository(projectPath);
+			} else {
+				throw new RuntimeException("You did not select a Java project");
+			}
+		}
+	}
+
+	private void openRepository(String path) {
+		File file = new File(path);
+		try {
+			git = Git.open(file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if(null == git) {
+				try {
+					git = Git.open(file.getParentFile());
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
-		} else {
-			throw new RuntimeException("You did not select a Java project");
 		}
 	}
 	
@@ -97,6 +116,14 @@ public class SCMRepository {
 			changedFile.setTypeChange(TypeChange.REMOVED);
 		}
 		return differences;
+	}
+
+	public String getProjectPath() {
+		return projectPath;
+	}
+
+	public void setProjectPath(String projectPath) {
+		this.projectPath = projectPath;
 	}
 	
 }
