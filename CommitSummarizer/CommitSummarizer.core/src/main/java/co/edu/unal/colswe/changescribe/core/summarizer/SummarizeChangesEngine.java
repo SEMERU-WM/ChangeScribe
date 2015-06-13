@@ -241,13 +241,7 @@ public class SummarizeChangesEngine {
 				IType[] allTypes = identifier.getCompilationUnit().getAllTypes();
 				
 				for (IType iType : allTypes) {
-					String packageName = iType.getPackageFragment().getElementName();
-					String extractedName = packageName.substring(packageName.lastIndexOf(".") + 1, packageName.length());
-					
-					Module module = new Module();
-					module.setModuleName(extractedName);
-					module.setPackageName(packageName);
-					
+					Module module = createModuleFromPackageElement(iType);
 					if(!modules.contains(module)) {
 						modules.add(module);
 					}
@@ -257,6 +251,16 @@ public class SummarizeChangesEngine {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private Module createModuleFromPackageElement(IType iType) {
+		String packageName = iType.getPackageFragment().getElementName();
+		String extractedName = packageName.substring(
+				packageName.lastIndexOf(".") + 1, packageName.length());
+		Module module = new Module();
+		module.setModuleName(extractedName);
+		module.setPackageName(packageName);
+		return module;
 	}
 	
 

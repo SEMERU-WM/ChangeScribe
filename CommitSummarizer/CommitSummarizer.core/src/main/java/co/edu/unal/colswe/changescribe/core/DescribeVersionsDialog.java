@@ -120,7 +120,7 @@ public class DescribeVersionsDialog extends TitleAreaDialog {
 	private String commitPreviousID = "";
 	private Shell shellTmp;
 
-	public DescribeVersionsDialog(Shell shell, Git git, IJavaProject selection) {
+	public DescribeVersionsDialog(Shell shell, Set<ChangedFile> differences, Git git, IJavaProject selection) {
 		super(shell);
 		shellTmp = shell;
 

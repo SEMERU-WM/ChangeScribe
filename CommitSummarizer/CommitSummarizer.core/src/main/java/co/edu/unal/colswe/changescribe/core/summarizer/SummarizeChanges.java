@@ -303,12 +303,8 @@ public class SummarizeChanges {
 			}
 		}
 		
-		CommitGeneralDescriptor generalDescriptor = new CommitGeneralDescriptor();
-		generalDescriptor.setDifferences(differences);
-		generalDescriptor.setInitialCommit(isInitialCommit);
-		generalDescriptor.setGit(git);
-		desc.insert(0, generalDescriptor.describe());
-		
+		CommitGeneralDescriptor generalDescriptor = createGeneralDescriptor(
+				desc, isInitialCommit);
 		//Commit stereotype description
 		desc.insert(0, summarizeCommitStereotype());
 		
@@ -336,6 +332,16 @@ public class SummarizeChanges {
 		}
 		this.setSummary(desc.toString());
 		removeCreatedPackages();
+	}
+
+	private CommitGeneralDescriptor createGeneralDescriptor(StringBuilder desc,
+			boolean isInitialCommit) {
+		CommitGeneralDescriptor generalDescriptor = new CommitGeneralDescriptor();
+		generalDescriptor.setDifferences(differences);
+		generalDescriptor.setInitialCommit(isInitialCommit);
+		generalDescriptor.setGit(git);
+		desc.insert(0, generalDescriptor.describe());
+		return generalDescriptor;
 	}
 	
 	private void setSummary(String summary) {
@@ -371,13 +377,7 @@ public class SummarizeChanges {
 				IType[] allTypes = identifier.getCompilationUnit().getAllTypes();
 				
 				for (IType iType : allTypes) {
-					String packageName = iType.getPackageFragment().getElementName();
-					String extractedName = packageName.substring(packageName.lastIndexOf(".") + 1, packageName.length());
-					
-					Module module = new Module();
-					module.setModuleName(extractedName);
-					module.setPackageName(packageName);
-					
+					Module module = createModuleFromPackageElement(iType);
 					if(!modules.contains(module)) {
 						modules.add(module);
 					}
@@ -387,6 +387,16 @@ public class SummarizeChanges {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private Module createModuleFromPackageElement(IType iType) {
+		String packageName = iType.getPackageFragment().getElementName();
+		String extractedName = packageName.substring(
+				packageName.lastIndexOf(".") + 1, packageName.length());
+		Module module = new Module();
+		module.setModuleName(extractedName);
+		module.setPackageName(packageName);
+		return module;
 	}
 	
 	protected void removeCreatedPackages() {

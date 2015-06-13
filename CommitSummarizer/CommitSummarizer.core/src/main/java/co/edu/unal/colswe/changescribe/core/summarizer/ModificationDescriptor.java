@@ -596,15 +596,8 @@ public class ModificationDescriptor {
 			if(methodDependencySummary.getDependencies() != null && methodDependencySummary.getDependencies().size() > 0) {
 				List<SearchMatch> dependencies = methodDependencySummary.getDependencies();
 				for (SearchMatch searchMatch : dependencies) {
-					NamedMember type = null;
-		        	if(searchMatch.getElement() instanceof ResolvedSourceMethod) {
-		        		type = ((ResolvedSourceMethod ) searchMatch.getElement());
-		        	} else if(searchMatch.getElement() instanceof ResolvedSourceType) {
-		        		type = ((ResolvedSourceType ) searchMatch.getElement());
-		        	} else if(searchMatch.getElement() instanceof ResolvedSourceField) {
-		        		type = ((ResolvedSourceField) searchMatch.getElement());
-		        	}
-		        	impactedElements.add(type);
+					NamedMember type = getNamedMemberFromElement(searchMatch);
+					impactedElements.add(type);
 				}
 			}
 		}
@@ -624,6 +617,18 @@ public class ModificationDescriptor {
 			}
 			descriptor.append(localDescriptor.toString());
 		}
+	}
+
+	private NamedMember getNamedMemberFromElement(SearchMatch searchMatch) {
+		NamedMember type = null;
+		if (searchMatch.getElement() instanceof ResolvedSourceMethod) {
+			type = ((ResolvedSourceMethod) searchMatch.getElement());
+		} else if (searchMatch.getElement() instanceof ResolvedSourceType) {
+			type = ((ResolvedSourceType) searchMatch.getElement());
+		} else if (searchMatch.getElement() instanceof ResolvedSourceField) {
+			type = ((ResolvedSourceField) searchMatch.getElement());
+		}
+		return type;
 	}
 	
 	public List<SourceCodeChange> getChanges() {
