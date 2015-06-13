@@ -5,6 +5,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import co.edu.unal.colswe.changescribe.core.textgenerator.pos.POSTagger;
+import co.edu.unal.colswe.changescribe.core.ui.FilesChangedListDialog;
 
 /**
  * The activator class controls the plug-in life cycle

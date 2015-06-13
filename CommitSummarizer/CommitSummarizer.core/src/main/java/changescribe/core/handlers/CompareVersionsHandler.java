@@ -11,9 +11,9 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import co.edu.unal.colswe.changescribe.core.DescribeVersionsDialog;
 import co.edu.unal.colswe.changescribe.core.git.ChangedFile;
 import co.edu.unal.colswe.changescribe.core.git.SCMRepository;
+import co.edu.unal.colswe.changescribe.core.ui.DescribeVersionsDialog;
 import co.edu.unal.colswe.changescribe.core.util.UIUtils;
 
 public class CompareVersionsHandler extends AbstractHandler {

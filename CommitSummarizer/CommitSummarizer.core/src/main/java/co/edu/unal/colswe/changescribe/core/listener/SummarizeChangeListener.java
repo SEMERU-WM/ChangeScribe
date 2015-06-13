@@ -7,8 +7,8 @@ import org.eclipse.swt.events.SelectionListener;
 
 import changescribe.core.preferences.PreferenceConstants;
 import co.edu.unal.colswe.changescribe.core.Activator;
-import co.edu.unal.colswe.changescribe.core.FilesChangedListDialog;
 import co.edu.unal.colswe.changescribe.core.summarizer.SummarizeChanges;
+import co.edu.unal.colswe.changescribe.core.ui.FilesChangedListDialog;
 
 public class SummarizeChangeListener implements SelectionListener {
 

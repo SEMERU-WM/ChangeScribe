@@ -4,8 +4,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 
-import co.edu.unal.colswe.changescribe.core.DescribeVersionsDialog;
 import co.edu.unal.colswe.changescribe.core.summarizer.SummarizeChangesTMP;
+import co.edu.unal.colswe.changescribe.core.ui.DescribeVersionsDialog;
 
 public class SummarizeVersionChangesListener implements SelectionListener {
 

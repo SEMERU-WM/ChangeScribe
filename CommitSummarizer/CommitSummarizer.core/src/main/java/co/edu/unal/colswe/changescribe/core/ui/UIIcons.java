@@ -1,9 +1,11 @@
-package co.edu.unal.colswe.changescribe.core;
+package co.edu.unal.colswe.changescribe.core.ui;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+
+import co.edu.unal.colswe.changescribe.core.Activator;
 
 /**
  * Icons for the the Eclipse plugin. Mostly decorations.

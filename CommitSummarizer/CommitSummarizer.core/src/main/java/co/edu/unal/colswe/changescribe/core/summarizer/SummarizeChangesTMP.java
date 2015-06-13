@@ -40,7 +40,6 @@ import ch.uzh.ifi.seal.changedistiller.distilling.FileDistiller;
 import ch.uzh.ifi.seal.changedistiller.model.entities.StructureEntityVersion;
 import changescribe.core.preferences.PreferenceConstants;
 import co.edu.unal.colswe.changescribe.core.Activator;
-import co.edu.unal.colswe.changescribe.core.DescribeVersionsDialog;
 import co.edu.unal.colswe.changescribe.core.Module;
 import co.edu.unal.colswe.changescribe.core.ast.ProjectInformation;
 import co.edu.unal.colswe.changescribe.core.git.ChangedFile;
@@ -53,6 +52,7 @@ import co.edu.unal.colswe.changescribe.core.stereotype.stereotyped.StereotypedMe
 import co.edu.unal.colswe.changescribe.core.stereotype.taxonomy.CommitStereotype;
 import co.edu.unal.colswe.changescribe.core.stereotype.taxonomy.MethodStereotype;
 import co.edu.unal.colswe.changescribe.core.textgenerator.phrase.util.CompilationUtils;
+import co.edu.unal.colswe.changescribe.core.ui.DescribeVersionsDialog;
 import co.edu.unal.colswe.changescribe.core.util.Utils;
 
 public class SummarizeChangesTMP {

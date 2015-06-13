@@ -1,4 +1,4 @@
-package co.edu.unal.colswe.changescribe.core;
+package co.edu.unal.colswe.changescribe.core.ui;
 
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;

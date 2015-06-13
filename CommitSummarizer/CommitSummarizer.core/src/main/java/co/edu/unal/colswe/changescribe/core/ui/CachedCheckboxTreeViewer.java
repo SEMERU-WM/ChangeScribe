@@ -1,4 +1,4 @@
-package co.edu.unal.colswe.changescribe.core;
+package co.edu.unal.colswe.changescribe.core.ui;
 
 import java.util.Collection;
 import java.util.HashSet;

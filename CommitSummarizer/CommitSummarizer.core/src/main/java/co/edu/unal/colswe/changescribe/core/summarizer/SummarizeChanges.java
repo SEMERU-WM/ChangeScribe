@@ -36,7 +36,6 @@ import ch.uzh.ifi.seal.changedistiller.ChangeDistiller;
 import ch.uzh.ifi.seal.changedistiller.ChangeDistiller.Language;
 import ch.uzh.ifi.seal.changedistiller.distilling.FileDistiller;
 import ch.uzh.ifi.seal.changedistiller.model.entities.StructureEntityVersion;
-import co.edu.unal.colswe.changescribe.core.FilesChangedListDialog;
 import co.edu.unal.colswe.changescribe.core.Module;
 import co.edu.unal.colswe.changescribe.core.ast.ProjectInformation;
 import co.edu.unal.colswe.changescribe.core.git.ChangedFile;
@@ -49,6 +48,7 @@ import co.edu.unal.colswe.changescribe.core.stereotype.stereotyped.StereotypedMe
 import co.edu.unal.colswe.changescribe.core.stereotype.taxonomy.CommitStereotype;
 import co.edu.unal.colswe.changescribe.core.stereotype.taxonomy.MethodStereotype;
 import co.edu.unal.colswe.changescribe.core.textgenerator.phrase.util.CompilationUtils;
+import co.edu.unal.colswe.changescribe.core.ui.FilesChangedListDialog;
 import co.edu.unal.colswe.changescribe.core.util.Utils;
 
 public class SummarizeChanges {
