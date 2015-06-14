@@ -100,7 +100,7 @@ import co.edu.unal.colswe.changescribe.core.stereotype.taxonomy.MethodStereotype
 import co.edu.unal.colswe.changescribe.core.util.UIPreferences;
 import edu.stanford.nlp.util.Sets;
 
-public class DescribeVersionsDialog extends TitleAreaDialog {
+public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 	private StyledText text;
 	private Git git;
 	private IJavaProject selection;
@@ -233,11 +233,6 @@ public class DescribeVersionsDialog extends TitleAreaDialog {
 				case REMOVED_UNTRACKED:
 					decorator = UIIcons.OVR_STAGED_REMOVE;
 					break;
-				/*case UNTRACKED_FOLDERS:
-					other = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
-					DecorationOverlayIcon decorated = new DecorationOverlayIcon(other, UIIcons.OVR_UNTRACKED, IDecoration.BOTTOM_RIGHT);
-					finalOther = (Image) this.resourceManager.get(decorated);
-					break;*/
 				default:
 					break;
 			}
@@ -632,7 +627,6 @@ public class DescribeVersionsDialog extends TitleAreaDialog {
 				Set<ChangedFile> differences = new TreeSet<ChangedFile>();
 				String projectName = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).getName();
 				
-	
 				//rename detector
 				TreeWalk tw = new TreeWalk(git.getRepository());
 				tw.setRecursive(true);

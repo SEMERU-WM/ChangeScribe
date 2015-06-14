@@ -54,7 +54,7 @@ public class Main {
 		
 		gettingRepositoryStatus();
 		
-		SummarizeChanges summarizer = new SummarizeChanges(git, false, 0);
+		SummarizeChanges summarizer = new SummarizeChanges(git, false, 0, null, null);
 		summarizer.setProjectPath(projectPath);
 		if(null != differences && differences.size() > 0) {
 			ChangedFile [] changes = new ChangedFile[differences.size()];

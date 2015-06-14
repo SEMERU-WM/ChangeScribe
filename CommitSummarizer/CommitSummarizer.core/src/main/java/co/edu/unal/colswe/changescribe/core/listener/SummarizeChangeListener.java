@@ -27,7 +27,7 @@ public class SummarizeChangeListener implements SelectionListener {
 			boolean filtering = store.getBoolean(PreferenceConstants.P_FILTER_COMMIT_MESSAGE);
 			double factor = store.getDouble(PreferenceConstants.P_FILTER_FACTOR);
 			
-			SummarizeChanges summarizer = new SummarizeChanges(changedListDialog.getGit(), filtering, factor);
+			SummarizeChanges summarizer = new SummarizeChanges(changedListDialog.getGit(), filtering, factor, null, null);
 			summarizer.setChangedListDialog(changedListDialog);
 			
 			summarizer.summarize(changedListDialog.getSelectedFiles());

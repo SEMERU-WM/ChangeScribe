@@ -94,7 +94,7 @@ import co.edu.unal.colswe.changescribe.core.listener.SummarizeChangeListener;
 import co.edu.unal.colswe.changescribe.core.stereotype.taxonomy.MethodStereotype;
 import co.edu.unal.colswe.changescribe.core.util.UIPreferences;
 
-public class FilesChangedListDialog extends TitleAreaDialog {
+public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 	private StyledText text;
 	private Git git;
 	private IJavaProject selection;
@@ -235,11 +235,6 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 				case REMOVED_UNTRACKED:
 					decorator = UIIcons.OVR_STAGED_REMOVE;
 					break;
-				/*case UNTRACKED_FOLDERS:
-					other = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
-					DecorationOverlayIcon decorated = new DecorationOverlayIcon(other, UIIcons.OVR_UNTRACKED, IDecoration.BOTTOM_RIGHT);
-					finalOther = (Image) this.resourceManager.get(decorated);
-					break;*/
 				default:
 					break;
 			}
@@ -403,12 +398,12 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 	
 	protected String validateCommit() {
 		String authorValue = author;
-		if (authorValue.length() == 0 /*|| RawParseUtils.parsePersonIdent(authorValue) == null*/) {
+		if (authorValue.length() == 0) {
 			return "Empty or Invalid author";
 		}
 
 		String committerValue = committer;
-		if (committerValue.length() == 0 /*|| RawParseUtils.parsePersonIdent(committerValue) == null*/) {
+		if (committerValue.length() == 0) {
 			return "Empty or Invalid committer";
 		}
 		
@@ -492,23 +487,6 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 		toolkit.paintBordersFor(personArea);
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(personArea);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(personArea);
-
-		/*toolkit.createLabel(personArea, "Author: ").setForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
-		setAuthorText(toolkit.createText(personArea, null));
-		getAuthorText().setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
-		getAuthorText().setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
-		if (git.getRepository() != null && git.getRepository().getRepositoryState().equals(RepositoryState.CHERRY_PICKING_RESOLVED)) {
-			getAuthorText().setEnabled(false);
-		}
-		
-		toolkit.createLabel(personArea, "Committer").setForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
-		setCommitterText(toolkit.createText(personArea, null));
-		getCommitterText().setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
-		if (getCommitter() != null) {
-			getCommitterText().setText(getCommitter());
-		}*/
-
-		/////////////////////
 		
 		boolean visible = Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.P_COMMIT_SIGNATURE_ACTIVE);
 		
@@ -523,7 +501,6 @@ public class FilesChangedListDialog extends TitleAreaDialog {
 					.grab(true, true).hint(size).minSize(size.x, 0)
 					.align(SWT.FILL, SWT.FILL).create());
 		}
-		//signatureCanvas.setWidth(getShell().getSize().x - 90);	
 		signatureCanvas.getCanvas().setVisible(visible);
 		
 		return messageAndPersonArea;
