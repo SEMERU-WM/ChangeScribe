@@ -662,10 +662,6 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		} else if (!isCommitWithoutFilesAllowed()) {
 			message = "No files selected";
 			type = IMessageProvider.INFORMATION;
-		} else {
-			//CommitStatus status = commitMessageComponent.getStatus();
-			//message = status.getMessage();
-			//type = status.getMessageType();
 		}
 
 		setMessage(message, type);
@@ -809,5 +805,4 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 			this.author = author;
 		}
 	}
-
 }

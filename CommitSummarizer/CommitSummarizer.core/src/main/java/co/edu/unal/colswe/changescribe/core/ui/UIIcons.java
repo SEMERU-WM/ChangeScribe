@@ -239,8 +239,6 @@ public class UIIcons {
 	/** base URL */
 	public final static URL base;
 
-	
-
 	static {
 		base = init();
 		OVR_STAGED = map("ovr/staged.gif"); //$NON-NLS-1$
