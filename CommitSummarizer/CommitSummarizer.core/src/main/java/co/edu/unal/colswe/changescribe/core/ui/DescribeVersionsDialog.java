@@ -98,6 +98,7 @@ import co.edu.unal.colswe.changescribe.core.git.ChangedFile.TypeChange;
 import co.edu.unal.colswe.changescribe.core.listener.SummarizeVersionChangesListener;
 import co.edu.unal.colswe.changescribe.core.stereotype.taxonomy.MethodStereotype;
 import co.edu.unal.colswe.changescribe.core.util.UIPreferences;
+import co.edu.unal.colswe.changescribe.core.util.UIUtils;
 import edu.stanford.nlp.util.Sets;
 
 public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
@@ -112,8 +113,8 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 	private Set<ChangedFile> items;
 	private TreeMap<MethodStereotype, Integer> signatureMap;
 	private SignatureCanvas signatureCanvas;
-	private Text previousVersionText;
-	private Text currentVersionText;
+	private Text olderVersionText;
+	private Text newerVersionText;
 	private static final String DIALOG_SETTINGS_SECTION_NAME = Activator.getDefault() + ".COMMIT_DIALOG_SECTION"; //$NON-NLS-1$
 	private SashForm sashForm;
 	private Composite messageAndPersonArea;
@@ -332,11 +333,11 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 	}
 	
 	protected String validateCommit() {
-		if (previousVersionText.getText().length() == 0 ) {
+		if (olderVersionText.getText().length() == 0 ) {
 			return "Empty or invalid older commit id"; 
 		}
 
-		if (currentVersionText.getText().length() == 0 ) {
+		if (newerVersionText.getText().length() == 0 ) {
 			return "Empty or invalid newer commit id";
 		}
 		
@@ -349,6 +350,22 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 		Composite container = (Composite) super.createDialogArea(parent);
 		parent.getShell().setText("Commit changes");
 
+		container = createDialogAreaUtil(container);
+		setTitle("Commit Changes");
+		setMessage("Commit message", IMessageProvider.INFORMATION);
+
+		filesViewer.addCheckStateListener(new ICheckStateListener() {
+
+			public void checkStateChanged(CheckStateChangedEvent event) {
+				updateMessage();
+			}
+		});
+
+		updateFileSectionText();
+		return container;
+	}
+
+	public Composite createDialogAreaUtil(Composite container) {
 		container = toolkit.createComposite(container);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		toolkit.paintBordersFor(container);
@@ -363,17 +380,6 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 
 		applyDialogFont(container);
 		container.pack();
-		setTitle("Commit Changes");
-		setMessage("Commit message", IMessageProvider.INFORMATION);
-
-		filesViewer.addCheckStateListener(new ICheckStateListener() {
-
-			public void checkStateChanged(CheckStateChangedEvent event) {
-				updateMessage();
-			}
-		});
-
-		updateFileSectionText();
 		return container;
 	}
 	
@@ -385,7 +391,8 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 		GridLayoutFactory.swtDefaults().margins(0, 0).spacing(0, 0)
 				.applyTo(messageAndPersonArea);
 
-		Section messageSection = toolkit.createSection(messageAndPersonArea, ExpandableComposite.TITLE_BAR | ExpandableComposite.CLIENT_INDENT);
+		Section messageSection = toolkit.createSection(messageAndPersonArea, 
+				ExpandableComposite.TITLE_BAR | ExpandableComposite.CLIENT_INDENT);
 		messageSection.setText("Commit message");
 		Composite messageArea = toolkit.createComposite(messageSection);
 		GridLayoutFactory.fillDefaults().spacing(0, 0).extendedMargins(2, 2, 2, 2).applyTo(messageArea);
@@ -410,32 +417,25 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(personArea);
 
 		toolkit.createLabel(personArea, "Older Commit ID: ").setForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
-		setAuthorText(toolkit.createText(personArea, null));
-		getAuthorText().setText(commitPreviousID);
-		getAuthorText().setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
-		getAuthorText().setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+		setOlderVersionText(toolkit.createText(personArea, null));
+		getOlderVersionText().setText(commitPreviousID);
+		getOlderVersionText().setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
+		getOlderVersionText().setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 		
 		toolkit.createLabel(personArea, "Newer Commit ID: ").setForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
-		setCommitterText(toolkit.createText(personArea, null));
-		getCommitterText().setText(commitCurrentID);
-		getCommitterText().setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+		setNewerVersionText(toolkit.createText(personArea, null));
+		getNewerVersionText().setText(commitCurrentID);
+		getNewerVersionText().setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 		
-		///////////////////////
-		
-		JavaViewer viewer = new JavaViewer();
-		viewer.setShell(getShell());
-		viewer.setComposite(messageAndPersonArea);
-		viewer.createStyledText();
-		int minHeight = 114;
-		Point size = container.getSize();
-		viewer.getText().setLayoutData(GridDataFactory.fillDefaults()
-				.grab(true, true).hint(size).minSize(size.x - 30, minHeight)
-				.align(SWT.FILL, SWT.FILL).create());
-		setEditor(viewer);
-		messageSection.setClient(messageArea);
+		Point size = createJavaSourceCodeViewer(container, messageSection,
+				messageArea);
 
-		/////////////////////
+		createSignatureCanvas(size);
 		
+		return messageAndPersonArea;
+	}
+
+	public void createSignatureCanvas(Point size) {
 		boolean visible = Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.P_COMMIT_SIGNATURE_ACTIVE);
 		
 		signatureCanvas = new SignatureCanvas(signatureMap, messageAndPersonArea, getShell());
@@ -451,8 +451,22 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 		}
 		
 		signatureCanvas.getCanvas().setVisible(visible);
-		
-		return messageAndPersonArea;
+	}
+
+	public Point createJavaSourceCodeViewer(Composite container,
+			Section messageSection, Composite messageArea) {
+		JavaViewer viewer = new JavaViewer();
+		viewer.setShell(getShell());
+		viewer.setComposite(messageAndPersonArea);
+		viewer.createStyledText();
+		int minHeight = 114;
+		Point size = container.getSize();
+		viewer.getText().setLayoutData(GridDataFactory.fillDefaults()
+				.grab(true, true).hint(size).minSize(size.x - 30, minHeight)
+				.align(SWT.FILL, SWT.FILL).create());
+		setEditor(viewer);
+		messageSection.setClient(messageArea);
+		return size;
 	}
 	
 	
@@ -462,20 +476,6 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 			signatureCanvas.setSignatureMap(signatureMap);
 			signatureCanvas.redraw();
 		}
-	}
-	
-	/**
-	 * Create a help button with the help icon on it.
-	 * No action is associated with the button
-	 * @param container parent container
-	 * @return created button
-	 */
-	private ToolItem createHelpButton(ToolBar filesToolbar) {
-		ToolItem help = new ToolItem(filesToolbar,SWT.PUSH);
-	    Image img = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_LCL_LINKTO_HELP);
-	    help.setImage(img);
-	    help.setToolTipText("Help");
-	    return help;
 	}
 	
 	private Section createFileSection(Composite container) {
@@ -534,7 +534,7 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 			}
 		});
 		
-		ToolItem help = createHelpButton(filesToolbar);
+		ToolItem help = UIUtils.createHelpButton(filesToolbar);
 		help.addSelectionListener(new SelectionAdapter() {
 		    @Override
 		    public void widgetSelected(SelectionEvent e) {
@@ -545,7 +545,7 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 		});
 		
 		ToolItem computeModificationsItem = new ToolItem(filesToolbar, SWT.PUSH);
-		Image describeImage2 = UIIcons.ANNOTATE.createImage();
+		Image describeImage2 = UIIcons.EXTRACT_DIFFERENCES.createImage();
 		computeModificationsItem.setImage(describeImage2);
 		computeModificationsItem.setToolTipText("Compute modifications");
 		computeModificationsItem.addSelectionListener(new SelectionListener() {
@@ -609,10 +609,10 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 		ObjectId currentId = null;
 		try {
 			currentId = git.getRepository()
-					.resolve(getCommitterText().getText() + "^{tree}");
+					.resolve(getNewerVersionText() + "^{tree}");
 
 			ObjectId oldId = git.getRepository().resolve(
-					getAuthorText().getText() + "^{tree}");
+					getOlderVersionText() + "^{tree}");
 
 			ObjectReader reader = git.getRepository().newObjectReader(); 
 
@@ -880,19 +880,21 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 		this.signatureMap = signatureMap;
 	}
 
-	public Text getAuthorText() {
-		return previousVersionText;
+	public Text getOlderVersionText() {
+		return olderVersionText;
 	}
 
-	public void setAuthorText(Text authorText) {
-		this.previousVersionText = authorText;
+	public void setOlderVersionText(Text olderVersionText) {
+		this.olderVersionText = olderVersionText;
 	}
 
-	public Text getCommitterText() {
-		return currentVersionText;
+	public Text getNewerVersionText() {
+		return newerVersionText;
 	}
 
-	public void setCommitterText(Text committerText) {
-		this.currentVersionText = committerText;
+	public void setNewerVersionText(Text newerVersionText) {
+		this.newerVersionText = newerVersionText;
 	}
+
+	
 }

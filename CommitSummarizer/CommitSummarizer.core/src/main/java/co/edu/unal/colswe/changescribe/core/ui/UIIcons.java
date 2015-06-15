@@ -231,9 +231,15 @@ public class UIIcons {
 
 	/** Compact tree presentation icon */
 	public final static ImageDescriptor COMPACT;
+	
+	public static final ImageDescriptor HELP;
+	
+	public static final ImageDescriptor EXTRACT_DIFFERENCES;
 
 	/** base URL */
 	public final static URL base;
+
+	
 
 	static {
 		base = init();
@@ -317,6 +323,8 @@ public class UIIcons {
 		HIERARCHY = map("elcl16/hierarchicalLayout.gif"); //$NON-NLS-1$
 		FLAT = map("elcl16/flatLayout.gif"); //$NON-NLS-1$
 		COMPACT = map("elcl16/compactLayout.gif"); //$NON-NLS-1$
+		HELP = map("etool16/help.gif"); //$NON-NLS-1$
+		EXTRACT_DIFFERENCES = map("etool16/diff.gif"); //$NON-NLS-1$
 	}
 
 	private static ImageDescriptor map(final String icon) {

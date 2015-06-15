@@ -27,7 +27,7 @@ public class SummarizeVersionChangesListener implements SelectionListener {
 			double factor = store.getDouble(PreferenceConstants.P_FILTER_FACTOR);
 			
 			SummarizeChanges summarizer = new SummarizeChanges(changedListDialog.getGit(), filtering, factor,
-					changedListDialog.getAuthorText().getText(), changedListDialog.getCommitterText().getText());
+					changedListDialog.getOlderVersionText().getText(), changedListDialog.getNewerVersionText().getText());
 			summarizer.setChangedListDialog(changedListDialog);
 			
 			summarizer.summarize(changedListDialog.getSelectedFiles());

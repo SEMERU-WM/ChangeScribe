@@ -81,7 +81,7 @@ public class SummarizeChanges {
 		this.identifiers = new ArrayList<StereotypeIdentifier>();
 		this.olderVersionId = olderVersionId;
 		this.newerVersionId = newerVersionId;
-		distiller = ChangeDistiller.createFileDistiller(Language.JAVA);
+		this.distiller = ChangeDistiller.createFileDistiller(Language.JAVA);
 	}
 	
 	public void initSummary(final ChangedFile[] differences) {
@@ -432,16 +432,12 @@ public class SummarizeChanges {
 	public void compareModified(ChangedFile file) {
 		File previousType = null;
 		File currentType = null;
-		
 		try {
-			//previousType = Utils.getFileContentOfLastCommit(file.getPath(), getGit().getRepository());
-			//////////
 			if(olderVersionId != null && !olderVersionId.equals("")) { 
 				previousType = Utils.getFileContentOfCommitID(file.getPath(), getGit().getRepository(), olderVersionId);
 			} else {
 				previousType = Utils.getFileContentOfLastCommit(file.getPath(), getGit().getRepository());
 			}
-			////////
 			currentType = new File(file.getAbsolutePath());
 			distiller.extractClassifiedSourceCodeChanges(previousType, currentType);
 			
@@ -607,15 +603,12 @@ public class SummarizeChanges {
 
 	public StereotypeIdentifier getRemovedStereotypeIdentifier(ChangedFile file) {
 		try {
-			//String removedFile = Utils.getStringContentOfLastCommit(file.getPath(), getGit().getRepository());
 			String removedFile = "";
-			/////////////
 			if(olderVersionId != null && !olderVersionId.equals("")) { 
 				removedFile = Utils.getStringContentOfCommitID(file.getPath(), getGit().getRepository(), olderVersionId);
 			} else {
 				removedFile = Utils.getStringContentOfLastCommit(file.getPath(), getGit().getRepository());
 			}
-			///////////
 			IPackageFragment pack = null;
 			String packageName = "";
 			packageName = "commsummtmp." + CompilationUtils.getPackageNameFromStringClass(removedFile);
@@ -644,15 +637,12 @@ public class SummarizeChanges {
 	
 	public StereotypeIdentifier getModifiedStereotypeIdentifier(ChangedFile file) {
 		try {
-			//String removedFile = Utils.getStringContentOfLastCommit(file.getPath(), getGit().getRepository());
-			/////////////////
 			String removedFile = "";
 			if(olderVersionId != null && !olderVersionId.equals("")) { 
 				removedFile = Utils.getStringContentOfCommitID(file.getPath(), getGit().getRepository(), olderVersionId);
 			} else {
 				removedFile = Utils.getStringContentOfLastCommit(file.getPath(), getGit().getRepository());
 			}
-			/////////////////
 			IPackageFragment pack = null;
 			String packageName = "";
 			packageName = "commsummtmp." + CompilationUtils.getPackageNameFromStringClass(removedFile);

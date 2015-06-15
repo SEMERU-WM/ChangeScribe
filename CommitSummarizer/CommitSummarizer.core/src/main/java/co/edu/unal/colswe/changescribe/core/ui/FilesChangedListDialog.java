@@ -93,6 +93,7 @@ import co.edu.unal.colswe.changescribe.core.git.ChangedFile;
 import co.edu.unal.colswe.changescribe.core.listener.SummarizeChangeListener;
 import co.edu.unal.colswe.changescribe.core.stereotype.taxonomy.MethodStereotype;
 import co.edu.unal.colswe.changescribe.core.util.UIPreferences;
+import co.edu.unal.colswe.changescribe.core.util.UIUtils;
 
 public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 	private StyledText text;
@@ -117,7 +118,6 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 	private static final String DIALOG_SETTINGS_SECTION_NAME = Activator.getDefault() + ".COMMIT_DIALOG_SECTION"; //$NON-NLS-1$
 	private SashForm sashForm;
 	private Composite messageAndPersonArea;
-	//private static final String SHOW_UNTRACKED_PREF = "CommitDialog.showUntracked"; //$NON-NLS-1$
 
 	public FilesChangedListDialog(Shell shell, Set<ChangedFile> differences, Git git, IJavaProject selection) {
 		super(shell);
@@ -424,10 +424,12 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		sashForm = new SashForm(container, SWT.VERTICAL | SWT.FILL);
 		toolkit.adapt(sashForm, true, true);
 		sashForm.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+		
 		createMessageAndPersonArea(sashForm);
+		
 		filesSection = createFileSection(sashForm);
+		
 		sashForm.setWeights(new int[] { 50, 50 });
-
 		applyDialogFont(container);
 		container.pack();
 		setTitle("Commit Changes");
@@ -469,25 +471,15 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		
 		messageSection.setTextClient(headerArea);
 		
-		JavaViewer viewer = new JavaViewer();
-		viewer.setShell(getShell());
-		viewer.setComposite(messageAndPersonArea);
-		viewer.createStyledText();
-		int minHeight = 114;
-		Point size = container.getSize();
-		viewer.getText().setLayoutData(GridDataFactory.fillDefaults()
-				.grab(true, true).hint(size).minSize(size.x - 30, minHeight)
-				.align(SWT.FILL, SWT.FILL).create());
-		setEditor(viewer);
-		messageSection.setClient(messageArea);
+		Point size = createJavaSourceCodeViewer(container, messageSection,
+				messageArea);
 		
-		///////////////////
+		createSignatureCanvas(size);
 		
-		Composite personArea = toolkit.createComposite(messageAndPersonArea);
-		toolkit.paintBordersFor(personArea);
-		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(personArea);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(personArea);
-		
+		return messageAndPersonArea;
+	}
+
+	public void createSignatureCanvas(Point size) {
 		boolean visible = Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.P_COMMIT_SIGNATURE_ACTIVE);
 		
 		signatureCanvas = new SignatureCanvas(signatureMap, messageAndPersonArea, getShell());
@@ -502,8 +494,22 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 					.align(SWT.FILL, SWT.FILL).create());
 		}
 		signatureCanvas.getCanvas().setVisible(visible);
-		
-		return messageAndPersonArea;
+	}
+
+	public Point createJavaSourceCodeViewer(Composite container,
+			Section messageSection, Composite messageArea) {
+		JavaViewer viewer = new JavaViewer();
+		viewer.setShell(getShell());
+		viewer.setComposite(messageAndPersonArea);
+		viewer.createStyledText();
+		int minHeight = 114;
+		Point size = container.getSize();
+		viewer.getText().setLayoutData(GridDataFactory.fillDefaults()
+				.grab(true, true).hint(size).minSize(size.x - 30, minHeight)
+				.align(SWT.FILL, SWT.FILL).create());
+		setEditor(viewer);
+		messageSection.setClient(messageArea);
+		return size;
 	}
 	
 	
@@ -515,33 +521,18 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		}
 	}
 	
-	/**
-	 * Create a help button with the help icon on it.
-	 * No action is associated with the button
-	 * @param container parent container
-	 * @return created button
-	 */
-	private ToolItem createHelpButton(ToolBar filesToolbar) {
-		ToolItem help = new ToolItem(filesToolbar,SWT.PUSH);
-		help.setWidth(20);
-	    Image img = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_LCL_LINKTO_HELP);
-	    help.setImage(img);
-	    help.setToolTipText("Help");
-	    return help;
-	}
-	
 	private Section createFileSection(Composite container) {
 		Section filesSection = toolkit.createSection(container,
 				ExpandableComposite.TITLE_BAR
 						| ExpandableComposite.CLIENT_INDENT);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(filesSection);
+		
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(filesSection);
 		Composite filesArea = toolkit.createComposite(filesSection);
 		filesSection.setClient(filesArea);
 		toolkit.paintBordersFor(filesArea);
 		GridLayoutFactory.fillDefaults().extendedMargins(2, 2, 2, 2).applyTo(filesArea);
 
-		ToolBar filesToolbar = new ToolBar(filesSection, SWT.WRAP);
-
+		ToolBar filesToolbar = new ToolBar(filesSection, SWT.FLAT);
 		filesSection.setTextClient(filesToolbar);
 
 		PatternFilter patternFilter = new PatternFilter() {
@@ -586,7 +577,7 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 			}
 		});
 		
-		ToolItem help = createHelpButton(filesToolbar);
+		ToolItem help = UIUtils.createHelpButton(filesToolbar);
 		help.addSelectionListener(new SelectionAdapter() {
 		    @Override
 		    public void widgetSelected(SelectionEvent e) {
@@ -597,14 +588,12 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		});
 		
 		ToolItem describeChangesItem = new ToolItem(filesToolbar, SWT.PUSH);
-		describeChangesItem.setWidth(20);
 		Image describeImage = UIIcons.ANNOTATE.createImage();
 		describeChangesItem.setImage(describeImage);
 		describeChangesItem.setToolTipText("Describe changes");
 		describeChangesItem.addSelectionListener(new SummarizeChangeListener(this));
 
 		ToolItem checkAllItem = new ToolItem(filesToolbar, SWT.PUSH);
-		checkAllItem.setWidth(20);
 		Image checkImage = UIIcons.CHECK_ALL.createImage();
 		checkAllItem.setImage(checkImage);
 		checkAllItem.setToolTipText("Select All");
@@ -619,7 +608,6 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		});
 
 		ToolItem uncheckAllItem = new ToolItem(filesToolbar, SWT.PUSH);
-		uncheckAllItem.setWidth(20);
 		Image uncheckImage = UIIcons.UNCHECK_ALL.createImage();
 		uncheckAllItem.setImage(uncheckImage);
 		uncheckAllItem.setToolTipText("Deselect All");

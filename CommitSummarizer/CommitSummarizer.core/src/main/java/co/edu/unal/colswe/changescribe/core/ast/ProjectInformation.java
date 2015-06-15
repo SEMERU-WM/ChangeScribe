@@ -146,7 +146,7 @@ public class ProjectInformation {
      * 
      * Otherwise, return null.
      * 
-     * @param selection
+     * @param data.selection
      * @return a Vaadin project or null
      */
     public static IProject getProject(IResource resource) {
