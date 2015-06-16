@@ -453,8 +453,6 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 		return size;
 	}
 	
-	
-	
 	public void updateSignatureCanvas() {
 		if(signatureMap != null) {
 			signatureCanvas.setSignatureMap(signatureMap);
@@ -545,8 +543,6 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 
 			@Override
 			public void widgetDefaultSelected(SelectionEvent arg0) {
-				
-				
 			}
 		});
 		
@@ -575,15 +571,12 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 		uncheckAllItem.setImage(uncheckImage);
 		uncheckAllItem.setToolTipText("Deselect All");
 		uncheckAllItem.addSelectionListener(new SelectionAdapter() {
-
 			public void widgetSelected(SelectionEvent e) {
 				filesViewer.setAllChecked(false);
 				updateFileSectionText();
 				updateMessage();
 			}
-
 		});
-
 		statCol.pack();
 		resourceCol.pack();
 		return filesSection;
@@ -593,14 +586,11 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 		Set<ChangedFile> modifications = DescribeVersionsDialogUtil.computeModifications(this.getShell(), git, getOlderVersionText().getText(), getNewerVersionText().getText());
 		listSelectionDialog = new ListSelectionDialog(this.shellTmp.getShell(), 
 				modifications, new ArrayContentProvider(), new LabelProvider(), "Changes");
-		
 		items = modifications;
-		
 		if(items != null) {
 			filesViewer.setInput(items.toArray());
 		}
 	}
-	
 	
 	private void updateFileSectionText() {
 		filesSection.setText(MessageFormat.format("Modified files (selected {0} of {1})",
@@ -623,20 +613,15 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 
 		String message = null;
 		int type = IMessageProvider.NONE;
-
 		String commitMsg = getEditor().getText().getText().toString();
+		
 		if (commitMsg == null || commitMsg.trim().length() == 0) {
 			message = "Empty message";
 			type = IMessageProvider.INFORMATION;
 		} else if (!isCommitWithoutFilesAllowed()) {
 			message = "No files selected";
 			type = IMessageProvider.INFORMATION;
-		} else {
-			//CommitStatus status = commitMessageComponent.getStatus();
-			//message = status.getMessage();
-			//type = status.getMessageType();
-		}
-
+		} 
 		setMessage(message, type);
 	}
 	

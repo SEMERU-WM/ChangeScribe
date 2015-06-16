@@ -96,6 +96,8 @@ import co.edu.unal.colswe.changescribe.core.util.UIPreferences;
 import co.edu.unal.colswe.changescribe.core.util.UIUtils;
 
 public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
+	public static final int COMMIT_AND_PUSH_ID = 30;
+	private static final String DIALOG_SETTINGS_SECTION_NAME = Activator.getDefault() + ".COMMIT_DIALOG_SECTION"; //$NON-NLS-1$
 	private StyledText text;
 	private Git git;
 	private IJavaProject selection;
@@ -107,7 +109,6 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 	private Set<ChangedFile> items;
 	private Button commitButton;
 	private Button commitAndPushButton;
-	public static final int COMMIT_AND_PUSH_ID = 30;
 	private TreeMap<MethodStereotype, Integer> signatureMap;
 	private SignatureCanvas signatureCanvas;
 	private boolean isPushRequested;
@@ -115,7 +116,6 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 	private Text committerText;
 	private String committer = null;
 	private String author = null;
-	private static final String DIALOG_SETTINGS_SECTION_NAME = Activator.getDefault() + ".COMMIT_DIALOG_SECTION"; //$NON-NLS-1$
 	private SashForm sashForm;
 	private Composite messageAndPersonArea;
 
@@ -398,17 +398,14 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 	
 	protected String validateCommit() {
 		String authorValue = author;
+		String committerValue = committer;
 		if (authorValue.length() == 0) {
 			return "Empty or Invalid author";
 		}
-
-		String committerValue = committer;
 		if (committerValue.length() == 0) {
 			return "Empty or Invalid committer";
 		}
-		
 		return "";
-
 	}
 	
 	@Override
@@ -447,7 +444,6 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 	}
 	
 	private Composite createMessageAndPersonArea(Composite container) {
-
 		messageAndPersonArea = toolkit.createComposite(container);
 		GridDataFactory.fillDefaults().grab(true, true)
 				.applyTo(messageAndPersonArea);
@@ -512,8 +508,6 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		return size;
 	}
 	
-	
-	
 	public void updateSignatureCanvas() {
 		if(signatureMap != null) {
 			signatureCanvas.setSignatureMap(signatureMap);
@@ -550,8 +544,8 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		Tree resourcesTree = resourcesTreeComposite.getViewer().getTree();
 		resourcesTree.setData(FormToolkit.KEY_DRAW_BORDER,FormToolkit.TREE_BORDER);
 		resourcesTreeComposite.setLayoutData(GridDataFactory.fillDefaults().hint(600, 230).grab(true, true).create());
-
 		resourcesTree.setHeaderVisible(true);
+		
 		TreeColumn statCol = new TreeColumn(resourcesTree, SWT.LEFT);
 		statCol.setText("Status");
 		statCol.setWidth(150);
@@ -571,7 +565,6 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		}
 		
 		filesViewer.addCheckStateListener(new ICheckStateListener() {
-
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				updateFileSectionText();
 			}
@@ -612,15 +605,12 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		uncheckAllItem.setImage(uncheckImage);
 		uncheckAllItem.setToolTipText("Deselect All");
 		uncheckAllItem.addSelectionListener(new SelectionAdapter() {
-
 			public void widgetSelected(SelectionEvent e) {
 				filesViewer.setAllChecked(false);
 				updateFileSectionText();
 				updateMessage();
 			}
-
 		});
-
 		statCol.pack();
 		resourceCol.pack();
 		return filesSection;
@@ -699,8 +689,6 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		range2.background = getShell().getDisplay().getSystemColor(SWT.COLOR_YELLOW);
 
 		getText().setStyleRange(range2);
-		
-		
 	}
 
 	@Override
