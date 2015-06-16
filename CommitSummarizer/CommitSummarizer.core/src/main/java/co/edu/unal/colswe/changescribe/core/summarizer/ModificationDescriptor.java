@@ -49,6 +49,7 @@ import ch.uzh.ifi.seal.changedistiller.model.entities.SourceCodeChange;
 import ch.uzh.ifi.seal.changedistiller.model.entities.StructureEntityVersion;
 import ch.uzh.ifi.seal.changedistiller.model.entities.Update;
 import ch.uzh.ifi.seal.changedistiller.structuredifferencing.java.JavaStructureNode.Type;
+import co.edu.unal.colswe.changescribe.core.Constants;
 import co.edu.unal.colswe.changescribe.core.dependencies.MethodDependencySummary;
 import co.edu.unal.colswe.changescribe.core.git.ChangedFile;
 import co.edu.unal.colswe.changescribe.core.textgenerator.phrase.NounPhrase;
@@ -147,7 +148,7 @@ public class ModificationDescriptor {
 			    		localDescription.append(descTmp.toString());
 			    		
 			    		if(!descTmp.toString().equals("") && (change instanceof Update || change instanceof Insert || change instanceof Delete)) {
-				    		desc.append("\n");
+				    		desc.append(Constants.NEW_LINE);
 				    	}
 			    	}
 		    	}
@@ -159,7 +160,7 @@ public class ModificationDescriptor {
 		    	if(changes != null && changes.size() > 0) {
 					desc.insert(0, "Modifications to " + file.getName() + ":  \n\n");
 				} 
-		    	desc.append("\n");
+		    	desc.append(Constants.NEW_LINE);
 		    }
 		}
 		System.out.println("Modification Descriptor: " + desc.toString());
@@ -456,7 +457,7 @@ public class ModificationDescriptor {
 				String beforeName = update.getChangedEntity().getName().replace(";", "");
 				String afterName = update.getNewEntity().getUniqueName().replace(";", "");
 				desc.append(StringUtils.capitalize(fType));
-				if(!afterName.contains("\n")) {
+				if(!afterName.contains(Constants.NEW_LINE)) {
 					desc.append(" " + beforeName + " with " + afterName);
 				}
 				desc.append(" at " + update.getRootEntity().getJavaStructureNode().getName() + " " + update.getRootEntity().getJavaStructureNode().getType().name().toLowerCase());
@@ -613,7 +614,7 @@ public class ModificationDescriptor {
 			
 			if(localDescriptor.toString().trim().length() > 0) {
 				localDescriptor = new StringBuilder(localDescriptor.substring(0, localDescriptor.length() - 2));
-				localDescriptor.append("\n");
+				localDescriptor.append(Constants.NEW_LINE);
 			}
 			descriptor.append(localDescriptor.toString());
 		}

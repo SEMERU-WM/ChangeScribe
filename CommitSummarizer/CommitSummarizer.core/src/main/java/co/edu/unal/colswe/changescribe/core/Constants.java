@@ -8,5 +8,7 @@ public class Constants {
 	public static final String REMOVE = "REMOVE";
 	public static final String ADD = "ADD";
 	public static final String MODIFY = "MODIFY";
+	public static final String HELP_RESOURCES_DIR = "/html/help/commitstereotypes.html";
+	public static final String NEW_LINE = "\n";
 
 }

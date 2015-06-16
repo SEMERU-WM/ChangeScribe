@@ -15,6 +15,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolTip;
 
+import co.edu.unal.colswe.changescribe.core.Constants;
+import co.edu.unal.colswe.changescribe.core.Messages;
 import co.edu.unal.colswe.changescribe.core.stereotype.taxonomy.MethodStereotype;
 
 /**
@@ -133,8 +135,8 @@ public class SignatureCanvas {
 							toolTip = new ToolTip(getShell(), SWT.BALLOON | SWT.ICON_INFORMATION);
 							currentRectangle = rect;
 							toolTip.setVisible(false);
-							toolTip.setText("Stereotype description");
-							toolTip.setMessage(getToolTipInfo(counter) + "\n" + getToolTipMessage(counter));
+							toolTip.setText(Messages.SignatureCanvas_StereotypeDescription);
+							toolTip.setMessage(getToolTipInfo(counter) + Constants.NEW_LINE + getToolTipMessage(counter)); //$NON-NLS-1$
 							toolTip.setVisible(true);
 							toolTip.setAutoHide(true);
 						} else {
@@ -168,14 +170,13 @@ public class SignatureCanvas {
 	}
 	
 	public String getToolTipInfo(int value) {
-		String text = "Stereotype: " + ((MethodStereotype)signatureMap.keySet().toArray()[value]).name().replace("_", " ") + "\n";
-		text += "Amount: " + signatureMap.values().toArray()[value];
+		String text = Messages.SignatureCanvas_Stereotype + ((MethodStereotype)signatureMap.keySet().toArray()[value]).name().replace("_", " ") + Constants.NEW_LINE; //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		text += Messages.SignatureCanvas_Amount + signatureMap.values().toArray()[value];
 		
 		return text;
 	}
 	
 	public String getToolTipMessage(int value) {
-		
 		return ((MethodStereotype)signatureMap.keySet().toArray()[value]).getSubcategory().getDescription();
 	}
 	
@@ -190,9 +191,9 @@ public class SignatureCanvas {
 			e.gc.drawLine(accumulate, 5, accumulate, 55);
 			
 			if(accumulate == initial) {
-				e.gc.drawString("" + i + "%", accumulate, 58, true);
+				e.gc.drawString("" + i + "%", accumulate, 58, true); //$NON-NLS-1$ //$NON-NLS-2$
 			} else {
-				e.gc.drawString("" + i + "%", accumulate - 10, 58, true);
+				e.gc.drawString("" + i + "%", accumulate - 10, 58, true); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			accumulate = accumulate + width / 10;
 			i = i + 10;
@@ -203,22 +204,18 @@ public class SignatureCanvas {
 		e.gc.setBackground(color);
 		int widthValue = (int)Math.round((percentaje * getWidth())/100);
 		if(accum + widthValue > getWidth() + 20) {
-			//widthValue = getWidth() + 15 - accum;
 			int ruleLenght = ((getShell().getSize().x - width)/ 2) + width ;
 			widthValue = ruleLenght - accum - 5;
 		} else {
-			/*int diff = (getWidth() + 15) - (accum + widthValue);
-			widthValue = widthValue + diff;*/
 			widthValue = (int) ((width * percentaje) / 100);			
 		}
 
-		
 		Rectangle rect = new Rectangle(accum, 20, widthValue ,getHeight());
 		rectangles.add(rect);
 		
 		e.gc.fillRectangle(accum, 15, widthValue ,getHeight());
 		e.gc.textExtent(signature.getKey().name());
-		e.gc.drawText(signature.getValue() + "", (accum + (int)Math.round((percentaje * getWidth())/100)/2), 20);
+		e.gc.drawText(signature.getValue() + "", (accum + (int)Math.round((percentaje * getWidth())/100)/2), 20); //$NON-NLS-1$
 	}
 
 	public Composite getComposite() {

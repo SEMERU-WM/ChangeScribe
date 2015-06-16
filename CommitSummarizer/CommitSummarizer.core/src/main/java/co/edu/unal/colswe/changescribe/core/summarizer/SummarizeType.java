@@ -1,5 +1,6 @@
 package co.edu.unal.colswe.changescribe.core.summarizer;
 
+import co.edu.unal.colswe.changescribe.core.Constants;
 import co.edu.unal.colswe.changescribe.core.git.ChangedFile;
 import co.edu.unal.colswe.changescribe.core.stereotype.stereotyped.StereotypeIdentifier;
 import co.edu.unal.colswe.changescribe.core.stereotype.stereotyped.StereotypedElement;
@@ -29,7 +30,7 @@ public class SummarizeType {
 		
 		
 		localBuilder.append(StereotypeMethodDescriptor.describe(getElement().getStereoSubElements()));
-		localBuilder.append(ImpactSetDescriptor.describe(identifier.getCompilationUnit(), getDifferences(), identifier.getScmOperation()) + "\n");
+		localBuilder.append(ImpactSetDescriptor.describe(identifier.getCompilationUnit(), getDifferences(), identifier.getScmOperation()) + Constants.NEW_LINE);
 		
 		if(!localBuilder.toString().trim().equals("")) {
 			if(getElement().getStereoSubElements() != null && getElement().getStereoSubElements().size() > 0) {

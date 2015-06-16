@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
+import co.edu.unal.colswe.changescribe.core.Constants;
 import co.edu.unal.colswe.changescribe.core.stereotype.analyzer.MethodAnalyzer;
 import co.edu.unal.colswe.changescribe.core.stereotype.information.TypeInfo;
 import co.edu.unal.colswe.changescribe.core.stereotype.rules.MethodStereotypeRules;
@@ -97,7 +98,7 @@ public class StereotypedMethod extends MethodStereotypeRules implements
 	}
 
 	public void findStereotypes() {
-		this.report.append("\n" + this.getKey());
+		this.report.append(Constants.NEW_LINE + this.getKey());
 		try { 
 			this.methodAnalyzer = new MethodAnalyzer(this.method);
 			this.primaryStereotype = this.findPrimaryStereotype();

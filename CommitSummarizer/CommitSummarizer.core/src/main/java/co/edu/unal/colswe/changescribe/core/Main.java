@@ -42,7 +42,6 @@ public class Main {
 			differences = SCMRepository.getDifferences(status,git.getRepository().getWorkTree().getAbsolutePath());
 			
 		} else {
-			
 			System.out.println("Git repository not found!");
 			return org.eclipse.core.runtime.Status.CANCEL_STATUS;
 		}

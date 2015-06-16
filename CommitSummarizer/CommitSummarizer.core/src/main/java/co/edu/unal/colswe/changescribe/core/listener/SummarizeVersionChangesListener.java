@@ -7,6 +7,7 @@ import org.eclipse.swt.events.SelectionListener;
 
 import changescribe.core.preferences.PreferenceConstants;
 import co.edu.unal.colswe.changescribe.core.Activator;
+import co.edu.unal.colswe.changescribe.core.Messages;
 import co.edu.unal.colswe.changescribe.core.summarizer.SummarizeChanges;
 import co.edu.unal.colswe.changescribe.core.ui.DescribeVersionsDialog;
 
@@ -32,7 +33,7 @@ public class SummarizeVersionChangesListener implements SelectionListener {
 			
 			summarizer.summarize(changedListDialog.getSelectedFiles());
 		} else {
-			MessageDialog.openInformation(changedListDialog.getShell(), "Information",
+			MessageDialog.openInformation(changedListDialog.getShell(), Messages.INFORMATION,
 					"You do not select any change");
 			
 		}

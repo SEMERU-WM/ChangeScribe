@@ -16,6 +16,7 @@ import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchWindow;
 
+import co.edu.unal.colswe.changescribe.core.Messages;
 import co.edu.unal.colswe.changescribe.core.git.ChangedFile;
 import co.edu.unal.colswe.changescribe.core.git.GitException;
 import co.edu.unal.colswe.changescribe.core.git.SCMRepository;
@@ -56,11 +57,11 @@ public class HandlerUtil {
 			} catch (GitAPIException e) {
 				e.printStackTrace();
 			} catch (final GitException e) {
-				UIUtils.showInformationWindow(window, "Information", e.getMessage());
+				UIUtils.showInformationWindow(window, Messages.INFORMATION, e.getMessage());
 			}
 			differences = SCMRepository.getDifferences(status,git.getRepository().getWorkTree().getAbsolutePath());
 		} else {
-			UIUtils.showInformationWindow(window, "Information", "Git repository not found!");
+			UIUtils.showInformationWindow(window, Messages.INFORMATION, "Git repository not found!");
 		}
 		return differences;
 	}

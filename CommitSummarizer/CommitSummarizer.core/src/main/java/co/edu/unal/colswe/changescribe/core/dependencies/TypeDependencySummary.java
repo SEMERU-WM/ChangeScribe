@@ -17,6 +17,7 @@ import org.eclipse.jdt.internal.core.ResolvedSourceMethod;
 import org.eclipse.jdt.internal.core.ResolvedSourceType;
 import org.eclipse.swt.widgets.Display;
 
+import co.edu.unal.colswe.changescribe.core.Constants;
 import co.edu.unal.colswe.changescribe.core.ast.ProjectInformation;
 import co.edu.unal.colswe.changescribe.core.git.ChangedFile.TypeChange;
 import co.edu.unal.colswe.changescribe.core.textgenerator.phrase.util.PhraseUtils;
@@ -74,7 +75,7 @@ public class TypeDependencySummary extends DependencySummary {
 			} else {
 				lead = "\nReferenced by:";
 			}
-			setBuilder(new StringBuilder(lead +"\n"));
+			setBuilder(new StringBuilder(lead +Constants.NEW_LINE));
 		}
 		
 		for (SearchMatch match : getDependencies()) {
@@ -88,11 +89,11 @@ public class TypeDependencySummary extends DependencySummary {
         	}
 
 			if(match.isInsideDocComment()) {
-				getBuilder().append("\t" + " Referenced in comments of " + type.getParent().getElementName() + " " + PhraseUtils.getStringType(type.getDeclaringType()) + "\n");
+				getBuilder().append("\t" + " Referenced in comments of " + type.getParent().getElementName() + " " + PhraseUtils.getStringType(type.getDeclaringType()) + Constants.NEW_LINE);
 			} else if(match.isImplicit()) {
-				getBuilder().append("\t" + " Implicit reference in " + type.getParent().getElementName() + " " + PhraseUtils.getStringType(type.getDeclaringType()) + "\n");
-			} else if(!getBuilder().toString().contains("\t" + type.getParent().getElementName() + " " + PhraseUtils.getStringType(type.getDeclaringType()) + "\n")){
-				getBuilder().append("\t" + type.getParent().getElementName() + " " + PhraseUtils.getStringType(type.getDeclaringType()) + "\n");
+				getBuilder().append("\t" + " Implicit reference in " + type.getParent().getElementName() + " " + PhraseUtils.getStringType(type.getDeclaringType()) + Constants.NEW_LINE);
+			} else if(!getBuilder().toString().contains("\t" + type.getParent().getElementName() + " " + PhraseUtils.getStringType(type.getDeclaringType()) + Constants.NEW_LINE)){
+				getBuilder().append("\t" + type.getParent().getElementName() + " " + PhraseUtils.getStringType(type.getDeclaringType()) + Constants.NEW_LINE);
 			}
 		}
 	}

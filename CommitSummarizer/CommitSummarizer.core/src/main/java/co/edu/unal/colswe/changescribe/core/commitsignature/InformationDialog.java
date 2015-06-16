@@ -14,6 +14,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import co.edu.unal.colswe.changescribe.core.Constants;
+import co.edu.unal.colswe.changescribe.core.Messages;
 import co.edu.unal.colswe.changescribe.core.ProjectInformation;
 
 public class InformationDialog extends TitleAreaDialog {
@@ -29,8 +31,8 @@ public class InformationDialog extends TitleAreaDialog {
 	 @Override
 	 protected Control createDialogArea(Composite parent) {
 		Composite container = (Composite) super.createDialogArea(parent);
-		parent.getShell().setText("Help");
-		setTitle("Information");
+		parent.getShell().setText(Messages.InformationDialog_Help);
+		setTitle(Messages.INFORMATION);
 		
 		container = toolkit.createComposite(container);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -51,7 +53,7 @@ public class InformationDialog extends TitleAreaDialog {
 	    	browser = new Browser(container, SWT.MOZILLA);
 	    }
 	    if(browser != null) {
-	    	browser.setUrl(ProjectInformation.getAbsoluteURL("/html/help/commitstereotypes.html"));
+	    	browser.setUrl(ProjectInformation.getAbsoluteURL(Constants.HELP_RESOURCES_DIR)); //$NON-NLS-1$
 	    	toolkit.adapt(browser, true, true);
 	    	browser.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 	    }
@@ -70,5 +72,4 @@ public class InformationDialog extends TitleAreaDialog {
 		});
 		return super.createContents(parent);
 	}
-
 }

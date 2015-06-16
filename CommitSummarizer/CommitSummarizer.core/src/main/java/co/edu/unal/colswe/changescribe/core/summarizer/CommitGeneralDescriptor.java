@@ -10,6 +10,7 @@ import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
 
+import co.edu.unal.colswe.changescribe.core.Constants;
 import co.edu.unal.colswe.changescribe.core.git.ChangedFile;
 import co.edu.unal.colswe.changescribe.core.git.ChangedFile.TypeChange;
 
@@ -53,7 +54,7 @@ public class CommitGeneralDescriptor {
 			descriptionBuilder.append("");
 		}
 		
-		descriptionBuilder.append("\n");
+		descriptionBuilder.append(Constants.NEW_LINE);
 		return descriptionBuilder.toString();
 	}
 	

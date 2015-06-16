@@ -11,6 +11,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import co.edu.unal.colswe.changescribe.core.Messages;
 import co.edu.unal.colswe.changescribe.core.git.ChangedFile;
 import co.edu.unal.colswe.changescribe.core.git.SCMRepository;
 import co.edu.unal.colswe.changescribe.core.ui.DescribeVersionsDialog;
@@ -44,7 +45,7 @@ public class CompareVersionsHandler extends AbstractHandler {
 			differences = changescribe.core.handlers.HandlerUtil.initMonitorDialog(selection, git, repo, window);
 			changescribe.core.handlers.HandlerUtil.openMonitorDialog(new DescribeVersionsDialog(window.getShell(), differences, git, javaProject));
 		} catch (final RuntimeException e) {
-			UIUtils.showInformationWindow(window, "Information", e.getMessage());
+			UIUtils.showInformationWindow(window, Messages.INFORMATION, e.getMessage());
 		}
 		return null;
 	}

@@ -27,6 +27,8 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jface.text.Document;
 
+import co.edu.unal.colswe.changescribe.core.Constants;
+
 public class JParser {
     private CompilationUnit unit;
     private List<ASTNode> elements;
@@ -91,7 +93,7 @@ public class JParser {
 			in = new BufferedReader(new FileReader(file));
 			String line = null;
 			while (null != (line = in.readLine())) {
-			     buffer.append(line).append("\n");
+			     buffer.append(line).append(Constants.NEW_LINE);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

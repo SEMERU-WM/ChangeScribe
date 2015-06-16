@@ -75,6 +75,7 @@ import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 
 import changescribe.core.preferences.PreferenceConstants;
 import co.edu.unal.colswe.changescribe.core.Activator;
+import co.edu.unal.colswe.changescribe.core.Messages;
 import co.edu.unal.colswe.changescribe.core.commitsignature.InformationDialog;
 import co.edu.unal.colswe.changescribe.core.commitsignature.SignatureCanvas;
 import co.edu.unal.colswe.changescribe.core.decorator.ProblemLabelDecorator;
@@ -131,7 +132,7 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 	public void refreshView() {
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
-				MessageDialog.openInformation(getShell(), "Information", "You must close the window for the changes to take effect");
+				MessageDialog.openInformation(getShell(), Messages.INFORMATION, "You must close the window for the changes to take effect");
 			}});
 	}
 	

@@ -36,6 +36,7 @@ import ch.uzh.ifi.seal.changedistiller.ChangeDistiller;
 import ch.uzh.ifi.seal.changedistiller.ChangeDistiller.Language;
 import ch.uzh.ifi.seal.changedistiller.distilling.FileDistiller;
 import ch.uzh.ifi.seal.changedistiller.model.entities.StructureEntityVersion;
+import co.edu.unal.colswe.changescribe.core.Constants;
 import co.edu.unal.colswe.changescribe.core.Module;
 import co.edu.unal.colswe.changescribe.core.ast.ProjectInformation;
 import co.edu.unal.colswe.changescribe.core.git.ChangedFile;
@@ -371,11 +372,11 @@ public class SummarizeChanges {
 		String connector = (modules.size() == 1)?" this new module":" these new modules";
 		descTmp.append("The commit includes" + connector + ": \n\n");
 		for (Module module : modules) {
-			if(!descTmp.toString().contains("\t- " + module.getModuleName() + "\n")) {
-				descTmp.append("\t- " + module.getModuleName() + "\n");
+			if(!descTmp.toString().contains("\t- " + module.getModuleName() + Constants.NEW_LINE)) {
+				descTmp.append("\t- " + module.getModuleName() + Constants.NEW_LINE);
 			}
 		}
-		descTmp.append("\n");
+		descTmp.append(Constants.NEW_LINE);
 		
 		desc.append(descTmp);
 	}
