@@ -10,5 +10,10 @@ public class Constants {
 	public static final String MODIFY = "MODIFY";
 	public static final String HELP_RESOURCES_DIR = "/html/help/commitstereotypes.html";
 	public static final String NEW_LINE = "\n";
+	public static final String SPACE = " ";
+	public static final String TAB = "\t";
+	public static final String JAVA_EXTENSION = ".java";
+	public static final String EMPTY_STRING = "";
+	public static final String SLASH = "/";
 
 }

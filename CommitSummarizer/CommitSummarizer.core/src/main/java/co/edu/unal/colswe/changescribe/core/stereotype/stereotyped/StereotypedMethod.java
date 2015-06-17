@@ -302,7 +302,7 @@ public class StereotypedMethod extends MethodStereotypeRules implements
 
 	public String getName() {
 		return (this.method != null && this.method.resolveBinding() != null) ? this.method
-				.resolveBinding().getName() : "";
+				.resolveBinding().getName() : Constants.EMPTY_STRING;
 	}
 
 	public String getQualifiedName() {

@@ -7,6 +7,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
+import co.edu.unal.colswe.changescribe.core.Constants;
 import co.edu.unal.colswe.changescribe.core.textgenerator.pos.Tag;
 import co.edu.unal.colswe.changescribe.core.textgenerator.pos.TaggedTerm;
 
@@ -107,7 +108,7 @@ public class PhraseUtils {
 	}
 	
 	public static String getAdjetive(List<TaggedTerm> terms) {
-		String adjetive = "";
+		String adjetive = Constants.EMPTY_STRING;
 		for(TaggedTerm term : terms) {
 			
 			if(Tag.isAdjective(term.getTag())) {
@@ -119,7 +120,7 @@ public class PhraseUtils {
 	}
 	
 	public static String getObject(List<TaggedTerm> terms) {
-		String object = "";
+		String object = Constants.EMPTY_STRING;
 		for(TaggedTerm term : terms) {
 			
 			if(Tag.isNoun(term.getTag())) {
@@ -141,7 +142,7 @@ public class PhraseUtils {
     }
 	
 	public static String getStringType(IType type) {
-		String rta = "";
+		String rta = Constants.EMPTY_STRING;
 		try {
 			if(type.isClass()) {
 				rta = "class";
@@ -212,7 +213,7 @@ public class PhraseUtils {
     }
     
     public static String getIsAre(int size) {
-    	String value = "";
+    	String value = Constants.EMPTY_STRING;
     	if(size == 1) {
     		value = " is ";
     	} else if(size > 1) {

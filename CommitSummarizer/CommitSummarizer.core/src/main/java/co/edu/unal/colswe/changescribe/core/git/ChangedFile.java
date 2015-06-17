@@ -3,6 +3,7 @@ package co.edu.unal.colswe.changescribe.core.git;
 import java.io.File;
 import java.util.List;
 
+import co.edu.unal.colswe.changescribe.core.Constants;
 import ch.uzh.ifi.seal.changedistiller.model.entities.StructureEntityVersion;
 
 @SuppressWarnings("rawtypes")
@@ -85,8 +86,7 @@ public class ChangedFile implements Comparable {
 
 	@Override
 	public String toString() {
-		//return "ChangedFile [path=" + path + ", changeType=" + changeType + "]";
-		return "" + changeType + " - " + path;
+		return Constants.EMPTY_STRING + changeType + " - " + path;
 	}
 
 	public String getAbsolutePath() {

@@ -24,18 +24,17 @@ public class CommitGeneralDescriptor {
 	private boolean isInitialCommit;
 	
 	public CommitGeneralDescriptor() {
-		
 	}
 	
 	public String describe() {
-		StringBuilder descriptionBuilder = new StringBuilder("");
+		StringBuilder descriptionBuilder = new StringBuilder(Constants.EMPTY_STRING);
 		if(differences != null) {
 			extractNewModules();
 			extractInternationalization();
 			extractNewFeatures();
 			extractRenames();
 			
-			descriptionBuilder = new StringBuilder("");
+			descriptionBuilder = new StringBuilder(Constants.EMPTY_STRING);
 			
 			if(!isInitialCommit && newModules != null && newModules.size() > 0) {
 				describeNewModules(descriptionBuilder);
@@ -51,7 +50,7 @@ public class CommitGeneralDescriptor {
 				descriptionBuilder.insert(0, "This commit ");
 			}
 		} else  {
-			descriptionBuilder.append("");
+			descriptionBuilder.append(Constants.EMPTY_STRING);
 		}
 		
 		descriptionBuilder.append(Constants.NEW_LINE);
@@ -72,7 +71,7 @@ public class CommitGeneralDescriptor {
 		newModules = new TreeMap<String, ChangedFile>();		
 		for (String string : repositoryStatus.getUntrackedFolders()) {
 			for(ChangedFile file : differences) {
-				if(file.getPath().lastIndexOf("/") != -1 && file.getPath().substring(0, file.getPath().lastIndexOf("/")).equals(string) && !newModules.containsKey(string)) {
+				if(file.getPath().lastIndexOf(Constants.SLASH) != -1 && file.getPath().substring(0, file.getPath().lastIndexOf(Constants.SLASH)).equals(string) && !newModules.containsKey(string)) {
 					ChangedFile changedFile = new ChangedFile(string, TypeChange.UNTRACKED_FOLDERS.name(), git.getRepository().getWorkTree().getAbsolutePath());
 					if(!newModules.containsKey(string)) {
 						newModules.put(string, changedFile);

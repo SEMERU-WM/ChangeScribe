@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
+import co.edu.unal.colswe.changescribe.core.Constants;
 import co.edu.unal.colswe.changescribe.core.stereotype.analyzer.TypeAnalyzer;
 import co.edu.unal.colswe.changescribe.core.stereotype.information.TypeInfo;
 import co.edu.unal.colswe.changescribe.core.stereotype.taxonomy.CodeStereotype;
@@ -379,11 +380,11 @@ public class StereotypedType extends TypeStereotypeRules implements StereotypedE
     }
     
     public String getName() {
-        return (this.type != null && this.type.resolveBinding() != null) ? this.type.resolveBinding().getName() : "";
+        return (this.type != null && this.type.resolveBinding() != null) ? this.type.resolveBinding().getName() : Constants.EMPTY_STRING;
     }
     
     public String getQualifiedName() {
-    	String qualifiedName = (this.type.getName() != null && this.type.resolveBinding() != null) ? this.type.resolveBinding().getQualifiedName() : "";
+    	String qualifiedName = (this.type.getName() != null && this.type.resolveBinding() != null) ? this.type.resolveBinding().getQualifiedName() : Constants.EMPTY_STRING;
     	
     	if(null == qualifiedName || qualifiedName.isEmpty()) {
     		qualifiedName = type.getName().getFullyQualifiedName();
@@ -398,7 +399,7 @@ public class StereotypedType extends TypeStereotypeRules implements StereotypedE
 	    	fullyQualifiedClassName.append(".");
 	    	fullyQualifiedClassName.append(type.getName());
     	} else {
-    		String name = (this.type != null && this.type.resolveBinding() != null) ? this.type.resolveBinding().getQualifiedName() : "";
+    		String name = (this.type != null && this.type.resolveBinding() != null) ? this.type.resolveBinding().getQualifiedName() : Constants.EMPTY_STRING;
     		fullyQualifiedClassName.append(name);
     	}
     	

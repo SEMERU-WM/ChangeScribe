@@ -24,7 +24,6 @@ import co.edu.unal.colswe.changescribe.core.textgenerator.phrase.util.PhraseUtil
 
 @SuppressWarnings("restriction")
 public class TypeDependencySummary extends DependencySummary {
-	
 
 	public TypeDependencySummary(IJavaElement element, String operation) {
 		setElement(element); 
@@ -51,7 +50,7 @@ public class TypeDependencySummary extends DependencySummary {
         }
         
         SearchPattern pattern = SearchPattern.createPattern(
-                		getElement().getPrimaryElement().getElementName().replace(".java", ""),
+                		getElement().getPrimaryElement().getElementName().replace(Constants.JAVA_EXTENSION, Constants.EMPTY_STRING),
                         IJavaSearchConstants.TYPE,
                         IJavaSearchConstants.REFERENCES,
                         SearchPattern.R_EXACT_MATCH);
@@ -64,36 +63,42 @@ public class TypeDependencySummary extends DependencySummary {
 		}
 	}
 	
-	
-	
 	@Override
 	public void generateSummary() {
 		if(getDependencies() != null && getDependencies().size() > 0) {
-			String lead = "";
+			String lead = Constants.NEW_LINE;
 			if(getOperation().equals(TypeChange.REMOVED.toString())) {
-				lead = "\nWas referenced by:";
+				lead = "Was referenced by:";
 			} else {
-				lead = "\nReferenced by:";
+				lead = "Referenced by:";
 			}
 			setBuilder(new StringBuilder(lead +Constants.NEW_LINE));
-		}
 		
-		for (SearchMatch match : getDependencies()) {
-			NamedMember type = null;
-        	if(match.getElement() instanceof ResolvedSourceMethod) {
-        		type = ((ResolvedSourceMethod )match.getElement());
-        	} else if(match.getElement() instanceof ResolvedSourceType) {
-        		type = ((ResolvedSourceType )match.getElement());
-        	} else if(match.getElement() instanceof ResolvedSourceField) {
-        		type = ((ResolvedSourceField)match.getElement());
-        	}
-
-			if(match.isInsideDocComment()) {
-				getBuilder().append("\t" + " Referenced in comments of " + type.getParent().getElementName() + " " + PhraseUtils.getStringType(type.getDeclaringType()) + Constants.NEW_LINE);
-			} else if(match.isImplicit()) {
-				getBuilder().append("\t" + " Implicit reference in " + type.getParent().getElementName() + " " + PhraseUtils.getStringType(type.getDeclaringType()) + Constants.NEW_LINE);
-			} else if(!getBuilder().toString().contains("\t" + type.getParent().getElementName() + " " + PhraseUtils.getStringType(type.getDeclaringType()) + Constants.NEW_LINE)){
-				getBuilder().append("\t" + type.getParent().getElementName() + " " + PhraseUtils.getStringType(type.getDeclaringType()) + Constants.NEW_LINE);
+		
+			for (SearchMatch match : getDependencies()) {
+				NamedMember type = null;
+	        	if(match.getElement() instanceof ResolvedSourceMethod) {
+	        		type = ((ResolvedSourceMethod )match.getElement());
+	        	} else if(match.getElement() instanceof ResolvedSourceType) {
+	        		type = ((ResolvedSourceType )match.getElement());
+	        	} else if(match.getElement() instanceof ResolvedSourceField) {
+	        		type = ((ResolvedSourceField)match.getElement());
+	        	}
+	
+	        	getBuilder().append(Constants.TAB);
+				getBuilder().append(Constants.SPACE);
+				
+				if(match.isInsideDocComment()) {
+					getBuilder().append("Referenced in comments of");
+				} else if(match.isImplicit()) {
+					getBuilder().append("Implicit reference in");
+				} 
+				
+				getBuilder().append(Constants.SPACE);
+				getBuilder().append(type.getParent().getElementName());
+				getBuilder().append(Constants.SPACE);
+				getBuilder().append(PhraseUtils.getStringType(type.getDeclaringType()));
+				getBuilder().append(Constants.NEW_LINE);
 			}
 		}
 	}
@@ -104,6 +109,4 @@ public class TypeDependencySummary extends DependencySummary {
 		}
 		return getBuilder().toString();
 	}
-	
-	
 }

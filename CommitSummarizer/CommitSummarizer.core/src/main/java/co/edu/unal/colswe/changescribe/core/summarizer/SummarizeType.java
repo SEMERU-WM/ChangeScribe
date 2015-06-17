@@ -22,25 +22,24 @@ public class SummarizeType {
 	}
 	
 	public void generate() {
-		StringBuilder localBuilder = new StringBuilder("");
+		StringBuilder localBuilder = new StringBuilder(Constants.EMPTY_STRING);
 		builder = new StringBuilder();
-		
 		builder.append(GeneralDescriptor.describe(element, identifier.getParser().getCompilationUnit(), identifier.getScmOperation(), isLocal()));
 		
-		
-		
 		localBuilder.append(StereotypeMethodDescriptor.describe(getElement().getStereoSubElements()));
-		localBuilder.append(ImpactSetDescriptor.describe(identifier.getCompilationUnit(), getDifferences(), identifier.getScmOperation()) + Constants.NEW_LINE);
+		localBuilder.append(ImpactSetDescriptor.describe(identifier.getCompilationUnit(), getDifferences(), identifier.getScmOperation()));
+		localBuilder.append(Constants.NEW_LINE);
 		
-		if(!localBuilder.toString().trim().equals("")) {
+		if(!localBuilder.toString().trim().equals(Constants.EMPTY_STRING)) {
 			if(getElement().getStereoSubElements() != null && getElement().getStereoSubElements().size() > 0) {
-				builder.append(". It allows to: \n\n");
-			} else {
-				builder.append("\n\n");
-			}
+				builder.append(". It allows to:");
+			} 
+			builder.append(Constants.NEW_LINE);
+			builder.append(Constants.NEW_LINE);
 			builder.append(localBuilder.toString());
 		} else {
-			builder.append("\n\n");
+			builder.append(Constants.NEW_LINE);
+			builder.append(Constants.NEW_LINE);
 		}
 	} 
 	

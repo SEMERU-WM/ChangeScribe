@@ -4,6 +4,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.Modifier;
 
+import co.edu.unal.colswe.changescribe.core.Constants;
 import co.edu.unal.colswe.changescribe.core.git.ChangedFile.TypeChange;
 import co.edu.unal.colswe.changescribe.core.stereotype.stereotyped.StereotypedElement;
 import co.edu.unal.colswe.changescribe.core.stereotype.stereotyped.StereotypedType;
@@ -71,7 +72,7 @@ public class GeneralDescriptor {
 	}
 	
 	private static String describeOperation(String operation) {
-		String description = "";
+		String description = Constants.EMPTY_STRING;
 		if(operation.equals(TypeChange.ADDED.toString()) || operation.equals(TypeChange.UNTRACKED.toString())) {
 			description = "Add";
 		} else if(operation.equals(TypeChange.REMOVED.toString())) {

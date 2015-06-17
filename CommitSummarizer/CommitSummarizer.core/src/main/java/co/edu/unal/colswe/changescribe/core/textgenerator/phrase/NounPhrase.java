@@ -3,6 +3,7 @@ package co.edu.unal.colswe.changescribe.core.textgenerator.phrase;
 import java.util.LinkedList;
 import java.util.List;
 
+import co.edu.unal.colswe.changescribe.core.Constants;
 import co.edu.unal.colswe.changescribe.core.textgenerator.phrase.util.StringUtils;
 import co.edu.unal.colswe.changescribe.core.textgenerator.pos.POSTagger;
 import co.edu.unal.colswe.changescribe.core.textgenerator.pos.TaggedTerm;
@@ -39,16 +40,16 @@ public class NounPhrase extends Phrase {
 		
 		if(parameters != null && !parameters.isEmpty()) {
 			this.complementPhrase = new StringBuilder();
-			String argsDescriptor = "";
+			String argsDescriptor = Constants.EMPTY_STRING;
 			for(Parameter param : getParameters()) {
 				ParameterPhrase pp = new ParameterPhrase(param);
 				pp.generate();
 				String paramText = pp.toString();
 				if(!argsDescriptor.toLowerCase().contains(paramText.toLowerCase())) {
-					if(!argsDescriptor.equals("")) {
+					if(!argsDescriptor.equals(Constants.EMPTY_STRING)) {
 						argsDescriptor += ", ";
 					} else {
-						argsDescriptor = "";
+						argsDescriptor = Constants.EMPTY_STRING;
 					}
 					argsDescriptor += paramText;
 				}
@@ -60,10 +61,10 @@ public class NounPhrase extends Phrase {
 
 	public String toString() {
 		StringBuilder phrase = new StringBuilder();
-		if(this.phrase != null && !this.phrase.toString().equals("")) {
+		if(this.phrase != null && !this.phrase.toString().equals(Constants.EMPTY_STRING)) {
 			phrase.append(this.phrase.toString() + " ");
 		}
-		if(this.complementPhrase != null && !this.complementPhrase.toString().equals("")) {
+		if(this.complementPhrase != null && !this.complementPhrase.toString().equals(Constants.EMPTY_STRING)) {
 			phrase.append(connector + " " + this.complementPhrase.toString() + " ");
 		}
 		

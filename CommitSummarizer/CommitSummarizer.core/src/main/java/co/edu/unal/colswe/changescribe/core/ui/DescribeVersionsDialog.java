@@ -75,6 +75,7 @@ import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 
 import changescribe.core.preferences.PreferenceConstants;
 import co.edu.unal.colswe.changescribe.core.Activator;
+import co.edu.unal.colswe.changescribe.core.Constants;
 import co.edu.unal.colswe.changescribe.core.Messages;
 import co.edu.unal.colswe.changescribe.core.commitsignature.InformationDialog;
 import co.edu.unal.colswe.changescribe.core.commitsignature.SignatureCanvas;
@@ -103,8 +104,8 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 	private static final String DIALOG_SETTINGS_SECTION_NAME = Activator.getDefault() + ".COMMIT_DIALOG_SECTION"; //$NON-NLS-1$
 	private SashForm sashForm;
 	private Composite messageAndPersonArea;
-	private String commitCurrentID = "";
-	private String commitPreviousID = "";
+	private String commitCurrentID = Constants.EMPTY_STRING;
+	private String commitPreviousID = Constants.EMPTY_STRING;
 	private Shell shellTmp;
 
 	public DescribeVersionsDialog(Shell shell, Set<ChangedFile> differences, Git git, IJavaProject selection) {
@@ -326,7 +327,7 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 			return "Empty or invalid newer commit id";
 		}
 		
-		return "";
+		return Constants.EMPTY_STRING;
 
 	}
 	
@@ -535,7 +536,7 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 			
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				if(!validateCommit().equals("")) {
+				if(!validateCommit().equals(Constants.EMPTY_STRING)) {
 					MessageDialog.openWarning(getShell(), "Error", validateCommit());
 				} else {
 					computeModifications();

@@ -6,6 +6,8 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
+import co.edu.unal.colswe.changescribe.core.Constants;
+
 public class CompilationUtils {
 
 	public CompilationUtils() {
@@ -24,7 +26,7 @@ public class CompilationUtils {
 	}
 	
 	public static String getCUType(ICompilationUnit type) {
-		String fileType = "";
+		String fileType = Constants.EMPTY_STRING;
 		try {
 			if(null != type.getPrimary() && null != type.getPrimary().findPrimaryType()) {
 				if(type.getPrimary().findPrimaryType().isInterface()) {

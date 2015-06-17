@@ -191,9 +191,9 @@ public class SignatureCanvas {
 			e.gc.drawLine(accumulate, 5, accumulate, 55);
 			
 			if(accumulate == initial) {
-				e.gc.drawString("" + i + "%", accumulate, 58, true); //$NON-NLS-1$ //$NON-NLS-2$
+				e.gc.drawString(Constants.EMPTY_STRING + i + "%", accumulate, 58, true); //$NON-NLS-1$ //$NON-NLS-2$
 			} else {
-				e.gc.drawString("" + i + "%", accumulate - 10, 58, true); //$NON-NLS-1$ //$NON-NLS-2$
+				e.gc.drawString(Constants.EMPTY_STRING + i + "%", accumulate - 10, 58, true); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			accumulate = accumulate + width / 10;
 			i = i + 10;
@@ -215,7 +215,7 @@ public class SignatureCanvas {
 		
 		e.gc.fillRectangle(accum, 15, widthValue ,getHeight());
 		e.gc.textExtent(signature.getKey().name());
-		e.gc.drawText(signature.getValue() + "", (accum + (int)Math.round((percentaje * getWidth())/100)/2), 20); //$NON-NLS-1$
+		e.gc.drawText(signature.getValue() + Constants.EMPTY_STRING, (accum + (int)Math.round((percentaje * getWidth())/100)/2), 20); //$NON-NLS-1$
 	}
 
 	public Composite getComposite() {

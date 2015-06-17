@@ -85,6 +85,7 @@ import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 
 import changescribe.core.preferences.PreferenceConstants;
 import co.edu.unal.colswe.changescribe.core.Activator;
+import co.edu.unal.colswe.changescribe.core.Constants;
 import co.edu.unal.colswe.changescribe.core.Messages;
 import co.edu.unal.colswe.changescribe.core.commitsignature.InformationDialog;
 import co.edu.unal.colswe.changescribe.core.commitsignature.SignatureCanvas;
@@ -347,7 +348,7 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		if (!isCommitWithoutFilesAllowed()) {
 			MessageDialog.openWarning(getShell(), "No files selected", "You do not selected files to be commited");
 			return;
-		} else if(!validateCommit().equals("")) {
+		} else if(!validateCommit().equals(Constants.EMPTY_STRING)) {
 			MessageDialog.openWarning(getShell(), "Error", validateCommit());
 			return;
 		}
@@ -366,7 +367,7 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 			
 			CommitCommand commit = git.commit();
 			commit.setAuthor(getAuthor(), getAuthor());
-			commit.setCommitter(getCommitter(), "");
+			commit.setCommitter(getCommitter(), Constants.EMPTY_STRING);
 			commit.setMessage(editor.getText().getText());
 			commit.call();
 			
@@ -406,7 +407,7 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		if (committerValue.length() == 0) {
 			return "Empty or Invalid committer";
 		}
-		return "";
+		return Constants.EMPTY_STRING;
 	}
 	
 	@Override

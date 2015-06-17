@@ -93,10 +93,10 @@ public class SummarizeChanges {
 		this.otherFiles = new LinkedList<>();
 		this.typesProblem = new LinkedList<>();
 		this.modules = new ArrayList<>();
-		this.summary = "";
+		this.summary = Constants.EMPTY_STRING;
 		
 		if(changedListDialog != null) {
-			changedListDialog.getEditor().getText().setText("");
+			changedListDialog.getEditor().getText().setText(Constants.EMPTY_STRING);
 		}
 		removeCreatedPackages();
 	}
@@ -104,7 +104,7 @@ public class SummarizeChanges {
 	@SuppressWarnings("unused")
 	public void summarize(final ChangedFile[] differences) {
 		initSummary(differences);
-		String currentPackage = "";
+		String currentPackage = Constants.EMPTY_STRING;
 		
 		if(null != projectPath && !projectPath.isEmpty()) {
 			analyzeForShell();
@@ -118,18 +118,18 @@ public class SummarizeChanges {
 			StereotypeIdentifier identifier = null;
 			try {
 				System.out.println("CHANGE TYPE: " + file.getChangeType());
-				if (file.getAbsolutePath().endsWith(".java")) {
+				if (file.getAbsolutePath().endsWith(Constants.JAVA_EXTENSION)) {
 					if (file.getChangeType().equals(TypeChange.UNTRACKED.name()) || file.getChangeType().equals(TypeChange.ADDED.name())) {
-						if (file.getAbsolutePath().endsWith(".java")) {
+						if (file.getAbsolutePath().endsWith(Constants.JAVA_EXTENSION)) {
 							identifier = identifyStereotypes(file,file.getChangeType());
 						}
 					} else if (file.getChangeType().equals(
 							TypeChange.REMOVED.name())) {
-						if (file.getAbsolutePath().endsWith(".java")) {
+						if (file.getAbsolutePath().endsWith(Constants.JAVA_EXTENSION)) {
 							identifier = identifyStereotypes(file, file.getChangeType());
 						}
 					} else if (file.getChangeType().equals(TypeChange.MODIFIED.name())) {
-						if (file.getAbsolutePath().endsWith(".java")) {
+						if (file.getAbsolutePath().endsWith(Constants.JAVA_EXTENSION)) {
 							identifier = identifyStereotypes(file,file.getChangeType());
 						}
 					}
@@ -159,20 +159,20 @@ public class SummarizeChanges {
 							StereotypeIdentifier identifier = null;
 							try {
 								System.out.println("CHANGE TYPE: " + file.getChangeType());
-								if (file.getAbsolutePath().endsWith(".java")) {
+								if (file.getAbsolutePath().endsWith(Constants.JAVA_EXTENSION)) {
 									if (file.getChangeType().equals(TypeChange.UNTRACKED.name()) || file.getChangeType().equals(TypeChange.ADDED.name())) {
-										if (file.getAbsolutePath().endsWith(".java")) {
+										if (file.getAbsolutePath().endsWith(Constants.JAVA_EXTENSION)) {
 											monitor.subTask("Identifying stereotypes for " + file.getName());
 											identifier = identifyStereotypes(file,file.getChangeType());
 										}
 									} else if (file.getChangeType().equals(
 											TypeChange.REMOVED.name())) {
-										if (file.getAbsolutePath().endsWith(".java")) {
+										if (file.getAbsolutePath().endsWith(Constants.JAVA_EXTENSION)) {
 											monitor.subTask("Identifying stereotypes for " + file.getName());
 											identifier = identifyStereotypes(file, file.getChangeType());
 										}
 									} else if (file.getChangeType().equals(TypeChange.MODIFIED.name())) {
-										if (file.getAbsolutePath().endsWith(".java")) {
+										if (file.getAbsolutePath().endsWith(Constants.JAVA_EXTENSION)) {
 											monitor.subTask("Identifying stereotypes for "+ file.getName());
 											identifier = identifyStereotypes(file,file.getChangeType());
 										}
@@ -240,7 +240,7 @@ public class SummarizeChanges {
 			impact.calculateImpactSet();
 		}
 		
-		String currentPackage = "";
+		String currentPackage = Constants.EMPTY_STRING;
 		StringBuilder desc = new StringBuilder(); 
 		
 		int i = 1;
@@ -255,9 +255,9 @@ public class SummarizeChanges {
 		for(Entry<String, StereotypeIdentifier> identifier : summarized.entrySet()) {
 			
 			if(i==15) { 
-				System.out.println("");;
+				System.out.println(Constants.EMPTY_STRING);;
 			}
-			StringBuilder descTmp = new StringBuilder("");
+			StringBuilder descTmp = new StringBuilder(Constants.EMPTY_STRING);
 			StereotypeIdentifier calculated = identifiers.get(identifiers.indexOf(identifier.getValue()));
 			if(filtering && calculated != null && calculated.getImpactPercentaje() <= (filterFactor) ) {
 				continue;
@@ -265,7 +265,7 @@ public class SummarizeChanges {
 			if(i == 1) {
 				desc.append(" This change set is mainly composed of:  \n\n");
 			}
-			if(currentPackage.trim().equals("")) {
+			if(currentPackage.trim().equals(Constants.EMPTY_STRING)) {
 				currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
 				System.out.println("current 1: " + currentPackage);
 				desc.append(i + ". Changes to package " + currentPackage + ":  \n\n");
@@ -304,10 +304,10 @@ public class SummarizeChanges {
 				if(!identifier.getValue().getChangedFile().isRenamed()) {
 					descTmp.append((i - 1) + "." + j + ". " + identifier.getValue().toString());
 				} else {
-					descTmp.append((i - 1) + "." + j + ". " + "Rename type " + identifier.getValue().getChangedFile().getRenamedPath().substring(identifier.getValue().getChangedFile().getRenamedPath().lastIndexOf("/") + 1).replace(".java", "") + " with " + identifier.getValue().getChangedFile().getName().replace(".java", "\n\n"));
+					descTmp.append((i - 1) + "." + j + ". " + "Rename type " + identifier.getValue().getChangedFile().getRenamedPath().substring(identifier.getValue().getChangedFile().getRenamedPath().lastIndexOf("/") + 1).replace(Constants.JAVA_EXTENSION, Constants.EMPTY_STRING) + " with " + identifier.getValue().getChangedFile().getName().replace(Constants.JAVA_EXTENSION, "\n\n"));
 				}
 			}
-			if(!descTmp.toString().equals("")) {
+			if(!descTmp.toString().equals(Constants.EMPTY_STRING)) {
 				desc.append(descTmp.toString());
 				j++;
 			}
@@ -368,7 +368,7 @@ public class SummarizeChanges {
 		if(modules != null && modules.size() == 0) {
 			return;
 		}
-		StringBuilder descTmp = new StringBuilder("");
+		StringBuilder descTmp = new StringBuilder(Constants.EMPTY_STRING);
 		String connector = (modules.size() == 1)?" this new module":" these new modules";
 		descTmp.append("The commit includes" + connector + ": \n\n");
 		for (Module module : modules) {
@@ -434,7 +434,7 @@ public class SummarizeChanges {
 		File previousType = null;
 		File currentType = null;
 		try {
-			if(olderVersionId != null && !olderVersionId.equals("")) { 
+			if(olderVersionId != null && !olderVersionId.equals(Constants.EMPTY_STRING)) { 
 				previousType = Utils.getFileContentOfCommitID(file.getPath(), getGit().getRepository(), olderVersionId);
 			} else {
 				previousType = Utils.getFileContentOfLastCommit(file.getPath(), getGit().getRepository());
@@ -494,7 +494,7 @@ public class SummarizeChanges {
 	@SuppressWarnings("unchecked")
 	public String summarizeCommitStereotype() {
 		List<StereotypedMethod> methods = new ArrayList<StereotypedMethod>();
-		String result = "";
+		String result = Constants.EMPTY_STRING;
 		
 		for(StereotypeIdentifier identifier : identifiers) {
 			for(StereotypedElement element : identifier.getStereotypedElements()) {
@@ -575,14 +575,14 @@ public class SummarizeChanges {
 			projectName = changedListDialog.getSelection().getElementName();
 			
 			if(file.getPath().startsWith(projectName)) {
-				res = changedListDialog.getSelection().getProject().findMember(file.getPath().replaceFirst(projectName, ""));
+				res = changedListDialog.getSelection().getProject().findMember(file.getPath().replaceFirst(projectName, Constants.EMPTY_STRING));
 			} else {
 				res = changedListDialog.getSelection().getProject().findMember(file.getPath());
 			}
 			stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(res, changedListDialog.getSelection()), 0, 0);
 		} else if(null == projectPath){
 			projectName = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).getName();
-			res = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).findMember(file.getPath().replaceFirst(projectName, ""));
+			res = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).findMember(file.getPath().replaceFirst(projectName, Constants.EMPTY_STRING));
 			IFile ifile = ProjectInformation.getSelectedProject().getWorkspace().getRoot().getFile(res.getFullPath());
 			stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(ifile), 0, 0);
 		} else {
@@ -604,14 +604,14 @@ public class SummarizeChanges {
 
 	public StereotypeIdentifier getRemovedStereotypeIdentifier(ChangedFile file) {
 		try {
-			String removedFile = "";
-			if(olderVersionId != null && !olderVersionId.equals("")) { 
+			String removedFile = Constants.EMPTY_STRING;
+			if(olderVersionId != null && !olderVersionId.equals(Constants.EMPTY_STRING)) { 
 				removedFile = Utils.getStringContentOfCommitID(file.getPath(), getGit().getRepository(), olderVersionId);
 			} else {
 				removedFile = Utils.getStringContentOfLastCommit(file.getPath(), getGit().getRepository());
 			}
 			IPackageFragment pack = null;
-			String packageName = "";
+			String packageName = Constants.EMPTY_STRING;
 			packageName = "commsummtmp." + CompilationUtils.getPackageNameFromStringClass(removedFile);
 			IFolder folder = ((IJavaProject) changedListDialog.getSelection()).getProject().getFolder("src");
 			pack = changedListDialog.getSelection().getPackageFragmentRoot(folder).createPackageFragment(packageName, true, null);
@@ -638,14 +638,14 @@ public class SummarizeChanges {
 	
 	public StereotypeIdentifier getModifiedStereotypeIdentifier(ChangedFile file) {
 		try {
-			String removedFile = "";
-			if(olderVersionId != null && !olderVersionId.equals("")) { 
+			String removedFile = Constants.EMPTY_STRING;
+			if(olderVersionId != null && !olderVersionId.equals(Constants.EMPTY_STRING)) { 
 				removedFile = Utils.getStringContentOfCommitID(file.getPath(), getGit().getRepository(), olderVersionId);
 			} else {
 				removedFile = Utils.getStringContentOfLastCommit(file.getPath(), getGit().getRepository());
 			}
 			IPackageFragment pack = null;
-			String packageName = "";
+			String packageName = Constants.EMPTY_STRING;
 			packageName = "commsummtmp." + CompilationUtils.getPackageNameFromStringClass(removedFile);
 			IFolder folder = ((IJavaProject)changedListDialog.getSelection()).getProject().getFolder("src");
 			pack = changedListDialog.getSelection().getPackageFragmentRoot(folder).createPackageFragment(packageName, true, null);

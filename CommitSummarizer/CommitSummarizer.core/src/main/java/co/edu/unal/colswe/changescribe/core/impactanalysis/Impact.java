@@ -25,6 +25,7 @@ import org.eclipse.jdt.internal.core.SourceField;
 import org.eclipse.jdt.internal.core.SourceMethod;
 import org.eclipse.jdt.internal.core.SourceType;
 
+import co.edu.unal.colswe.changescribe.core.Constants;
 import co.edu.unal.colswe.changescribe.core.stereotype.stereotyped.StereotypeIdentifier;
 
 @SuppressWarnings("restriction")
@@ -76,13 +77,13 @@ public class Impact {
 	        	workspaceScope = SearchEngine.createWorkspaceScope();
 	        }
 	        
-	        String typeName = "";
+	        String typeName = Constants.EMPTY_STRING;
 	        if(identifier.getCompilationUnit().findPrimaryType() != null) {
 	        	typeName = identifier.getCompilationUnit().findPrimaryType().getElementName();
 	        } else {
 	        	typeName = identifier.getCompilationUnit().getElementName();
-	        	if(typeName.endsWith(".java")) {
-	        		typeName = typeName.replace(".java", "");
+	        	if(typeName.endsWith(Constants.JAVA_EXTENSION)) {
+	        		typeName = typeName.replace(Constants.JAVA_EXTENSION, Constants.EMPTY_STRING);
 	        	}
 	        }
 	        
@@ -108,7 +109,7 @@ public class Impact {
 		int i = 0;
 		for(final StereotypeIdentifier cf : identifiers) {
 			if(cf.getChangedFile().getPath().startsWith(projectName)) {
-				scope[i] = JavaCore.create(project.findMember(cf.getChangedFile().getPath().replaceFirst(projectName, "")));
+				scope[i] = JavaCore.create(project.findMember(cf.getChangedFile().getPath().replaceFirst(projectName, Constants.EMPTY_STRING)));
 			} else if(null != cf.getCompilationUnit()) {
 				scope[i] = cf.getCompilationUnit();
 			} else {
@@ -141,22 +142,17 @@ public class Impact {
 						for (IType iType : types) {
 							IType type = null;
 							@SuppressWarnings("unused")
-							String typeName = "";
+							String typeName = Constants.EMPTY_STRING;
 							if(identifier.getCompilationUnit().getAllTypes() != null && identifier.getCompilationUnit().getAllTypes().length > 0) {
 								type = identifier.getCompilationUnit().getAllTypes()[0];
 								typeName = type.getFullyQualifiedName();
 							}
-							//if(!iType.getFullyQualifiedName().equals(typeName)) {
-								methods += iType.getMethods().length;
-							/*} else {
-								methods += iType.getMethods().length / 4;
-							}*/
+							methods += iType.getMethods().length;
 						}
 					} catch (JavaModelException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
 				}
 				identifier.setImpactPercentaje((methods / getTotal()) * 100);
 			} else {
@@ -196,7 +192,6 @@ public class Impact {
 				if (identifier.getCompilationUnit().exists()) {
 					IType[] allTypes = identifier.getCompilationUnit().getAllTypes();
 					for (IType iType : allTypes) {
-						//((SourceType)iType.getChildren()[3]).getMethods()
 						if(iType.isAnonymous()) {
 							System.out.println("INNER");
 						}

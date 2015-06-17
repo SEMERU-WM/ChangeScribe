@@ -8,6 +8,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
+import co.edu.unal.colswe.changescribe.core.Constants;
 import co.edu.unal.colswe.changescribe.core.stereotype.stereotyped.StereotypedElement;
 import co.edu.unal.colswe.changescribe.core.textgenerator.phrase.util.MethodPhraseUtils;
 import co.edu.unal.colswe.changescribe.core.textgenerator.phrase.util.PhraseUtils;
@@ -63,16 +64,14 @@ public class MethodPhraseGenerator implements PhraseGenerator {
 	@SuppressWarnings("unchecked")
 	private void generateSimpleDescription() {
 		String methodName = Tokenizer.split(getMethod().getName().getFullyQualifiedName());
-		String className = "";
-		String returnType = "";
+		String className = Constants.EMPTY_STRING;
+		String returnType = Constants.EMPTY_STRING;
 		if(getMethod().getReturnType2() != null) {
 			returnType = getMethod().getReturnType2().toString();
 		}
 		if(getMethod().getParent() instanceof TypeDeclaration) {
 			className = Tokenizer.split(((TypeDeclaration) getMethod().getParent()).getName().toString());
-		} /*else if(getMethod().getParent() instanceof AnonymousClassDeclaration) {
-			className = Tokenizer.split(((AnonymousClassDeclaration) getMethod().getParent())..toString());
-		}*/
+		} 
 		
 	 final LinkedList<TaggedTerm> taggedMethod = POSTagger.tag(Tokenizer.split(getMethod().getName().getFullyQualifiedName()));
         if (getMethod().isConstructor()) {
