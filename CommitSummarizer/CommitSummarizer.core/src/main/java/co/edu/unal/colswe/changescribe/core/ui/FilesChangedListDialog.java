@@ -126,12 +126,12 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		this.items = differences;
 		listSelectionDialog = new ListSelectionDialog(shell, differences,
 				new ArrayContentProvider(),
-				new LabelProvider(), "Changes");
+				new LabelProvider(), Messages.FilesChangedListDialog_Changes);
 		this.git = git;
 		this.setSelection(selection);
 		this.setHelpAvailable(false);
-		setAuthor("anonymous");
-		setCommitter("anonymous");
+		setAuthor(Constants.ANONYMOUS); 
+		setCommitter(Constants.ANONYMOUS); 
 		
 		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(new IPropertyChangeListener() {
 		    @Override
@@ -150,7 +150,7 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 	public void refreshView() {
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
-				MessageDialog.openInformation(getShell(), Messages.INFORMATION, "You must close the window for the changes to take effect");
+				MessageDialog.openInformation(getShell(), Messages.INFORMATION, Messages.FilesChangedListDialog_CloseDialogWindow);
 			}});
 	}
 	
@@ -272,9 +272,9 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 	protected void createButtonsForButtonBar(Composite parent) {
 		toolkit.adapt(parent, false, false);
 		commitAndPushButton = createButton(parent, COMMIT_AND_PUSH_ID,
-				"Commit and push", false);
+				Messages.FilesChangedListDialog_CommitPush, false);
 		commitButton = createButton(parent, IDialogConstants.OK_ID,
-				"Commit", true);
+				Messages.FilesChangedListDialog_Commit, true);
 		createButton(parent, IDialogConstants.CANCEL_ID,
 				IDialogConstants.CANCEL_LABEL, false);
 		updateMessage();
@@ -318,7 +318,7 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 			}
 		});
 		MenuItem preferencesItem = new MenuItem(menu, SWT.PUSH);
-		preferencesItem.setText("Configure link");
+		preferencesItem.setText(Messages.FilesChangedListDialog_ConfigureLink);
 		preferencesItem.addSelectionListener(new SelectionAdapter() {
 
 			public void widgetSelected(SelectionEvent e) {
@@ -346,10 +346,10 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 	@Override
 	protected void okPressed() {
 		if (!isCommitWithoutFilesAllowed()) {
-			MessageDialog.openWarning(getShell(), "No files selected", "You do not selected files to be commited");
+			MessageDialog.openWarning(getShell(), Messages.NO_FILES_SELECTED_TITLE, Messages.NO_FILES_SELECTED_MESSAGE); //$NON-NLS-1$
 			return;
 		} else if(!validateCommit().equals(Constants.EMPTY_STRING)) {
-			MessageDialog.openWarning(getShell(), "Error", validateCommit());
+			MessageDialog.openWarning(getShell(), Messages.FilesChangedListDialog_Error, validateCommit());
 			return;
 		}
 
@@ -402,10 +402,10 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		String authorValue = author;
 		String committerValue = committer;
 		if (authorValue.length() == 0) {
-			return "Empty or Invalid author";
+			return Messages.FilesChangedListDialog_EmptyAuthor;
 		}
 		if (committerValue.length() == 0) {
-			return "Empty or Invalid committer";
+			return Messages.FilesChangedListDialog_EmptyCommiter;
 		}
 		return Constants.EMPTY_STRING;
 	}
@@ -413,7 +413,7 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite container = (Composite) super.createDialogArea(parent);
-		parent.getShell().setText("Commit changes");
+		parent.getShell().setText(Messages.FilesChangedListDialog_CommitChanges);
 
 		container = toolkit.createComposite(container);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -431,8 +431,8 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		sashForm.setWeights(new int[] { 50, 50 });
 		applyDialogFont(container);
 		container.pack();
-		setTitle("Commit Changes");
-		setMessage("Commit message", IMessageProvider.INFORMATION);
+		setTitle(Messages.FilesChangedListDialog_CommitChanges);
+		setMessage(Messages.FilesChangedListDialog_CommitMessage, IMessageProvider.INFORMATION);
 
 		filesViewer.addCheckStateListener(new ICheckStateListener() {
 
@@ -453,7 +453,7 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 				.applyTo(messageAndPersonArea);
 
 		Section messageSection = toolkit.createSection(messageAndPersonArea, ExpandableComposite.TITLE_BAR | ExpandableComposite.CLIENT_INDENT);
-		messageSection.setText("Commit message");
+		messageSection.setText(Messages.FilesChangedListDialog_CommitMessage);
 		Composite messageArea = toolkit.createComposite(messageSection);
 		GridLayoutFactory.fillDefaults().spacing(0, 0).extendedMargins(2, 2, 2, 2).applyTo(messageArea);
 		toolkit.paintBordersFor(messageArea);
@@ -549,11 +549,11 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		resourcesTree.setHeaderVisible(true);
 		
 		TreeColumn statCol = new TreeColumn(resourcesTree, SWT.LEFT);
-		statCol.setText("Status");
+		statCol.setText(Messages.FilesChangedListDialog_Status);
 		statCol.setWidth(150);
 
 		TreeColumn resourceCol = new TreeColumn(resourcesTree, SWT.LEFT);
-		resourceCol.setText("Path");
+		resourceCol.setText(Messages.FilesChangedListDialog_Path);
 		resourceCol.setWidth(415);
 
 		filesViewer = resourcesTreeComposite.getCheckboxTreeViewer();
@@ -585,13 +585,13 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		ToolItem describeChangesItem = new ToolItem(filesToolbar, SWT.PUSH);
 		Image describeImage = UIIcons.ANNOTATE.createImage();
 		describeChangesItem.setImage(describeImage);
-		describeChangesItem.setToolTipText("Describe changes");
+		describeChangesItem.setToolTipText(Messages.FilesChangedListDialog_DescribeChanges);
 		describeChangesItem.addSelectionListener(new SummarizeChangeListener(this));
 
 		ToolItem checkAllItem = new ToolItem(filesToolbar, SWT.PUSH);
 		Image checkImage = UIIcons.CHECK_ALL.createImage();
 		checkAllItem.setImage(checkImage);
-		checkAllItem.setToolTipText("Select All");
+		checkAllItem.setToolTipText(Messages.FilesChangedListDialog_SelectAll);
 		checkAllItem.addSelectionListener(new SelectionAdapter() {
 
 			public void widgetSelected(SelectionEvent e) {
@@ -605,7 +605,7 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		ToolItem uncheckAllItem = new ToolItem(filesToolbar, SWT.PUSH);
 		Image uncheckImage = UIIcons.UNCHECK_ALL.createImage();
 		uncheckAllItem.setImage(uncheckImage);
-		uncheckAllItem.setToolTipText("Deselect All");
+		uncheckAllItem.setToolTipText(Messages.FilesChangedListDialog_DeselectAll);
 		uncheckAllItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				filesViewer.setAllChecked(false);
@@ -623,7 +623,7 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 	}
 	
 	private void updateFileSectionText() {
-		filesSection.setText(MessageFormat.format("Modified files (selected {0} of {1})",
+		filesSection.setText(MessageFormat.format(Messages.FilesChangedListDialog_ChangedFileListTitle,
 				Integer.valueOf(filesViewer.getCheckedElements().length),
 				Integer.valueOf(filesViewer.getTree().getItemCount())));
 	}
@@ -649,10 +649,10 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 
 		String commitMsg = getEditor().getText().getText().toString();
 		if (commitMsg == null || commitMsg.trim().length() == 0) {
-			message = "Empty message";
+			message = Messages.FilesChangedListDialog_EmptyMessage;
 			type = IMessageProvider.INFORMATION;
 		} else if (!isCommitWithoutFilesAllowed()) {
-			message = "No files selected";
+			message = Messages.FilesChangedListDialog_EmptySelection;
 			type = IMessageProvider.INFORMATION;
 		}
 
@@ -680,7 +680,7 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 		orange = new Color(getShell().getDisplay(), 255, 127, 0);
 		blue = getShell().getDisplay().getSystemColor(SWT.COLOR_BLUE);
 		
-		Font font = new Font(getShell().getDisplay(), "Courier", 10, SWT.NORMAL);
+		Font font = new Font(getShell().getDisplay(), Messages.FilesChangedListDialog_FontType, 10, SWT.NORMAL);
 		getText().setFont(font);
 
 		StyleRange range1 = new StyleRange(0, 4, orange, null);

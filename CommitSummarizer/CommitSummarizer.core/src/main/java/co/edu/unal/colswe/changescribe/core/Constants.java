@@ -15,5 +15,6 @@ public class Constants {
 	public static final String JAVA_EXTENSION = ".java";
 	public static final String EMPTY_STRING = "";
 	public static final String SLASH = "/";
+	public static final String ANONYMOUS = "anonymous";
 
 }

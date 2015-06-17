@@ -31,8 +31,6 @@ public class SCMRepository {
 		} catch(NoClassDefFoundError e) {
 			System.out.println("you did not select a java project");
 		}
-		
-		
 		if(project !=  null) {
 			openRepository(ProjectInformation.getSelectedProject()
 					.getProject().getLocationURI().getPath().toString());

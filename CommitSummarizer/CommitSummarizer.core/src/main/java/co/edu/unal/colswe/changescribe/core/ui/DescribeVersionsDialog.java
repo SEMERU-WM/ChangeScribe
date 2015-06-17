@@ -88,6 +88,7 @@ import co.edu.unal.colswe.changescribe.core.util.UIPreferences;
 import co.edu.unal.colswe.changescribe.core.util.UIUtils;
 
 public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
+	private static final String DIALOG_SETTINGS_SECTION_NAME = Activator.getDefault() + ".COMMIT_DIALOG_SECTION"; //$NON-NLS-1$
 	private StyledText text;
 	private Git git;
 	private IJavaProject selection;
@@ -101,7 +102,6 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 	private SignatureCanvas signatureCanvas;
 	private Text olderVersionText;
 	private Text newerVersionText;
-	private static final String DIALOG_SETTINGS_SECTION_NAME = Activator.getDefault() + ".COMMIT_DIALOG_SECTION"; //$NON-NLS-1$
 	private SashForm sashForm;
 	private Composite messageAndPersonArea;
 	private String commitCurrentID = Constants.EMPTY_STRING;
@@ -111,7 +111,6 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 	public DescribeVersionsDialog(Shell shell, Set<ChangedFile> differences, Git git, IJavaProject selection) {
 		super(shell);
 		shellTmp = shell;
-
 		this.git = git;
 		this.setSelection(selection);
 		this.setHelpAvailable(false);
@@ -133,7 +132,7 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 	public void refreshView() {
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
-				MessageDialog.openInformation(getShell(), Messages.INFORMATION, "You must close the window for the changes to take effect");
+				MessageDialog.openInformation(getShell(), Messages.INFORMATION, Messages.FilesChangedListDialog_CloseDialogWindow);
 			}});
 	}
 	
@@ -293,7 +292,7 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 			}
 		});
 		MenuItem preferencesItem = new MenuItem(menu, SWT.PUSH);
-		preferencesItem.setText("Configure link");
+		preferencesItem.setText(Messages.FilesChangedListDialog_ConfigureLink);
 		preferencesItem.addSelectionListener(new SelectionAdapter() {
 
 			public void widgetSelected(SelectionEvent e) {
@@ -320,11 +319,11 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 	
 	protected String validateCommit() {
 		if (olderVersionText.getText().length() == 0 ) {
-			return "Empty or invalid older commit id"; 
+			return Messages.DescribeVersionsDialog_EmptyOlderCommit; 
 		}
 
 		if (newerVersionText.getText().length() == 0 ) {
-			return "Empty or invalid newer commit id";
+			return Messages.DescribeVersionsDialog_EmptyNewerCommit;
 		}
 		
 		return Constants.EMPTY_STRING;
@@ -334,11 +333,11 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite container = (Composite) super.createDialogArea(parent);
-		parent.getShell().setText("Commit changes");
+		parent.getShell().setText(Messages.FilesChangedListDialog_CommitChanges);
 
 		container = createDialogAreaUtil(container);
-		setTitle("Commit Changes");
-		setMessage("Commit message", IMessageProvider.INFORMATION);
+		setTitle(Messages.FilesChangedListDialog_CommitChanges);
+		setMessage(Messages.FilesChangedListDialog_CommitMessage, IMessageProvider.INFORMATION); //$NON-NLS-1$
 
 		filesViewer.addCheckStateListener(new ICheckStateListener() {
 
@@ -379,7 +378,7 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 
 		Section messageSection = toolkit.createSection(messageAndPersonArea, 
 				ExpandableComposite.TITLE_BAR | ExpandableComposite.CLIENT_INDENT);
-		messageSection.setText("Commit message");
+		messageSection.setText(Messages.FilesChangedListDialog_CommitMessage);
 		Composite messageArea = toolkit.createComposite(messageSection);
 		GridLayoutFactory.fillDefaults().spacing(0, 0).extendedMargins(2, 2, 2, 2).applyTo(messageArea);
 		toolkit.paintBordersFor(messageArea);
@@ -395,20 +394,18 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 		
 		messageSection.setTextClient(headerArea);
 		
-		///////////////////
-		
 		Composite personArea = toolkit.createComposite(messageAndPersonArea);
 		toolkit.paintBordersFor(personArea);
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(personArea);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(personArea);
 
-		toolkit.createLabel(personArea, "Older Commit ID: ").setForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
+		toolkit.createLabel(personArea, Messages.DescribeVersionsDialog_OlderCommitId).setForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
 		setOlderVersionText(toolkit.createText(personArea, null));
 		getOlderVersionText().setText(commitPreviousID);
 		getOlderVersionText().setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
 		getOlderVersionText().setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 		
-		toolkit.createLabel(personArea, "Newer Commit ID: ").setForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
+		toolkit.createLabel(personArea, Messages.DescribeVersionsDialog_NewerCommitId).setForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
 		setNewerVersionText(toolkit.createText(personArea, null));
 		getNewerVersionText().setText(commitCurrentID);
 		getNewerVersionText().setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
@@ -494,11 +491,11 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 
 		resourcesTree.setHeaderVisible(true);
 		TreeColumn statCol = new TreeColumn(resourcesTree, SWT.LEFT);
-		statCol.setText("Status");
+		statCol.setText(Messages.FilesChangedListDialog_Status);
 		statCol.setWidth(150);
 
 		TreeColumn resourceCol = new TreeColumn(resourcesTree, SWT.LEFT);
-		resourceCol.setText("Path");
+		resourceCol.setText(Messages.FilesChangedListDialog_Path);
 		resourceCol.setWidth(415);
 
 		filesViewer = resourcesTreeComposite.getCheckboxTreeViewer();
@@ -531,13 +528,13 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 		ToolItem computeModificationsItem = new ToolItem(filesToolbar, SWT.PUSH);
 		Image describeImage2 = UIIcons.EXTRACT_DIFFERENCES.createImage();
 		computeModificationsItem.setImage(describeImage2);
-		computeModificationsItem.setToolTipText("Compute modifications");
+		computeModificationsItem.setToolTipText(Messages.DescribeVersionsDialog_ComputeChanges);
 		computeModificationsItem.addSelectionListener(new SelectionListener() {
 			
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				if(!validateCommit().equals(Constants.EMPTY_STRING)) {
-					MessageDialog.openWarning(getShell(), "Error", validateCommit());
+					MessageDialog.openWarning(getShell(), Messages.FilesChangedListDialog_Error, validateCommit()); //$NON-NLS-1$
 				} else {
 					computeModifications();
 				}
@@ -551,13 +548,13 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 		ToolItem describeChangesItem = new ToolItem(filesToolbar, SWT.PUSH);
 		Image describeImage = UIIcons.ANNOTATE.createImage();
 		describeChangesItem.setImage(describeImage);
-		describeChangesItem.setToolTipText("Describe changes");
+		describeChangesItem.setToolTipText(Messages.FilesChangedListDialog_DescribeChanges);
 		describeChangesItem.addSelectionListener(new SummarizeVersionChangesListener(this));
 
 		ToolItem checkAllItem = new ToolItem(filesToolbar, SWT.PUSH);
 		Image checkImage = UIIcons.CHECK_ALL.createImage();
 		checkAllItem.setImage(checkImage);
-		checkAllItem.setToolTipText("Select All");
+		checkAllItem.setToolTipText(Messages.FilesChangedListDialog_SelectAll);
 		checkAllItem.addSelectionListener(new SelectionAdapter() {
 
 			public void widgetSelected(SelectionEvent e) {
@@ -571,7 +568,7 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 		ToolItem uncheckAllItem = new ToolItem(filesToolbar, SWT.PUSH);
 		Image uncheckImage = UIIcons.UNCHECK_ALL.createImage();
 		uncheckAllItem.setImage(uncheckImage);
-		uncheckAllItem.setToolTipText("Deselect All");
+		uncheckAllItem.setToolTipText(Messages.FilesChangedListDialog_DeselectAll);
 		uncheckAllItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				filesViewer.setAllChecked(false);
@@ -587,7 +584,7 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 	private void computeModifications() {
 		Set<ChangedFile> modifications = DescribeVersionsDialogUtil.computeModifications(this.getShell(), git, getOlderVersionText().getText(), getNewerVersionText().getText());
 		listSelectionDialog = new ListSelectionDialog(this.shellTmp.getShell(), 
-				modifications, new ArrayContentProvider(), new LabelProvider(), "Changes");
+				modifications, new ArrayContentProvider(), new LabelProvider(), Messages.FilesChangedListDialog_Changes);
 		items = modifications;
 		if(items != null) {
 			filesViewer.setInput(items.toArray());
@@ -595,7 +592,7 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 	}
 	
 	private void updateFileSectionText() {
-		filesSection.setText(MessageFormat.format("Modified files (selected {0} of {1})",
+		filesSection.setText(MessageFormat.format(Messages.FilesChangedListDialog_ChangedFileListTitle,
 				Integer.valueOf(filesViewer.getCheckedElements().length),
 				Integer.valueOf(filesViewer.getTree().getItemCount())));
 	}
@@ -618,10 +615,10 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 		String commitMsg = getEditor().getText().getText().toString();
 		
 		if (commitMsg == null || commitMsg.trim().length() == 0) {
-			message = "Empty message";
+			message = Messages.FilesChangedListDialog_EmptyMessage;
 			type = IMessageProvider.INFORMATION;
 		} else if (!isCommitWithoutFilesAllowed()) {
-			message = "No files selected";
+			message = Messages.FilesChangedListDialog_EmptySelection;
 			type = IMessageProvider.INFORMATION;
 		} 
 		setMessage(message, type);
@@ -644,7 +641,7 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 		orange = new Color(getShell().getDisplay(), 255, 127, 0);
 		blue = getShell().getDisplay().getSystemColor(SWT.COLOR_BLUE);
 		
-		Font font = new Font(getShell().getDisplay(), "Courier", 10, SWT.NORMAL);
+		Font font = new Font(getShell().getDisplay(), Messages.FilesChangedListDialog_FontType, 10, SWT.NORMAL);
 		getText().setFont(font);
 
 		StyleRange range1 = new StyleRange(0, 4, orange, null);
