@@ -25,11 +25,11 @@ import co.edu.unal.colswe.changescribe.core.stereotype.taxonomy.MethodStereotype
 
 public class StereotypedMethod extends MethodStereotypeRules implements
 		StereotypedElement {
+	private static Pattern METHOD_KEY_PATTERN;
 	private MethodDeclaration method;
 	private MethodStereotype primaryStereotype;
 	private MethodStereotype secondaryStereotype;
 	private StringBuilder report;
-	private static Pattern METHOD_KEY_PATTERN;
 
 	static {
 		StereotypedMethod.METHOD_KEY_PATTERN = Pattern

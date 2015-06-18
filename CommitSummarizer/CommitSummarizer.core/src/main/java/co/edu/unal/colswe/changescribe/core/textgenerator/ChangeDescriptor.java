@@ -15,8 +15,6 @@ public class ChangeDescriptor {
 		template.append(typeDescriptor.generateDescription(change.getChangeType()));
 		template.append(artifactName(change));
 		template.append(rootNodeName(change));
-		//change.getParentEntity().getAstNode();
-		
 		//TODO describe each change according to granularity level
 		
 		return template.toString();
@@ -29,6 +27,4 @@ public class ChangeDescriptor {
 	public String artifactName(SourceCodeChange change) {
 		return " " + change.getChangedEntity().getUniqueName();
 	}
-	
-
 }

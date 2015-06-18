@@ -679,5 +679,4 @@ public class ModificationDescriptor {
 	public void setOnlyStructuralChanges(boolean onlyStructuralChanges) {
 		this.onlyStructuralChanges = onlyStructuralChanges;
 	}
-
 }

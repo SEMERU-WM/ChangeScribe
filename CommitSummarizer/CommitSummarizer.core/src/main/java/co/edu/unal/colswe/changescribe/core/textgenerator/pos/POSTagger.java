@@ -11,7 +11,6 @@ public class POSTagger {
 	public static void init() {
 		if (POSTagger.tagger == null) {
 				POSTagger.tagger = new MaxentTagger( "res/taggers/wsj-0-18-left3words-distsim.tagger");
-			
 		}
 	}
 

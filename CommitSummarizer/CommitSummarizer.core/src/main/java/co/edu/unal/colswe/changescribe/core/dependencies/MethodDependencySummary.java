@@ -82,5 +82,4 @@ public class MethodDependencySummary extends DependencySummary {
 	public void setConstructor(boolean isConstructor) {
 		this.isConstructor = isConstructor;
 	}
-
 }

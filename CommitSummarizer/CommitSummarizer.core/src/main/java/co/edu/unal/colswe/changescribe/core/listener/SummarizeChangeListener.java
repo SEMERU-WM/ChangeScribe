@@ -34,8 +34,7 @@ public class SummarizeChangeListener implements SelectionListener {
 			summarizer.summarize(changedListDialog.getSelectedFiles());
 		} else {
 			MessageDialog.openInformation(changedListDialog.getShell(), Messages.INFORMATION,
-					"You do not select any change");
-			
+					Messages.FilesChangedListDialog_EmptySelection);
 		}
 	}
 

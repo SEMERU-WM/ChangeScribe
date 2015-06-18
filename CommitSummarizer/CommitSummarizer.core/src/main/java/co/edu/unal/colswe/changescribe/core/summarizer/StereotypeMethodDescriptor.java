@@ -27,5 +27,4 @@ public class StereotypeMethodDescriptor {
 		}
 		return description;
 	}
-
 }

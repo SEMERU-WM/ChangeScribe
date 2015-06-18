@@ -20,6 +20,7 @@ import co.edu.unal.colswe.changescribe.core.ProjectInformation;
 
 public class InformationDialog extends TitleAreaDialog {
 	
+	private static final int MIN_HEIGHT = 400;
 	private FormToolkit toolkit;
 
 	public InformationDialog(Shell shell) {
@@ -27,37 +28,37 @@ public class InformationDialog extends TitleAreaDialog {
 		this.setHelpAvailable(false);
 	}
 	
-	
 	 @Override
-	 protected Control createDialogArea(Composite parent) {
+	protected Control createDialogArea(Composite parent) {
+		Browser browser = null;
 		Composite container = (Composite) super.createDialogArea(parent);
-		parent.getShell().setText(Messages.InformationDialog_Help);
+		
 		setTitle(Messages.INFORMATION);
+		parent.getShell().setText(Messages.InformationDialog_Help);
 		
 		container = toolkit.createComposite(container);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		
 		toolkit.paintBordersFor(container);
 		GridLayoutFactory.swtDefaults().applyTo(container);
-		
-		int minHeight = 400;
+
 		Point size = container.getSize();
-		container.setLayoutData(GridDataFactory.fillDefaults()
-				.grab(true, true).hint(size).minSize(size.x, minHeight)
+		container.setLayoutData(GridDataFactory.fillDefaults().grab(true, true)
+				.hint(size).minSize(size.x, InformationDialog.MIN_HEIGHT)
 				.align(SWT.FILL, SWT.FILL).create());
-		
-	    Browser browser = null;
-	    try {
-	    	browser = new Browser(container, SWT.NONE);
-	    } catch(SWTError e) {
-	    	browser = new Browser(container, SWT.MOZILLA);
-	    }
-	    if(browser != null) {
-	    	browser.setUrl(ProjectInformation.getAbsoluteURL(Constants.HELP_RESOURCES_DIR)); //$NON-NLS-1$
-	    	toolkit.adapt(browser, true, true);
-	    	browser.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-	    }
-	    
+
+		try {
+			browser = new Browser(container, SWT.NONE);
+		} catch (SWTError e) {
+			browser = new Browser(container, SWT.MOZILLA);
+		}
+		if (browser != null) {
+			browser.setUrl(ProjectInformation
+					.getAbsoluteURL(Constants.HELP_RESOURCES_DIR)); 
+			toolkit.adapt(browser, true, true);
+			browser.setLayoutData(GridDataFactory.fillDefaults()
+					.grab(true, true).create());
+		}
+
 		return container;
 	}
 	 

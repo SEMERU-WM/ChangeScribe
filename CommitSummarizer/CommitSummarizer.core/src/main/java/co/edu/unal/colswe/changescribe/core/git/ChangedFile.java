@@ -8,8 +8,6 @@ import ch.uzh.ifi.seal.changedistiller.model.entities.StructureEntityVersion;
 
 @SuppressWarnings("rawtypes")
 public class ChangedFile implements Comparable {
-	
-	
 	private String path;
 	private String changeType;
 	private String absolutePath;
@@ -31,16 +29,13 @@ public class ChangedFile implements Comparable {
 		this.absolutePath = rootPath + System.getProperty("file.separator") + (new File(path).getPath());
 	}
 
-
 	public String getPath() {
 		return path;
 	}
 
-
 	public void setPath(String path) {
 		this.path = path;
 	}
-
 
 	public String getChangeType() {
 		return changeType;
@@ -49,17 +44,17 @@ public class ChangedFile implements Comparable {
 	public String getChangeTypeToShow(boolean thirdPerson) {
 		String type = getChangeType();
 		if(!thirdPerson && changeType.equals(TypeChange.UNTRACKED_FOLDERS.toString()) || !thirdPerson && changeType.equals(TypeChange.ADDED.toString()) || !thirdPerson && changeType.equals(TypeChange.UNTRACKED.toString())) {
-			type = "ADD";
+			type = Constants.ADD;
 		} else if(thirdPerson && changeType.equals(TypeChange.UNTRACKED_FOLDERS.toString()) || thirdPerson && changeType.equals(TypeChange.ADDED.toString())  || changeType.equals(TypeChange.UNTRACKED.toString())) { 
-			type = "ADDS";
+			type = Constants.ADDS;
 		} else if(!thirdPerson && changeType.equals(TypeChange.MODIFIED.toString())) {
-			type = "MODIFY";
+			type = Constants.MODIFY;
 		} else if(thirdPerson && changeType.equals(TypeChange.MODIFIED.toString())) {
-			type = "MODIFIES";
+			type = Constants.MODIFIES;
 		} else if(!thirdPerson && changeType.equals(TypeChange.REMOVED.toString())) {
-			type = "REMOVE";
+			type = Constants.REMOVE;
 		} else if(thirdPerson && changeType.equals(TypeChange.REMOVED.toString())) {
-			type = "REMOVES";
+			type = Constants.REMOVES;
 		}
 		return type;
 	}
@@ -142,6 +137,4 @@ public class ChangedFile implements Comparable {
 		this.modifiedMethods = modifiedMethods;
 	}
     
-    
-
 }

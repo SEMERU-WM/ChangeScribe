@@ -16,6 +16,4 @@ public enum CommitStereotype implements CodeStereotype {
     
     private CommitStereotype(final String s, final int n) {
     }
-    
-    
 }

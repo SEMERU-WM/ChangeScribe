@@ -6,8 +6,6 @@ import java.util.regex.Pattern;
 public class Tokenizer
 {
     public static final String SEPARATOR = " ";
-    //private static final String NON_ALPHANUMERIC_REGEX = "[^a-zA-Z0-9]+";
-    //private static final String MULTIPLE_BLANKS_REGEX = "\\s++";
     private static final Pattern MIDDLE_DIGITS;
     private static final Pattern CAMEL_CASE;
     

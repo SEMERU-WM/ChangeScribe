@@ -18,7 +18,6 @@ public class CompilationUtils {
 		final ASTParser parser = ASTParser.newParser(4);
 		parser.setResolveBindings(true);
 		parser.setKind(8);
-		
 		parser.setSource(removedFile.toCharArray());
 		
 		CompilationUnit unit = (CompilationUnit)parser.createAST((IProgressMonitor)null);
@@ -43,7 +42,4 @@ public class CompilationUtils {
 		}
 		return fileType;
 	}
-	
-	
-
 }

@@ -44,7 +44,7 @@ public class JParser {
         
         parser.setSource(unit);
         
-        this.unit = (CompilationUnit)parser.createAST((IProgressMonitor)null);
+        this.unit = (CompilationUnit) parser.createAST((IProgressMonitor)null);
         this.elements = new ArrayList<ASTNode>();
 
     }
@@ -80,8 +80,6 @@ public class JParser {
 	        	System.out.println("Got {} problems compiling the source file: " + problem);
 	        }
 	    }
-        
-        
         this.elements = new ArrayList<ASTNode>();
     }
     

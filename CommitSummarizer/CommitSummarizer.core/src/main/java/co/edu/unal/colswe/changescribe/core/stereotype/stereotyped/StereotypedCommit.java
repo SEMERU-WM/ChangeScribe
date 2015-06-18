@@ -152,6 +152,4 @@ public class StereotypedCommit {
 	public void setMethods(List<StereotypedMethod> methods) {
 		this.methods = methods;
 	}
-
-
 }

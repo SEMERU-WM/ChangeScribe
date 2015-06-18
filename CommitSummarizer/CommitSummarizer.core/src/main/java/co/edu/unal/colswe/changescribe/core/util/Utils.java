@@ -51,7 +51,6 @@ public class Utils {
 		treeWalk.setPostOrderTraversal(true);
 		treeWalk.setFilter(PathFilter.create(filePath));
 		if (!treeWalk.next()) {
-			
 			//TODO the file is added to project
 			throw new IllegalStateException(
 					"CHANGECOMMIT -- Did not find expected file '" + filePath + "'");
@@ -66,7 +65,6 @@ public class Utils {
 	public static String getStringContentOfLastCommit(String filePath,Repository repository) throws RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException, IOException {
 		// find the HEAD
 		ObjectId lastCommitId = repository.resolve(Constants.HEAD);
-
 		// a RevWalk allows to walk over commits based on some filtering that is
 		// defined
 		RevWalk revWalk = new RevWalk(repository);
@@ -74,7 +72,6 @@ public class Utils {
 		// and using commit's tree find the path
 		RevTree tree = commit.getTree();
 		System.out.println("Having tree: " + tree);
-
 		// now try to find a specific file
 		TreeWalk treeWalk = new TreeWalk(repository);
 		treeWalk.addTree(tree);
@@ -82,7 +79,6 @@ public class Utils {
 		treeWalk.setPostOrderTraversal(true);
 		treeWalk.setFilter(PathFilter.create(filePath));
 		if (!treeWalk.next()) {
-			
 			//TODO the file is added to project
 			throw new IllegalStateException(
 					"CHANGECOMMIT -- Did not find expected file '" + filePath + "'");
@@ -118,18 +114,14 @@ public class Utils {
 			throw new IllegalStateException(
 					"CHANGECOMMIT -- Did not find expected file '" + filePath + "'");
 		}
-
 		ObjectId objectId = treeWalk.getObjectId(0);
 		ObjectLoader loader = repository.open(objectId);
-		
 		return IOUtils.stringFromFile(Utils.inputStreamToFile(loader.openStream()).getAbsolutePath(), "utf-8");
 	}
 	
 	public static File getFileContentOfCommitID(String filePath,Repository repository, String commitID) throws RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException, IOException {
 		// find the HEAD
 		ObjectId lastCommitId = repository.resolve(commitID);
-		
-
 		// a RevWalk allows to walk over commits based on some filtering that is
 		// defined
 		RevWalk revWalk = new RevWalk(repository);
@@ -137,8 +129,6 @@ public class Utils {
 		// and using commit's tree find the path
 		RevTree tree = commit.getTree();
 		System.out.println("Having tree: " + tree); 
-
-		// now try to find a specific file
 		TreeWalk treeWalk = new TreeWalk(repository);
 		treeWalk.addTree(tree);
 		treeWalk.setRecursive(true);
@@ -165,21 +155,16 @@ public class Utils {
 
 	public static File inputStreamToFile(InputStream is) throws IOException {
 		File contentFile = File.createTempFile("tmpCont", ".txt");
-
 		OutputStream outputStream = null;
 		outputStream = new FileOutputStream(contentFile);
-		
 		int read = 0;
 		byte[] bytes = new byte[1024];
- 
 		while ((read = is.read(bytes)) != -1) {
 			outputStream.write(bytes, 0, read);
 		}
-		
 		outputStream.close();
 		
 		return contentFile;
-		
 	}
 	
 	public static String cleanRelativePath(String path) {
@@ -188,19 +173,15 @@ public class Utils {
 			newPath.replaceAll("/", System.getProperty("file.separator"));
 		}
 		return newPath;
-		
 	}
 	
 	public static void compareModified(ChangedFile file,Git git) {
 		File previousType = null;
-		
 		try {
 			previousType = Utils.getFileContentOfLastCommit(file.getPath(), git.getRepository());
-			
 			if(previousType == null) {
 				throw new Exception("File renamed");
 			}
-			
 		} catch (RevisionSyntaxException e) {
 			e.printStackTrace();
 		} catch (AmbiguousObjectException e) {
@@ -217,11 +198,9 @@ public class Utils {
 	public static boolean isInitialCommit(Git git) {
 		boolean isInitialCommit = true;
 		LogCommand log = git.log();
-		
 		Iterable<RevCommit> commits = null;
 		try {
 			commits = log.all().call();
-			
 			for (RevCommit revCommit : commits) {
 				revCommit.getId();
 				isInitialCommit = false;
@@ -238,7 +217,6 @@ public class Utils {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 		
 		return isInitialCommit;
 	}

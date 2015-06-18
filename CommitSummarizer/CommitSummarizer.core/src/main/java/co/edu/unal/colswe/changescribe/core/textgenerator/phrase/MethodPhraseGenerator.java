@@ -30,10 +30,8 @@ public class MethodPhraseGenerator implements PhraseGenerator {
 		super();
 		this.element = element;
 		this.type = type;
-		
 		this.method = (MethodDeclaration)  element.getElement();
 		setParameters();
-		
 	}
 	
 	@SuppressWarnings("unchecked")

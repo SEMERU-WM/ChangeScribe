@@ -123,5 +123,4 @@ public class SCMRepository {
 	public void setProjectPath(String projectPath) {
 		this.projectPath = projectPath;
 	}
-	
 }

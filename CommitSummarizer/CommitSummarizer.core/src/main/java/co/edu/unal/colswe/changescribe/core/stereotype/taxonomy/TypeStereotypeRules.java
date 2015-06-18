@@ -9,8 +9,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import co.edu.unal.colswe.changescribe.core.stereotype.stereotyped.StereotypedMethod;
 
-public class TypeStereotypeRules
-{
+public class TypeStereotypeRules {
     protected TypeDeclaration type;
     protected Set<StereotypedMethod> totalMethods;
     protected Set<StereotypedMethod> getMethods;

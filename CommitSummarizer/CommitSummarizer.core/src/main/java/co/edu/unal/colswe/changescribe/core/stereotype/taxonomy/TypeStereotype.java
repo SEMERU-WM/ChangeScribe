@@ -42,6 +42,4 @@ public enum TypeStereotype implements CodeStereotype {
 	private void setId(int id) {
 		this.id = id;
 	}
-    
-    
 }

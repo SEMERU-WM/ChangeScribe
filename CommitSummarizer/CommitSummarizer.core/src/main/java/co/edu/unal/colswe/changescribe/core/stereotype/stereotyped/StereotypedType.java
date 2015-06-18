@@ -348,35 +348,6 @@ public class StereotypedType extends TypeStereotypeRules implements StereotypedE
     }
     
     private void completeReport() {
-        /*this.report.append("\n\nMethod counters (without considering constructors and methods overriding Object's methods)");
-        this.report.append("\nTOTAL" + Reporter.SEPARATOR + this.totalMethods.size());
-        this.report.append(Constants.NEW_LINE + MethodStereotype.Category.ACCESSOR + Reporter.SEPARATOR + this.accessorMethods.size());
-        this.report.append(Constants.NEW_LINE + MethodStereotype.Category.MUTATOR + Reporter.SEPARATOR + this.mutatorMethods.size());
-        this.report.append(Constants.NEW_LINE + MethodStereotype.Category.COLLABORATIONAL + Reporter.SEPARATOR + this.collaborationalMethods.size());
-        this.report.append(Constants.NEW_LINE + MethodStereotype.Category.DEGENERATE + Reporter.SEPARATOR + this.degenerateMethods.size());
-        this.report.append(Constants.NEW_LINE + MethodStereotype.GET + Reporter.SEPARATOR + this.getMethods.size());
-        this.report.append(Constants.NEW_LINE + MethodStereotype.PREDICATE + Reporter.SEPARATOR + this.predicateMethods.size());
-        this.report.append(Constants.NEW_LINE + MethodStereotype.PROPERTY + Reporter.SEPARATOR + this.propertyMethods.size());
-        this.report.append(Constants.NEW_LINE + MethodStereotype.VOID_ACCESSOR + Reporter.SEPARATOR + this.voidAccessorMethods.size());
-        this.report.append(Constants.NEW_LINE + MethodStereotype.SET + Reporter.SEPARATOR + this.setMethods.size());
-        this.report.append(Constants.NEW_LINE + MethodStereotype.COMMAND + Reporter.SEPARATOR + this.commandMethods.size());
-        this.report.append(Constants.NEW_LINE + MethodStereotype.NON_VOID_COMMAND + Reporter.SEPARATOR + this.nonVoidCommandMethods.size());
-        this.report.append(Constants.NEW_LINE + MethodStereotype.FACTORY + Reporter.SEPARATOR + this.factoryMethods.size());
-        this.report.append(Constants.NEW_LINE + MethodStereotype.LOCAL_CONTROLLER + Reporter.SEPARATOR + this.localControllerMethods.size());
-        this.report.append(Constants.NEW_LINE + MethodStereotype.COLLABORATOR + Reporter.SEPARATOR + this.collaboratorMethods.size());
-        this.report.append(Constants.NEW_LINE + MethodStereotype.CONTROLLER + Reporter.SEPARATOR + this.controllerMethods.size());
-        this.report.append(Constants.NEW_LINE + MethodStereotype.INCIDENTAL + Reporter.SEPARATOR + this.incidentalMethods.size());
-        this.report.append(Constants.NEW_LINE + MethodStereotype.EMPTY + Reporter.SEPARATOR + this.emptyMethods.size());
-        this.report.append(Constants.NEW_LINE + MethodStereotype.ABSTRACT + Reporter.SEPARATOR + this.abstractMethods.size());
-        final StringBuilder typeInfo = new StringBuilder(String.valueOf(this.getKey()) + Reporter.SEPARATOR + Reporter.SEPARATOR);
-        if (this.primaryStereotype != null) {
-            typeInfo.append(String.valueOf(Reporter.SEPARATOR) + this.primaryStereotype);
-        }
-        if (this.secondaryStereotype != null) {
-            typeInfo.append(String.valueOf(Reporter.SEPARATOR) + this.secondaryStereotype);
-        }
-        typeInfo.append(Constants.NEW_LINE);
-        this.report.insert(0, typeInfo.toString());*/
     }
     
     public String getName() {

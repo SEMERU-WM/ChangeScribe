@@ -21,5 +21,9 @@ public class Constants {
 	public static final int SIGNATURE_MIN_VALUE = 0;
 	public static final int SIGNATURE_MAX_VALUE = 100;
 	public static final int SIGNATURE_INCREMENT = 1;
+	public static final String UNDERSCORE = "_";
+	public static final String ADDS = "ADDS";
+	public static final String MODIFIES = "MODIFIES";
+	public static final String REMOVES = "REMOVES";
 
 }

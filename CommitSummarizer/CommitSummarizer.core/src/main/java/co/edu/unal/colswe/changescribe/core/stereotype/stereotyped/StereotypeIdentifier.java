@@ -163,6 +163,4 @@ public class StereotypeIdentifier {
 	public void setImpactPercentaje(double impactPercentaje) {
 		this.impactPercentaje = impactPercentaje;
 	}
-	
-	
 }

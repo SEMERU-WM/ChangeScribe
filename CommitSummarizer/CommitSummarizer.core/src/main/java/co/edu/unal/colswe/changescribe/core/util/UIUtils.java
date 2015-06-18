@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IWorkbenchWindow;
 
+import co.edu.unal.colswe.changescribe.core.Messages;
 import co.edu.unal.colswe.changescribe.core.ui.UIIcons;
 
 public class UIUtils {
@@ -28,7 +29,7 @@ public class UIUtils {
 		ToolItem help = new ToolItem(filesToolbar,SWT.PUSH);
 	    Image img = UIIcons.HELP.createImage(); 
 	    help.setImage(img);
-	    help.setToolTipText("Help");
+	    help.setToolTipText(Messages.UIUtils_Help);
 	    return help;
 	}
 }

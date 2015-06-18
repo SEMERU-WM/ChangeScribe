@@ -737,5 +737,4 @@ public class SummarizeChanges {
 	public void setFilterFactor(double filterFactor) {
 		this.filterFactor = filterFactor;
 	}
-
 }

@@ -19,5 +19,4 @@ public class ImpactSetDescriptor {
 		
 		return dependency.toString();
 	}
-
 }

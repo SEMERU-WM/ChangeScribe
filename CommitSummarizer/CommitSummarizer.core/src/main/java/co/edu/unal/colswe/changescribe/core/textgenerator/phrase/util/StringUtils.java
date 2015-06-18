@@ -8,7 +8,5 @@ public class StringUtils {
 			text = text.substring(0, text.length() - 2);
 		}
 		return text;
-		
 	}
-	
 }

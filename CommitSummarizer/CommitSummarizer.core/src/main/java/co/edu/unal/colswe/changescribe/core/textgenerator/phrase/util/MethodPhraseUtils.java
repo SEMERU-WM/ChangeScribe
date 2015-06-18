@@ -74,7 +74,5 @@ public class MethodPhraseUtils {
 			paramsConcat += " " + param.getType().toString() + " " + param.getName() + ", ";
 		}
 		return paramsConcat.trim();
-		
 	}
-
 }
