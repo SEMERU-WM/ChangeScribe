@@ -53,6 +53,8 @@ public class Messages extends NLS {
 
 	public static String FilesChangedListDialog_Status;
 
+	public static String HandlerUtil_RepositoryNotFound;
+
 	public static String INFORMATION;
 	public static String InformationDialog_Help;
 	public static String SignatureCanvas_Amount;
@@ -61,6 +63,17 @@ public class Messages extends NLS {
 	
 	public static String NO_FILES_SELECTED_TITLE;
 	public static String NO_FILES_SELECTED_MESSAGE;
+	public static String PreferencePage_Author;
+
+	public static String PreferencePage_Commiter;
+
+	public static String PreferencePage_FilterCommitMessage;
+
+	public static String PreferencePage_FilterFactor;
+
+	public static String PreferencePage_SectionTitle;
+
+	public static String PreferencePage_ViewCommitSignature;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -13,6 +13,8 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import co.edu.unal.colswe.changescribe.core.Activator;
+import co.edu.unal.colswe.changescribe.core.Constants;
+import co.edu.unal.colswe.changescribe.core.Messages;
 
 /**
  * This class represents a preference page that
@@ -33,8 +35,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 	public PreferencePage() {
 		super(GRID);
 		setPreferenceStore(Activator.getDefault().getPreferenceStore());
-		setDescription("Setting preferences of Commit Summarize plugin");
-		
+		setDescription(Messages.PreferencePage_SectionTitle);
 	}
 	
 	/**
@@ -46,13 +47,13 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 	public void createFieldEditors() {
 		BooleanFieldEditor commitSignatureActive = new BooleanFieldEditor(
 				PreferenceConstants.P_COMMIT_SIGNATURE_ACTIVE,
-				"&View commit signature",
+				Messages.PreferencePage_ViewCommitSignature,
 				getFieldEditorParent());
 		addField(commitSignatureActive);
 		
 		BooleanFieldEditor filterCk = new BooleanFieldEditor(
 				PreferenceConstants.P_FILTER_COMMIT_MESSAGE,
-				"&Filter commit message",
+				Messages.PreferencePage_FilterCommitMessage,
 				getFieldEditorParent());
 		filterCk.setPropertyChangeListener(new IPropertyChangeListener() {
 			
@@ -65,37 +66,25 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 		
 		addField(filterCk);
 		
-		//final StringFieldEditor fieldEditor = new StringFieldEditor(PreferenceConstants.P_FILTER_FACTOR, "&Filter factor:", getFieldEditorParent());
-		final ScaleFieldEditor scaleFieldEditor = new ScaleFieldEditor(PreferenceConstants.P_FILTER_FACTOR, "&Filter factor:", getFieldEditorParent());
-		scaleFieldEditor.setMinimum(0);
-		scaleFieldEditor.setMaximum(100);
-		scaleFieldEditor.setPageIncrement(1);
-		final StringFieldEditor fieldEditor = new StringFieldEditor(PreferenceConstants.P_FILTER_FACTOR, "", getFieldEditorParent());
+		final ScaleFieldEditor scaleFieldEditor = new ScaleFieldEditor(PreferenceConstants.P_FILTER_FACTOR, Messages.PreferencePage_FilterFactor, getFieldEditorParent());
+		scaleFieldEditor.setMinimum(Constants.SIGNATURE_MIN_VALUE);
+		scaleFieldEditor.setMaximum(Constants.SIGNATURE_MAX_VALUE);
+		scaleFieldEditor.setPageIncrement(Constants.SIGNATURE_INCREMENT);
+		final StringFieldEditor fieldEditor = new StringFieldEditor(PreferenceConstants.P_FILTER_FACTOR, Constants.EMPTY_STRING, getFieldEditorParent());
 		fieldEditor.setEnabled(false, getFieldEditorParent());
 		scaleFieldEditor.getScaleControl().addListener(SWT.Selection,
 				new Listener() {
 					public void handleEvent(Event event) {
 						int perspectiveValue = scaleFieldEditor.getScaleControl().getSelection() + scaleFieldEditor.getMinimum();
-						fieldEditor.setStringValue("" + perspectiveValue + " % ");
+						fieldEditor.setStringValue(perspectiveValue + Constants.SPACE + Constants.PERCENTAJE);
 					}
 		});
 		
-		fieldEditor.setStringValue(Activator.getDefault().getPreferenceStore().getDouble(PreferenceConstants.P_FILTER_FACTOR) + " % ");
+		fieldEditor.setStringValue(Activator.getDefault().getPreferenceStore().getDouble(PreferenceConstants.P_FILTER_FACTOR) + Constants.SPACE + Constants.PERCENTAJE);
 		
 		addField(scaleFieldEditor);
-		addField(new StringFieldEditor(PreferenceConstants.P_AUTHOR, "&Author:", getFieldEditorParent()));
-		addField(new StringFieldEditor(PreferenceConstants.P_COMMITER, "&Commiter:", getFieldEditorParent()));
-		
-		/*filterCk.setPropertyChangeListener(new IPropertyChangeListener() {
-			
-			@Override
-			public void propertyChange(PropertyChangeEvent event) {
-				if(fieldEditor != null) {
-					fieldEditor.setEnabled((boolean) event.getNewValue(), getFieldEditorParent());
-				}
-			}
-		});*/
-
+		addField(new StringFieldEditor(PreferenceConstants.P_AUTHOR, Messages.PreferencePage_Author, getFieldEditorParent()));
+		addField(new StringFieldEditor(PreferenceConstants.P_COMMITER, Messages.PreferencePage_Commiter, getFieldEditorParent()));
 	}
 
 	/* (non-Javadoc)

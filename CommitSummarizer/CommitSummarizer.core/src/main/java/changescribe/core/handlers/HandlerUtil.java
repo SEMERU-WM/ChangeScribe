@@ -61,13 +61,11 @@ public class HandlerUtil {
 			}
 			differences = SCMRepository.getDifferences(status,git.getRepository().getWorkTree().getAbsolutePath());
 		} else {
-			UIUtils.showInformationWindow(window, Messages.INFORMATION, "Git repository not found!");
+			UIUtils.showInformationWindow(window, Messages.INFORMATION, Messages.HandlerUtil_RepositoryNotFound);
 		}
 		return differences;
 	}
 
-	
-	
 	public static IJavaProject getJavaProject(Object selected) {
 		IJavaProject project = null;
 		if(selected instanceof IMember) {

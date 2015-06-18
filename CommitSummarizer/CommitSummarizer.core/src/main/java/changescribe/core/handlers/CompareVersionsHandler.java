@@ -49,8 +49,4 @@ public class CompareVersionsHandler extends AbstractHandler {
 		}
 		return null;
 	}
-	
-	
-
-
 }

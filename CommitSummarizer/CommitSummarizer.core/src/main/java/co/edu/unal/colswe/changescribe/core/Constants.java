@@ -16,5 +16,10 @@ public class Constants {
 	public static final String EMPTY_STRING = "";
 	public static final String SLASH = "/";
 	public static final String ANONYMOUS = "anonymous";
+	public static final double FILTER_FACTOR_DEFAULT = 10;
+	public static final String PERCENTAJE =  "%";
+	public static final int SIGNATURE_MIN_VALUE = 0;
+	public static final int SIGNATURE_MAX_VALUE = 100;
+	public static final int SIGNATURE_INCREMENT = 1;
 
 }
