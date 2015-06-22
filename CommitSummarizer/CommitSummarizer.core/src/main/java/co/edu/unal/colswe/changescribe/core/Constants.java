@@ -25,5 +25,6 @@ public class Constants {
 	public static final String ADDS = "ADDS";
 	public static final String MODIFIES = "MODIFIES";
 	public static final String REMOVES = "REMOVES";
+	public static final String EQUAL = "=";
 
 }
