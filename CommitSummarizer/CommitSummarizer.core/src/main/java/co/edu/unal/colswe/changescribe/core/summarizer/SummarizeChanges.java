@@ -53,7 +53,6 @@ import co.edu.unal.colswe.changescribe.core.ui.IDialog;
 import co.edu.unal.colswe.changescribe.core.util.Utils;
 
 public class SummarizeChanges {
-	
 	private Git git;
 	private StereotypeIdentifier stereotypeIdentifier;
 	private List<Module> modules;
@@ -117,7 +116,6 @@ public class SummarizeChanges {
 		for (final ChangedFile file : differences) {
 			StereotypeIdentifier identifier = null;
 			try {
-				System.out.println("CHANGE TYPE: " + file.getChangeType());
 				if (file.getAbsolutePath().endsWith(Constants.JAVA_EXTENSION)) {
 					if (file.getChangeType().equals(TypeChange.UNTRACKED.name()) || file.getChangeType().equals(TypeChange.ADDED.name())) {
 						if (file.getAbsolutePath().endsWith(Constants.JAVA_EXTENSION)) {
@@ -144,7 +142,6 @@ public class SummarizeChanges {
 				e.printStackTrace();
 			}
 		}
-		
 		composeCommitMessage();
 	}
 
@@ -158,7 +155,6 @@ public class SummarizeChanges {
 						protected IStatus run(IProgressMonitor monitor) {
 							StereotypeIdentifier identifier = null;
 							try {
-								System.out.println("CHANGE TYPE: " + file.getChangeType());
 								if (file.getAbsolutePath().endsWith(Constants.JAVA_EXTENSION)) {
 									if (file.getChangeType().equals(TypeChange.UNTRACKED.name()) || file.getChangeType().equals(TypeChange.ADDED.name())) {
 										if (file.getAbsolutePath().endsWith(Constants.JAVA_EXTENSION)) {
@@ -224,7 +220,6 @@ public class SummarizeChanges {
 	}
 
 	public void updateTextInputDescription() {
-		System.out.println("updateTextInputDescription");
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
 				composeCommitMessage();
@@ -234,29 +229,24 @@ public class SummarizeChanges {
 	}
 	
 	protected void composeCommitMessage() {
+		String currentPackage = Constants.EMPTY_STRING;
+		StringBuilder desc = new StringBuilder(); 
+		int i = 1;
+		int j = 1;
+		boolean isInitialCommit = Utils.isInitialCommit(git); 
+		
 		if(null == projectPath) {
 			Impact impact = new Impact(identifiers);
 			impact.setProject(ProjectInformation.getProject(ProjectInformation.getSelectedProject()));
 			impact.calculateImpactSet();
 		}
 		
-		String currentPackage = Constants.EMPTY_STRING;
-		StringBuilder desc = new StringBuilder(); 
-		
-		int i = 1;
-		int j = 1;
-		
-		boolean isInitialCommit = Utils.isInitialCommit(git); 
 		if(isInitialCommit) {
 			getNewModules();
 			describeNewModules(desc);
 		} 
 		
 		for(Entry<String, StereotypeIdentifier> identifier : summarized.entrySet()) {
-			
-			if(i==15) { 
-				System.out.println(Constants.EMPTY_STRING);;
-			}
 			StringBuilder descTmp = new StringBuilder(Constants.EMPTY_STRING);
 			StereotypeIdentifier calculated = identifiers.get(identifiers.indexOf(identifier.getValue()));
 			if(filtering && calculated != null && calculated.getImpactPercentaje() <= (filterFactor) ) {
@@ -267,7 +257,6 @@ public class SummarizeChanges {
 			}
 			if(currentPackage.trim().equals(Constants.EMPTY_STRING)) {
 				currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
-				System.out.println("current 1: " + currentPackage);
 				desc.append(i + ". Changes to package " + currentPackage + ":  \n\n");
 				i++;
 			} else if(!currentPackage.equals(identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName())) {
@@ -281,7 +270,6 @@ public class SummarizeChanges {
 					}
 				}
 				currentPackage = identifier.getValue().getParser().getCompilationUnit().getPackage().getName().getFullyQualifiedName();
-				System.out.println("current 2: " + currentPackage);
 				desc.append(i + ". Changes to package " + currentPackage + ":  \n\n");
 				j = 1;
 				i++;
@@ -336,10 +324,7 @@ public class SummarizeChanges {
 			changedListDialog.getEditor().getText().setText(desc.toString());
 			changedListDialog.updateSignatureCanvas();
 			changedListDialog.updateMessage();
-		} else {
-			System.out.println(desc.toString());
-			
-		}
+		} 
 		this.setSummary(desc.toString());
 		removeCreatedPackages();
 	}
@@ -364,12 +349,11 @@ public class SummarizeChanges {
 	}
 
 	protected void describeNewModules(StringBuilder desc) {
-		
 		if(modules != null && modules.size() == 0) {
 			return;
 		}
 		StringBuilder descTmp = new StringBuilder(Constants.EMPTY_STRING);
-		String connector = (modules.size() == 1)?" this new module":" these new modules";
+		String connector = (modules.size() == 1) ? " this new module" : " these new modules";
 		descTmp.append("The commit includes" + connector + ": \n\n");
 		for (Module module : modules) {
 			if(!descTmp.toString().contains("\t- " + module.getModuleName() + Constants.NEW_LINE)) {
@@ -414,16 +398,13 @@ public class SummarizeChanges {
 		String tmpFolderPath = "src/commsummtmp";
 		if(null != changedListDialog && null != changedListDialog.getSelection()) {
 			folder = ((IJavaProject) changedListDialog.getSelection()).getProject().getFolder(tmpFolderPath);
-			
 			try {
 				folder.delete(true, null);
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
-			
 		} else if(null != projectPath && !projectPath.isEmpty()) {
 			File tmpFolder = new File(projectPath + System.getProperty("file.separator") + tmpFolderPath);
-			
 			if(tmpFolder.exists()) {
 				tmpFolder.delete();
 			}
@@ -441,7 +422,6 @@ public class SummarizeChanges {
 			}
 			currentType = new File(file.getAbsolutePath());
 			distiller.extractClassifiedSourceCodeChanges(previousType, currentType);
-			
 		} catch (RevisionSyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -476,18 +456,14 @@ public class SummarizeChanges {
 						identifier.getBuilder().append(summarizeType.getBuilder().toString());
 					}
 				}
-				
-				
 				String key = element.getQualifiedName();
 				if(!key.contains(".")) {
 					key = identifier.getParser().getCompilationUnit().getPackage().getName() + "." + element.getQualifiedName();
 				}
-				
 				if(!summarized.containsKey(key) && !summarized.containsValue(identifier)) {
 					summarized.put(key, identifier);
 				}
 				i++;
-				
 		}
 	}
 	
@@ -515,6 +491,7 @@ public class SummarizeChanges {
 				}
 			}
 		}
+		
 		if(methods.size() > 0) {
 			StereotypedCommit stereotypedCommit = new StereotypedCommit(methods);
 			stereotypedCommit.buildSignature();
@@ -550,13 +527,13 @@ public class SummarizeChanges {
 	}
 	
 	public StereotypeIdentifier identifyStereotypes(ChangedFile file, String scmOperation) {
-		
-		if(scmOperation.equals(TypeChange.ADDED.toString()) ||scmOperation.equals(TypeChange.UNTRACKED.toString()) || scmOperation.equals(TypeChange.MODIFIED.toString())) {
+		if(scmOperation.equals(TypeChange.ADDED.toString()) ||
+				scmOperation.equals(TypeChange.UNTRACKED.toString()) || 
+				scmOperation.equals(TypeChange.MODIFIED.toString())) {
 			getAddedStereotypeIdentifier(file);
 		} else if(scmOperation.equals(TypeChange.REMOVED.toString())) {
 			stereotypeIdentifier = getRemovedStereotypeIdentifier(file);
 		} 
-		
 		stereotypeIdentifier.identifyStereotypes();
 		stereotypeIdentifier.setScmOperation(scmOperation);
 		stereotypeIdentifier.setChangedFile(file);
@@ -567,7 +544,6 @@ public class SummarizeChanges {
 	}
 	
 	public StereotypeIdentifier getAddedStereotypeIdentifier(ChangedFile file) {
-		
 		String projectName;
 		IResource res;
 		
@@ -595,8 +571,6 @@ public class SummarizeChanges {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} 
-			
-			
 		}
 		
 		return stereotypeIdentifier;
