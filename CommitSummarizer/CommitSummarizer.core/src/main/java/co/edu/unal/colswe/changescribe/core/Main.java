@@ -11,10 +11,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
 
 import co.edu.unal.colswe.changescribe.core.git.ChangedFile;
 import co.edu.unal.colswe.changescribe.core.git.GitException;
+import co.edu.unal.colswe.changescribe.core.git.RepositoryHistory;
 import co.edu.unal.colswe.changescribe.core.git.SCMRepository;
 import co.edu.unal.colswe.changescribe.core.summarizer.SummarizeChanges;
 
@@ -136,6 +138,8 @@ public class Main {
 			
 			gettingRepositoryStatus();
 			
+			RepositoryHistory.getRepositoryHistory(git);
+			
 			SummarizeChanges summarizer = new SummarizeChanges(git, false, filterFactor, olderVersionId, newerVersionId);
 			summarizer.setProjectPath(projectPath);
 			if(null != differences && differences.size() > 0) {
@@ -148,6 +152,14 @@ public class Main {
 			System.err.println("Not found a repository in the path " + projectPath);
 		} catch (IOException e) {
 			System.err.println("The output file can not be created in " + outputFile);
+		} catch (NoHeadException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (GitAPIException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
+
+	
 }
