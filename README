@@ -34,6 +34,10 @@ Obtaining ChangeScribe
 ChangeScribe is open source, available under Eclipse Public Licence, EPL (http://www.eclipse.org/legal/epl-v10.html). Please cite [1] if you want
 reference ChangeScribe in your scientific work.
 
+Notes
+-------
+ChangeScribe uses a version modified of Change Distiller. You can download here: [a link]https://bitbucket.org/lfcortes12/changedistillermodified
+
 References
 -------
 
