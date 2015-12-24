@@ -15,7 +15,7 @@ import org.eclipse.jgit.revwalk.RevWalk;
 
 public class RepositoryHistory {
 	
-	public static void getRepositoryHistory(Git git) throws NoHeadException, GitAPIException, MissingObjectException, IncorrectObjectTypeException, IOException {
+	public static List<CommitWrapper> getRepositoryHistory(Git git) throws NoHeadException, GitAPIException, MissingObjectException, IncorrectObjectTypeException, IOException {
 		RevWalk walk = new RevWalk(git.getRepository());
 		RevCommit commit = null;
 		List<CommitWrapper> commits = new ArrayList<>(); 
@@ -30,6 +30,8 @@ public class RepositoryHistory {
 		    	commits.add(commitWrapper);
 		    }
 		}
+		
+		return commits;
 	}
 	
 	public static void main(String[] args) {

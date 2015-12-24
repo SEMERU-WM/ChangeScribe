@@ -7,6 +7,8 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -14,7 +16,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import co.edu.unal.colswe.changescribe.core.Messages;
 import co.edu.unal.colswe.changescribe.core.git.ChangedFile;
 import co.edu.unal.colswe.changescribe.core.git.SCMRepository;
-import co.edu.unal.colswe.changescribe.core.ui.DescribeVersionsDialog;
+import co.edu.unal.colswe.changescribe.core.ui.describeversion.DescribeTwoVersionsWizard;
 import co.edu.unal.colswe.changescribe.core.util.UIUtils;
 
 public class CompareVersionsHandler extends AbstractHandler {
@@ -43,7 +45,15 @@ public class CompareVersionsHandler extends AbstractHandler {
 			git = repo.getGit();
 			changescribe.core.handlers.HandlerUtil.createRepository();
 			differences = changescribe.core.handlers.HandlerUtil.initMonitorDialog(selection, git, repo, window);
-			changescribe.core.handlers.HandlerUtil.openMonitorDialog(new DescribeVersionsDialog(window.getShell(), differences, git, javaProject));
+			//changescribe.core.handlers.HandlerUtil.openMonitorDialog(new DescribeVersionsDialog(window.getShell(), differences, git, javaProject));
+			WizardDialog wizardDialog = new WizardDialog(window.getShell(),
+				      new DescribeTwoVersionsWizard(git));
+				    if (wizardDialog.open() == Window.OK) {
+				      System.out.println("Ok pressed");
+				    } else {
+				      System.out.println("Cancel pressed");
+				      }
+				  
 		} catch (final RuntimeException e) {
 			UIUtils.showInformationWindow(window, Messages.INFORMATION, e.getMessage());
 		}

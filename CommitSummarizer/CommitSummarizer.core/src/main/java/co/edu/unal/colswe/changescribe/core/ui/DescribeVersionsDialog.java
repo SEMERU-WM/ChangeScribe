@@ -609,7 +609,6 @@ public class DescribeVersionsDialog extends TitleAreaDialog implements IDialog {
 	}
 	
 	public void updateMessage() {
-
 		String message = null;
 		int type = IMessageProvider.NONE;
 		String commitMsg = getEditor().getText().getText().toString();
