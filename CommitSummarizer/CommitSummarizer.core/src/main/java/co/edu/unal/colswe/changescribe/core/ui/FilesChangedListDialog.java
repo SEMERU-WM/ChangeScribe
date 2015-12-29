@@ -795,4 +795,16 @@ public class FilesChangedListDialog extends TitleAreaDialog implements IDialog {
 			this.author = author;
 		}
 	}
+
+	@Override
+	public Text getOlderVersionText() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Text getNewerVersionText() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

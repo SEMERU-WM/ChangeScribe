@@ -17,6 +17,7 @@ public class RepositoryHistory {
 	
 	public static List<CommitWrapper> getRepositoryHistory(Git git) throws NoHeadException, GitAPIException, MissingObjectException, IncorrectObjectTypeException, IOException {
 		RevWalk walk = new RevWalk(git.getRepository());
+		
 		RevCommit commit = null;
 		List<CommitWrapper> commits = new ArrayList<>(); 
 

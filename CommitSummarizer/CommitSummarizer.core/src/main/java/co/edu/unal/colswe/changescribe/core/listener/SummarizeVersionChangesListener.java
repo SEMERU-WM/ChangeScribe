@@ -10,12 +10,13 @@ import co.edu.unal.colswe.changescribe.core.Activator;
 import co.edu.unal.colswe.changescribe.core.Messages;
 import co.edu.unal.colswe.changescribe.core.summarizer.SummarizeChanges;
 import co.edu.unal.colswe.changescribe.core.ui.DescribeVersionsDialog;
+import co.edu.unal.colswe.changescribe.core.ui.IDialog;
 
 public class SummarizeVersionChangesListener implements SelectionListener {
 
-	private DescribeVersionsDialog changedListDialog;
+	private IDialog changedListDialog;
 	
-	public SummarizeVersionChangesListener(DescribeVersionsDialog changedListDialog) {
+	public SummarizeVersionChangesListener(IDialog changedListDialog) {
 		super();
 		this.changedListDialog = changedListDialog;
 	}
@@ -43,7 +44,7 @@ public class SummarizeVersionChangesListener implements SelectionListener {
 	}
 
 	public DescribeVersionsDialog getChangedListDialog() {
-		return changedListDialog;
+		return (DescribeVersionsDialog) changedListDialog;
 	}
 
 	public void setChangedListDialog(DescribeVersionsDialog changedListDialog) {

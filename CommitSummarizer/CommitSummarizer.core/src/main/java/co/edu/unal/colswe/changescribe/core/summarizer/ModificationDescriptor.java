@@ -486,6 +486,9 @@ public class ModificationDescriptor {
 					System.out.println("hola");
 				}
 			} else {
+				if(update.getChangedEntity().getName() == null) {
+					update.getChangedEntity().setName(update.getChangedEntity().getUniqueName());
+				}
 				String name = (!update.getChangedEntity().getName().equals(Constants.EMPTY_STRING)) ? update.getChangedEntity().getName() : update.getChangedEntity().getAstNode().toString();
 				desc.append("Change attribute type " + name + " with " + update.getNewEntity().getUniqueName().toString());
 			}

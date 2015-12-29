@@ -47,14 +47,17 @@ public class CompareVersionsHandler extends AbstractHandler {
 			differences = changescribe.core.handlers.HandlerUtil.initMonitorDialog(selection, git, repo, window);
 			//changescribe.core.handlers.HandlerUtil.openMonitorDialog(new DescribeVersionsDialog(window.getShell(), differences, git, javaProject));
 			WizardDialog wizardDialog = new WizardDialog(window.getShell(),
-				      new DescribeTwoVersionsWizard(git));
-				    if (wizardDialog.open() == Window.OK) {
-				      System.out.println("Ok pressed");
-				    } else {
-				      System.out.println("Cancel pressed");
-				      }
+				      new DescribeTwoVersionsWizard(git, repo, javaProject));
+			wizardDialog.setPageSize(635, 1500);
+			wizardDialog.setDialogHelpAvailable(false);
+		    if (wizardDialog.open() == Window.OK) {
+		      System.out.println("Ok pressed");
+		    } else {
+		      System.out.println("Cancel pressed");
+		      }
 				  
 		} catch (final RuntimeException e) {
+			e.printStackTrace();
 			UIUtils.showInformationWindow(window, Messages.INFORMATION, e.getMessage());
 		}
 		return null;

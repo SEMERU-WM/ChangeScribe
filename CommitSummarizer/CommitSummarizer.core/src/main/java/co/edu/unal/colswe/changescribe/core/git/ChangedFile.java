@@ -26,6 +26,10 @@ public class ChangedFile implements Comparable {
 		this.path = path;
 		this.changeType = changeType;
 		this.name = new File(path).getName();
+		
+		if(null == this.name || name.equals("null")) {
+			this.name = path.substring(path.lastIndexOf(System.getProperty("file.separator")) + 1);
+		}
 		this.absolutePath = rootPath + System.getProperty("file.separator") + (new File(path).getPath());
 	}
 
@@ -98,6 +102,9 @@ public class ChangedFile implements Comparable {
 	}
 
 	public String getName() {
+		if(null == this.name || name.equals("null")) {
+			this.name = path.substring(path.lastIndexOf(System.getProperty("file.separator")) + 1);
+		}
 		return name;
 	}
 

@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
@@ -71,6 +72,8 @@ public class SummarizeChanges {
 	private String summary;
 	private String olderVersionId;
 	private String newerVersionId;
+	private String projectName;
+	private IResource projectAsResource;
 	
 	public SummarizeChanges(Git git, boolean filtering, double filterFactor, String olderVersionId, String newerVersionId) {
 		super();
@@ -238,7 +241,7 @@ public class SummarizeChanges {
 		if(null == projectPath) {
 			Impact impact = new Impact(identifiers);
 			impact.setProject(ProjectInformation.getProject(ProjectInformation.getSelectedProject()));
-			impact.calculateImpactSet();
+			//impact.calculateImpactSet();
 		}
 		
 		if(isInitialCommit) {
@@ -526,11 +529,14 @@ public class SummarizeChanges {
 		return result;
 	}
 	
-	public StereotypeIdentifier identifyStereotypes(ChangedFile file, String scmOperation) {
+	public StereotypeIdentifier identifyStereotypes(final ChangedFile file, String scmOperation) {
 		if(scmOperation.equals(TypeChange.ADDED.toString()) ||
 				scmOperation.equals(TypeChange.UNTRACKED.toString()) || 
 				scmOperation.equals(TypeChange.MODIFIED.toString())) {
+			/*Display.getDefault().asyncExec(new Runnable() {
+				public void run() {*/
 			getAddedStereotypeIdentifier(file);
+				//}});
 		} else if(scmOperation.equals(TypeChange.REMOVED.toString())) {
 			stereotypeIdentifier = getRemovedStereotypeIdentifier(file);
 		} 
@@ -544,22 +550,20 @@ public class SummarizeChanges {
 	}
 	
 	public StereotypeIdentifier getAddedStereotypeIdentifier(ChangedFile file) {
-		String projectName;
-		IResource res;
-		
 		if(null != changedListDialog && null != changedListDialog.getSelection()) {
+			System.out.println("Calculating stereotypes to: " + file.getPath());
 			projectName = changedListDialog.getSelection().getElementName();
 			
 			if(file.getPath().startsWith(projectName)) {
-				res = changedListDialog.getSelection().getProject().findMember(file.getPath().replaceFirst(projectName, Constants.EMPTY_STRING));
+				projectAsResource = changedListDialog.getSelection().getProject().findMember(file.getPath().replaceFirst(projectName, Constants.EMPTY_STRING));
 			} else {
-				res = changedListDialog.getSelection().getProject().findMember(file.getPath());
+				projectAsResource = changedListDialog.getSelection().getProject().findMember(file.getPath());
 			}
-			stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(res, changedListDialog.getSelection()), 0, 0);
+			stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(projectAsResource, changedListDialog.getSelection()), 0, 0);
 		} else if(null == projectPath){
 			projectName = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).getName();
-			res = ProjectInformation.getProject(ProjectInformation.getSelectedProject()).findMember(file.getPath().replaceFirst(projectName, Constants.EMPTY_STRING));
-			IFile ifile = ProjectInformation.getSelectedProject().getWorkspace().getRoot().getFile(res.getFullPath());
+			projectAsResource = (null != projectAsResource) ? projectAsResource : ProjectInformation.getProject(ProjectInformation.getSelectedProject()).findMember(file.getPath().replaceFirst(projectName, Constants.EMPTY_STRING));
+			IFile ifile = ProjectInformation.getSelectedProject().getWorkspace().getRoot().getFile(projectAsResource.getFullPath());
 			stereotypeIdentifier = new StereotypeIdentifier((ICompilationUnit) JavaCore.create(ifile), 0, 0);
 		} else {
 			try {
@@ -588,6 +592,8 @@ public class SummarizeChanges {
 			String packageName = Constants.EMPTY_STRING;
 			packageName = "commsummtmp." + CompilationUtils.getPackageNameFromStringClass(removedFile);
 			IFolder folder = ((IJavaProject) changedListDialog.getSelection()).getProject().getFolder("src");
+			JavaCore.newProjectEntry(folder.getLocation());
+			changedListDialog.getSelection().getPackageFragmentRoot(folder).createPackageFragment("commsummtmp", true, null);
 			pack = changedListDialog.getSelection().getPackageFragmentRoot(folder).createPackageFragment(packageName, true, null);
 			ICompilationUnit cu = pack.createCompilationUnit(file.getName(), removedFile,true, null);
 			stereotypeIdentifier = new StereotypeIdentifier(cu, 0, 0);

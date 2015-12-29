@@ -78,12 +78,14 @@ public class Impact {
 	        }
 	        
 	        String typeName = Constants.EMPTY_STRING;
-	        if(identifier.getCompilationUnit().findPrimaryType() != null) {
+	        if(null != identifier.getCompilationUnit() && identifier.getCompilationUnit().findPrimaryType() != null) {
 	        	typeName = identifier.getCompilationUnit().findPrimaryType().getElementName();
 	        } else {
-	        	typeName = identifier.getCompilationUnit().getElementName();
-	        	if(typeName.endsWith(Constants.JAVA_EXTENSION)) {
-	        		typeName = typeName.replace(Constants.JAVA_EXTENSION, Constants.EMPTY_STRING);
+	        	if(null != identifier.getCompilationUnit()) {
+		        	typeName = identifier.getCompilationUnit().getElementName();
+		        	if(typeName.endsWith(Constants.JAVA_EXTENSION)) {
+		        		typeName = typeName.replace(Constants.JAVA_EXTENSION, Constants.EMPTY_STRING);
+		        	}
 	        	}
 	        }
 	        
@@ -189,7 +191,7 @@ public class Impact {
 	public void calculateSizeModifiedMethods() {
 		for (StereotypeIdentifier identifier : identifiers) {
 			try {
-				if (identifier.getCompilationUnit().exists()) {
+				if (null != identifier.getCompilationUnit() && identifier.getCompilationUnit().exists()) {
 					IType[] allTypes = identifier.getCompilationUnit().getAllTypes();
 					for (IType iType : allTypes) {
 						if(iType.isAnonymous()) {

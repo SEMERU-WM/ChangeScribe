@@ -42,6 +42,21 @@ public class SCMRepository {
 			}
 		}
 	}
+	
+	public void checkout(String versionID) {
+		if(null != git) {
+			try {
+				if(!versionID.contains("HEAD")) { 
+					git.checkout().setName(versionID).call();
+				} else {
+					git.checkout().setStartPoint(versionID).call();
+				}
+			} catch (GitAPIException e) {
+				e.printStackTrace();
+				throw new GitException("Can't checkout to this version: " + versionID);
+			}
+		}
+	}
 
 	private void openRepository(String path) {
 		File file = new File(path);

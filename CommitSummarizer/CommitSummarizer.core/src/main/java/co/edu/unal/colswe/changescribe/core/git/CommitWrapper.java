@@ -2,7 +2,7 @@ package co.edu.unal.colswe.changescribe.core.git;
 
 import org.eclipse.jgit.revwalk.RevCommit;
 
-public class CommitWrapper {
+public class CommitWrapper implements Comparable<CommitWrapper> {
 	
 	private RevCommit commit;
 	
@@ -17,5 +17,10 @@ public class CommitWrapper {
 
 	public void setCommit(RevCommit commit) {
 		this.commit = commit;
+	}
+
+	@Override
+	public int compareTo(CommitWrapper o) {
+		return commit.getCommitTime() > o.getCommit().getCommitTime() ? 1 : 0;
 	}
 }
