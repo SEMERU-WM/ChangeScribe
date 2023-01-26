@@ -21,7 +21,7 @@
 	<dependency>
 		<groupId>org.eclipse.jgit</groupId>
 		<artifactId>org.eclipse.jgit</artifactId>
-		<version>3.2.0.201312181205-r</version>
+		<version>3.5.3-atlassian-13</version>
 	</dependency>
 	            
   </dependencies>
